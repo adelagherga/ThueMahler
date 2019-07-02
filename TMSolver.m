@@ -594,9 +594,10 @@ prep2:=function(fieldKinfo,ClK,afplist,primelist);
     return alphgamlist;
 end function;
 
-ijkAutL:= function(fieldLinfo)
+ijkAutL:= procedure(~fieldLinfo,fieldKinfo);
     L:= fieldLinfo`field;
     tl:= fieldLinfo`gen;
+    th:= fieldKinfo`gen;
     G,Aut,tau:= AutomorphismGroup(L);
     assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
 
@@ -632,9 +633,11 @@ ijkAutL:= function(fieldLinfo)
     assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3]) and (ijk[3](tl[1]) eq tl[1]);
     assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1]) and (ijk[3](tl[2]) eq tl[2]);
     assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2]) and (ijk[3](tl[3]) eq tl[3]);
+    assert ijk[3](th) eq L!th; // this is the identity automorphism
     
-    return ijk, AutL;
-end function;
+    fieldLinfo`automorphisms:= AutL;
+    fieldLinfo`ijk:= ijk;
+end procedure;
 
 
 UpperBounds:=procedure(fieldKinfo,clist,primelist,a,~alphgamlist,ComplexPrec);
@@ -727,31 +730,244 @@ pAdicLog:=function(elt,p);
 end function;   
 
 
+pLatticePrep:= procedure(fieldKinfo, fieldLinfo,~fieldLpinfo, Case,HeightMultiplier );
 
-Ellipsoid:= function(Case,placeinfo,AutL,HeightBounds,RealPrec);
-
-    // will need this later for real case too
-    ////
+    K:= fieldKinfo`field;
+    OK:= fieldKinfo`ringofintegers;
+    th:= fieldKinfo`gen;
+    f:= fieldKinfo`minpoly;
+    zeta:= fieldKinfo`zeta;
+    epslist:= fieldKinfo`fundamentalunits;
+    assert Degree(K) eq 3;
     
-    ijk:= placeinfo`ijk;
-    gammalistL:= placeinfo`gammalistL;
-    epslistL:= placeinfo`epslistL;
-    tauL:= placeinfo`tauL;
+    L:= fieldLinfo`field;
+    OL:= fieldLinfo`ringofintegers;
+    ijkL:= fieldLinfo`ijk;
+    
+    gammalist:= Case`gammalist;
+    fplist:= Case`ideallist;
+    alpha:= Case`alpha;
+    heightbound:= Case`bound;
+    nu:= #gammalist;
+    r:= #epslist;
+    
+    p:= fieldLpinfo`prime;
+    idealinL:= fieldLpinfo`idealinL;
+
+    runningPrecloop:= true;
+    PrecMultiplier:= 1;
+    
+    //////////////////////////////////////////////
+    // insert heuristic here to check for precision
+    /////////////////////////////////////////
+    heuristicPrec:= Floor(HeightMultiplier*(Log(heightbound)));        // placeholder
+    //////////////////////////////////////////////
+    // insert heuristic here to check for precision
+    /////////////////////////////////////////
+   
+    while runningPrecloop do
+        PrecMultiplier:= PrecMultiplier + 1; 
+        
+        Lp, mapLLp:= Completion(L, idealinL : Precision:= heuristicPrec);
+        fieldLpinfo`field:= Lp;
+        fieldLpinfo`mapLLp:= mapLLp;
+        
+        fprs:=[f[1] : f in Factorisation(p*OK)];        // the prime ideals above p
+
+        thetaL:=[];
+        mapsLL:=[]; 
+        for i in [1..#fprs] do      // runs through each prime ideal above p
+            thetaL[i]:=[];
+            mapsLL[i]:=[];       // the preimage of thetap in L 
+                                        // ie. for th in L, mLp(ijk(th)) is one of the thetap in Lp 
+            Kp, mKp:= Completion(K,fprs[i] : Precision:= heuristicPrec);
+            gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
+            temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
+            for j in [1..#temp] do
+                vals, ind:= Max([Valuation(mapLLp(ijkL[k](L!th)) - temp[j][1]) : k in [1..3]]);
+                mapsLL[i][j]:= ijkL[ind];        // mLp(ijk[i][j](th)) maps to thetap[i][j]
+                thetaL[i][j]:= ijkL[ind](L!th);
+            end for;
+        end for;
+        
+        assert Degree(K) eq &+[#thetaL[i] : i in [1..#fprs]];       // check we have the correct number of thetas
+        Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
+        check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
+        // verify that thetap[i][j] are roots of f 
+        assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
+        // verify the precision has not been changed by the above test
+        assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
+        // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
+            // Note: this correspondence will not generate the roots in the correct order
+            // This is due to the fact that we cannot work in the algebraic closure of Qp, but only in one Lp
+            // ideally, we would be working in each Lp above each prime ideal over p in K, 
+            // but Magma does not allow this
+            
+        assert (#thetaL eq 2) or (#thetaL eq 3);
+        fieldLpinfo`thetaL:= thetaL;
+        fieldLpinfo`mapsLL:= mapsLL;
+
+        inds:= [];  // stores the indices of the unbounded primes in fplist
+        // verifies there is a prime ideal above p in fplist
+        assert &or[fq in fplist : fq in fprs];     
+        for i in [1..#fplist] do
+            fp:= fplist[i];
+            for j in [1..#fprs] do
+                fq:= fprs[j];
+                if fq eq fp then
+        // index of prime ideal above p appearing in fplist
+                    Append(~inds, j);   
+                end if;
+            end for;
+        end for;
+        assert #inds eq 1;  // this is i0
+        i0:=[inds[1],1];    // root of g_inds(t), first (and only) element
+        // verifies the unbounded ideal corresponds to deg(gp) = 1
+        assert #thetaL[i0[1]] eq 1;    
+        assert fprs[i0[1]] in fplist;
+        
+        // chooses j,k where g(t) = g_1(t)g_2(t), deg(g_1) = 1, deg(g_2) = 2
+        indjk:= [i : i in [1..#thetaL] | i ne inds[1]];
+        if #thetaL eq 2 then
+            assert #indjk eq 1;
+            assert #thetaL[indjk[1]] eq 2;
+            jj:= [indjk[1],1];
+            kk:= [indjk[1],2];
+        elif #thetaL eq 3 then
+            assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
+            assert #indjk eq 2;
+            jj:= [indjk[1],1];
+            kk:= [indjk[2],1];
+        end if;
+        
+        assert thetaL[jj[1]][jj[2]] ne thetaL[kk[1]][kk[2]]; 
+        fieldLpinfo`i0jk:= [i0,jj,kk];
+
+        tau:=alpha*zeta;
+
+        // generate images under the maps ijk: L-> L, th -> theta[i][j]
+        tauL:=ImageInL(mapsLL,L!tau);
+        gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
+        epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
+
+        // verify that the prime ideals in L above gamma do not cancel
+        for i in [1..nu] do
+            faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
+            facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
+            fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
+            assert (#faci0 eq #facjj) and (#facjj eq #fackk);
+            assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
+            assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
+            assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
+        end for;
+        
+        fieldLpinfo`tauL:= tauL;
+        fieldLpinfo`gammalistL:= gammalistL;
+        fieldLpinfo`epslistL:= epslistL;
+        
+        // check if we can bound Nail early (Lemma 6.5)
+        delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
+        delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
+        delta1Lp:= mapLLp(delta1L);
+        delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
+        delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
+        delta2Lp:= mapLLp(delta2L);
+        
+        fieldLpinfo`delta1L:= delta1L;
+        fieldLpinfo`delta2L:= delta2L;
+        fieldLpinfo`delta1Lp:= delta1Lp;
+        fieldLpinfo`delta2Lp:= delta2Lp;
+              
+        if (Valuation(delta1Lp) eq 0) then
+            cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            if heuristicPrec lt cp then
+                heuristicPrec:= heuristicPrec + heuristicPrec;  // restart loop with higher precision
+            else
+                runningPrecloop:= false;        // exit loop after the following commands
+                Logdelta1:= pAdicLog(delta1Lp,p); 
+                Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
+                Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
+                LogList:= Loggammalist cat Logepslist;
+                assert #LogList eq (nu+r);
+        
+                minval,ihat:= Min([Valuation(LogList[i]) :i in [1..nu+r]]);
+                if (Valuation(Logdelta1) ge minval) then
+                    // if the program makes it this far, there are no small bounds on Nail
+                    // arising from Lemma 6.5 and Lemma 6.9
+                    // hence the code must enter the FP process to reduce the bounds
+                    // generates the linear forms in p-adic logs elements for the Special Case
+                        
+                    logihat:= LogList[ihat];  // offset the first term, Logdelta1
+                    betalist:= [-LogList[i]/logihat : i in [1..nu+r]];
+                    // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
+                    beta1:= -Logdelta1/logihat;
+                    assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
+                    
+                    fieldLpinfo`ihat:= ihat;
+                    fieldLpinfo`logihat:= logihat;
+                    fieldLpinfo`betalist:= [*beta1,betalist*]; 
+                    fieldLpinfo`largePrec:= heuristicPrec;  
+                                       
+                else // Lemma 2 holds; early bound
+                    smallbound:= Max([Floor((1/(p-1) - Valuation(delta2Lp))),Ceiling(minval - Valuation(delta2Lp))-1]);
+                    if smallbound ge 0 then
+                        fieldLpinfo`smallbound:= smallbound;
+                    else
+                        fieldLpinfo`smallbound:= -1;     // negative bound; Case can be removed
+                    end if;
+                    
+                end if;
+            end if;
+        else        //Lemma holds; (Valuation(delta1Lp) ne 0), early bound
+            smallbound:= Min[Valuation(delta1Lp),0] - Valuation(delta2Lp);
+            if smallbound ge 0 then
+                fieldLpinfo`smallbound:= smallbound;
+            else
+                fieldLpinfo`smallbound:= -1;     // negative bound; Case can be removed
+            end if;
+            runningPrecloop:= false;    // exit loop
+        end if;
+        
+    end while;
+end procedure;
+   
+
+Ellipsoid:= function(fieldLinfo,fieldKinfo,Case,Localinfo,HeightBounds,RealPrec, LintoC);
+
+    K:= fieldKinfo`field;
+    AutL:= fieldLinfo`automorphisms;
     
     CasePrimes:= [Norm(fp) : fp in Case`ideallist];
     matA:= Case`matA;
-    
     HeightBoundonGammalist:= HeightBounds`heightgammalist;
     HeightBoundonEpslist:= HeightBounds`heightepslist;
-
-    nu:= #gammalistL;
-    r:= #epslistL;
+    
+    /////////////////////////////////////////////////
+    ///////////// if localinfo is p-adic or real/complex ////////////////
+    if assigned Localinfo`prime
+    ///////////////////////////
+    
+        fieldLpinfo:= Localinfo;
+        tauL:= fieldLpinfo`tauL;
+        gammalistL:= fieldLpinfo`gammalistL;
+        epslistL:= fieldLpinfo`epslistL;
+        ijk:= fieldLpinfo`i0jk;
+        
+        nu:= #gammalistL;
+        r:= #epslistL;
+    else
+    /////////////////////////////
+    ///////real ////////////////
+    //////////////////////////
+    end if;
+    
+    
     i0:= ijk[1];
     jj:= ijk[2];
     kk:= ijk[3];
     assert nu eq #Case`gammalist;
     assert nu eq #CasePrimes;
-    assert r eq #Case`epslist;
+    assert r eq #fieldKinfo`fundamentalunits;
     
     RField:= RealField(RealPrec);
     SetDefaultRealField(RField); 
@@ -833,366 +1049,6 @@ Ellipsoid:= function(Case,placeinfo,AutL,HeightBounds,RealPrec);
     
     return matM,Bgam,Beps;
 end function;
-
-////
-
-
-    delta1Lp:= mapLLp(delta1L);
-    delta2Lp:= mapLLp(delta2L);
-    
-    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
-    matA:= Case`matA;
-    
-    
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    matA:= Case`matA;
-            
-                
-                        
-    K:= fieldKinfo`field;
-    OK:= fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    zeta:= fieldKinfo`zeta;
-    epslist:= fieldKinfo`fundamentalunits;
-    L:= fieldLinfo`field;
-    OL:= fieldLinfo`ringofintegers;
-    
-    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    matA:= Case`matA;
-    
-    ijkLp:= localpinfo`ijkLp;
-    
-    tau:= alpha*zeta;
-    nu:= #gammalist;
-    r:= #epslist;
-    assert #CasePrimes eq nu;
-    
-    HeightBoundonGammalist:= HeightBounds`heightgammalist;
-    HeightBoundonEpslist:= HeightBounds`heightepslist;
-   
-    // choose i0jk, mapsLL
-    // generate images under the maps ijk: L-> L, th -> theta[i][j]
-    tauL:=ImageInL(mapsLL,L!tau);
-    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
-    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
-
-    RField:= RealField(RealPrec);
-    SetDefaultRealField(RField); 
-    
-    // verify that the prime ideals in L above gamma do not cancel
-    for i in [1..nu] do
-        faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
-        facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
-        fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
-        assert (#faci0 eq #facjj) and (#facjj eq #fackk);
-        assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
-        assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
-        assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
-    end for;
-            
-    CField<i>:= ComplexField(RealPrec);
-    LintoC:= hom< L -> CField | Conjugates(L.1)[1] >; 
-    
-    // compute i1, i2: L- > C to generate matrix R
-    for i1 in [1..#AutL] do
-        for i2 in [i1 + 1..#AutL] do
-            a:= (AutL[i1])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
-            a:= RField!(Log(Abs(LintoC(a))));
-            
-            b:= (AutL[i1])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
-            b:= Log(Abs(LintoC(b)));
-            
-            c:= (AutL[i2])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
-            c:= Log(Abs(LintoC(c))); 
-            
-            d:= (AutL[i2])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
-            d:= Log(Abs(LintoC(d))); 
-            if (a*d - b*c) ne 0 then
-                iotalist:= [i1,i2];
-                break i1;
-            end if;
-        end for;
-    end for;
-            
-    matR:= Matrix(ComplexField(RealPrec),2,2,[a,b,c,d]);
-    tR, matRinv:= IsInvertible(matR);
-    tA, matAinv:= IsInvertible(matA);
-    assert tR and tA;
-    i1:= iotalist[1];
-    i2:= iotalist[2];
-    
-    // compute iota 1 gammas and iota 2 in definition of wgamlklist
-    logamlistLi1:= [ Log(Abs(LintoC( (AutL[i1])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
-    logamlistLi2:= [ Log(Abs(LintoC( (AutL[i2])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
-    
-    // compute the coefficients w_{gam,l,k} in the bound for Beps
-    wgamlklist:= [];
-    for l in [1..r] do
-        wgamlklist[l]:= [];
-        for k in [1..nu] do
-            alphagamlk:= matRinv[l,1]*(&+[matAinv[i][k]*logamlistLi1[i] : i in [1..nu]]); 
-            alphagamlk:= alphagamlk + matRinv[l,2]*(&+[matAinv[i][k]*logamlistLi2[i] : i in [1..nu]]);
-            wgamlklist[l][k]:= Abs(alphagamlk)*Degree(K, Rationals())/Log(CasePrimes[k]);
-        end for;
-    end for;
-    
-    // compute the coefficients w_{eps,l,k} in the bound for Beps
-    wepslklist:= [];
-    for l in [1..r] do
-        wepslklist[l]:= [];
-        m:= Max(Abs(matRinv[l,1]), Abs(matRinv[l,2]));
-        for i in [1..#AutL] do
-            if i eq i1 then
-                wepslklist[l][i]:= (m+Abs(matRinv[l,1]))*(Degree(L, Rationals()));
-            elif i eq i2 then
-                wepslklist[l][i]:= (m+Abs(matRinv[l,2]))*(Degree(L, Rationals()));
-            else
-                wepslklist[l][i]:= m*(Degree(L, Rationals()));
-            end if;
-        end for;
-    end for;
-                        
-    Bgam:= Ceiling((1/Log(2)^2)*&+[ h^2 : h in HeightBoundonGammalist]);
-    
-    // compute bound b_eps; since r = 2, there is only 1 such b_eps where eps =! eps^*
-        // choose eps^* = epslist[2]; hence l = 1 here
-    Beps:= [];
-    for l in [1..r] do
-        Beps[l]:= ((1/Degree(K,Rationals()))*&+[HeightBoundonGammalist[k]*wgamlklist[l][k] : k in [1..nu]]);
-        Beps[l]:= (Beps[l] + (1/Degree(L,Rationals()))*&+[HeightBoundonEpslist[k]*wepslklist[l][k] : k in [1..#AutL]])^2;
-    end for;
-
-    matD:= DiagonalMatrix(Integers(), [ Floor(Log(p)^2/Log(2)^2) : p in CasePrimes]); 
-    matM:= IdentityMatrix(Integers(),nu+r);
-    InsertBlock(~matM, (&*[Ceiling(Beps[l]) : l in [1..r]])*(Transpose(matA)*matD*matA), 1, 1);
-    for l in [1..r] do
-        matM[nu+l,nu+l]:= Bgam*(&*[Ceiling(Beps[k]) : k in [1..r] | k ne l]);
-    end for;
-    
-    return matM,Bgam,Beps;
-end function;
-
-deltasinQp:=procedure(fieldKinfo,fieldLinfo,Case,~localpinfo,ijkL,AutL,Prec);
-    /*
-    INPUT:
-        primelist
-        L
-    OUTPUT:
-       // for each prime p[l], stores theta[l][i][j]:= theta_i^{(j)}, tje associated roots of g in the completion of Q_{p[l]}
-        // ie. for i in {1,...,m[l]}, theta[l][i] satisfies gp[l][i](theta[l][i]) = 0; ie g_i(theta_i) = 0
-        // theta[l][i][1], ..., theta[l][i][n_i]:= theta_i^{(1)}, ..., theta_i^{(n_i)} for p[l] are the conjugates of theta[l][i]
-    */
-    
-    pAdicPrec:= Prec[1];
-    RealPrec:= Prec[2];
-    
-    K:= fieldKinfo`field;
-    OK:= fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    f:= fieldKinfo`minpoly;
-    L:= fieldLinfo`field;
-    OL:= fieldLinfo`ringofintegers;
-    zeta:= fieldKinfo`zeta;
-    assert Degree(K) eq 3;
-    
-    p:= localpinfo`prime;
-    idealinL:= localpinfo`idealinL;
-    Lp, mapLLp:= Completion(L, idealinL : Precision:=pAdicPrec);
-    //fprsL:= localpinfo`idealinL;
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    nu:= #gammalist;
-    
-    //Lp, mapLLp:= Completion(L, fprsL : Precision:=pAdicPrec);
-    fprs:=[f[1] : f in Factorisation(p*OK)];        // the prime ideals above p
-    
-    thetaL:=[];
-    mapsLL:=[]; 
-    for i in [1..#fprs] do      // runs through each prime ideal above p
-        thetaL[i]:=[];
-        mapsLL[i]:=[];       // the preimage of thetap in L 
-                                    // ie. for th in L, mLp(ijk(th)) is one of the thetap in Lp 
-        Kp, mKp:= Completion(K,fprs[i] : Precision:=pAdicPrec);
-        gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
-        temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
-        for j in [1..#temp] do
-            vals, ind:= Max([Valuation(mapLLp(ijkL[k](L!th)) - temp[j][1]) : k in [1..3]]);
-            mapsLL[i][j]:= ijkL[ind];        // mLp(ijk[i][j](th)) maps to thetap[i][j]
-            thetaL[i][j]:= ijkL[ind](L!th);
-        end for;
-    end for;
-
-    assert n eq &+[#thetaL[i] : i in [1..#fprs]];       // check we have the correct number of thetas
-    Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
-    check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-    // verify that thetap[i][j] are roots of f 
-    assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-    // verify the precision has not been changed by the above test
-    assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
-    // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
-        // Note: this correspondence will not generate the roots in the correct order
-        // This is due to the fact that we cannot work in the algebraic closure of Qp, but only in one Lp
-        // ideally, we would be working in each Lp above each prime ideal over p in K, 
-        // but Magma does not allow this
-        
-    assert (#thetaL eq 2) or (#thetaL eq 3);
- 
-    inds:= [];  // stores the indices of the unbounded primes in fplist
-    // verifies there is a prime ideal above p in fplist
-    assert &or[fq in fplist : fq in fprs];     
-    for i in [1..#fplist] do
-        fp:= fplist[i];
-        for j in [1..#fprs] do
-            fq:= fprs[j];
-            if fq eq fp then
-    // index of prime ideal above p appearing in fplist
-                Append(~inds, j);   
-            end if;
-        end for;
-    end for;
-    assert #inds eq 1;  // this is i0
-    i0:=[inds[1],1];    // root of g_inds(t), first (and only) element
-    // verifies the unbounded ideal corresponds to deg(gp) = 1
-    assert #thetaL[i0[1]] eq 1;    
-    assert fprs[i0[1]] in fplist;
-    
-    // chooses j,k where g(t) = g_1(t)g_2(t), deg(g_1) = 1, deg(g_2) = 2
-    indjk:= [i : i in [1..#thetaL] | i ne inds[1]];
-    if #thetaL eq 2 then
-        assert #indjk eq 1;
-        assert #thetaL[indjk[1]] eq 2;
-        jj:= [indjk[1],1];
-        kk:= [indjk[1],2];
-    elif #thetaL eq 3 then
-        assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
-        assert #indjk eq 2;
-        jj:= [indjk[1],1];
-        kk:= [indjk[2],1];
-    end if;
-    
-    assert thetaL[jj[1]][jj[2]] ne thetaL[kk[1]][kk[2]]; 
-    tau:=alpha*zeta;
-    
-    // generate images under the maps ijk: L-> L, th -> theta[i][j]
-    tauL:=ImageInL(mapsLL,L!tau);
-    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
-
-    // verify that the prime ideals in L above gamma do not cancel
-    for i in [1..nu] do
-        faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
-        facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
-        fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
-        assert (#faci0 eq #facjj) and (#facjj eq #fackk);
-        assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
-        assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
-        assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
-    end for;
-    
-    // check if we can bound Nail early (Lemma 6.5)
-    delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
-    delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
-    delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
-    delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
-    
-    localpinfo`delta1inQp:= mapLLp(delta1L);
-    localpinfo`delta2inQp:= mapLLp(delta2L);
-    localpinfo`ijkLp:= [i0,jj,kk];
-end procedure;
-    
-    
-pLatticePrep:=procedure(fieldKinfo,fieldLinfo,Case,~localpinfo: UseSmallBound:=true);
-    
-    K:= fieldKinfo`field;
-    OK:= fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    f:= fieldKinfo`minpoly;
-    L:= fieldLinfo`field;
-    OL:= fieldLinfo`ringofintegers;
-    zeta:= fieldKinfo`zeta;
-    epslist:= fieldKinfo`fundamentalunits;
-    n:= Degree(K);
-    
-    p:= localpinfo`prime;
-    Lp:= localpinfo`Lp;
-    mapLLp:= localpinfo`Lp;
-    //fprsL:= localpinfo`idealinL;
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    nu:= #gammalist;
-    r:= #epslist;
-    
-    tau:=alpha*zeta;
-    
-    // generate images under the maps ijk: L-> L, th -> theta[i][j]
-    tauL:=ImageInL(mapsLL,L!tau);
-    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
-    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
-
-    // verify that the prime ideals in L above gamma do not cancel
-    for i in [1..nu] do
-        faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
-        facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
-        fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
-        assert (#faci0 eq #facjj) and (#facjj eq #fackk);
-        assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
-        assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
-        assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
-    end for;
-    
-    delta1inQp:= localpinfo`delta1inQp;
-    delta2inQp:= localpinfo`delta2inQp;
-    
-    if (Valuation(delta1inQp) ne 0) then
-        smallbound:= Min[Valuation(delta1inQp),0] - Valuation(delta2inQp);
-        if smallbound ge 0 then
-            localpinfo`smallbound:= smallbound;
-        else
-            localpinfo`smallbound:= -1;     // negative bound; Case can be removed
-        end if;
-    else
-        Logdelta1:= pAdicLog(delta1inQp,p); 
-        Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
-        Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
-        LogList:= Loggammalist cat Logepslist;
-        assert #LogList eq (nu+r);
-        
-        minval,ihat:= Min([Valuation(LogList[i]) :i in [1..nu+r]]);
-        
-        if Valuation(Logdelta1) lt minval then
-            smallbound:= Max([Floor((1/(p-1) - Valuation(delta2inQp))),Ceiling(minval - Valuation(delta2inQp))-1]);
-            if smallbound ge 0 then
-                localpinfo`smallbound:= smallbound;
-            else
-                localpinfo`smallbound:= -1;     // negative bound; Case can be removed
-            end if;
-    // if the program makes it this far, there are no small bounds on Nail
-    // arising from Lemma 6.5 and Lemma 6.9
-    // hence the code must enter the FP process to reduce the bounds
-    // generates the linear forms in p-adic logs elements for the Special Case
-        else
-            logihat:= LogList[ihat];  // offset the first term, Logdelta1
-            betalist:= [-LogList[i]/logihat : i in [1..nu+r]];
-            // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
-            beta1:= -Logdelta1/logihat;
-            assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
-            
-            localpinfo`ihat:= ihat;
-            localpinfo`logihat:= logihat;
-            localpinfo`betalist:= [*beta1,betalist*];            
-        end if;
-    end if;
-
-end procedure;
 
 
 pInteger:= function(Lp,p,mu,pAdicPrec,elt);
@@ -1278,26 +1134,24 @@ pInteger:= function(Lp,p,mu,pAdicPrec,elt);
 end function;
 
 
-pLattice:= function(fieldLinfo,localpinfo,pAdicPrec,mu);
+pLattice:= function(fieldLinfo,fieldLpinfo,pAdicPrec,mu);
                         
-    p:= localpinfo`prime;
-    Lp:= localpinfo`Lp;
-    beta1:= localpinfo`betalist[1];
-    betalist:= localpinfo`betalist[2];
-    ihat:= localpinfo`ihat;
-    matM:= localpinfo`ellipsoid;
-    Bgam:= localpinfo`bgam;
-    Bepslist:= localpinfo`bepslist;
+    p:= fieldLpinfo`prime;
+    Lp:= fieldLpinfo`field;
+    beta1:= fieldLpinfo`betalist[1];
+    betalist:= fieldLpinfo`betalist[2];
+    ihat:= fieldLpinfo`ihat;
+    //matM,Bgam,Bepslist:= Ellipsoid(fieldLinfo,Case,Localinfo,HeightBounds,RealPrec);
     nuplusr:= #betalist;
-    r:= #Bepslist;
+    r:= #Beps;
     
     //assert &and[mu le Precision(beta) : be
-    betalist:= [pInteger(Lp,p,mu,pAdicPrec,beta) : beta in betalist];
+    betalist:= [pInteger(Lp,p,mu,initialPrec,beta) : beta in betalist];
     // asserts that beta_ihat = -alpha_ihat/alpha_ihat = -1
     assert (betalist[ihat] eq (p^mu)-1);
     
     betalist[ihat]:= p^mu;
-    beta1:= pInteger(Lp,p,mu,pAdicPrec,beta1);
+    beta1:= pInteger(Lp,p,mu,initialPrec,beta1);
     
     // define matrix
     matAm:= IdentityMatrix(Rationals(), (nuplusr));
@@ -1311,7 +1165,7 @@ pLattice:= function(fieldLinfo,localpinfo,pAdicPrec,mu);
     
     vecc:= ZeroMatrix(Rationals(), nuplusr, 1);
     vecc[ihat,1]:= -beta1/p^mu;
-    boundForNormSquared:= Ceiling((1+r)*(Bgam*&*Bepslist));
+    boundForNormSquared:= Ceiling((1+r)*(Bgam*&*Beps));
    
     return matBtmatB, vecc, boundForNormSquared;
  
@@ -1578,7 +1432,7 @@ a:= 1;
     printf "-"^(80) cat "\n" cat "-"^(80) cat "\n"; 
     
     // generate a record to store relevant field info
-    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
+    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits,automorphisms,ijk>;
     
     alist, afplist, fieldKinfo:=prep1(clist, primelist, a);
     K:= fieldKinfo`field;
@@ -1636,11 +1490,14 @@ a:= 1;
     tf,mapKL:= IsSubfield(K,L);
     assert tf;
     assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-    fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
     
-    ijkL,AutL:= ijkAutL(fieldLinfo);
-    assert ijkL[3](th) eq L!th; // this is the identity automorphism
-
+    fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+    ijkAutL(~fieldLinfo,fieldKinfo);
+    AutL:= fieldLinfo`automorphisms;
+    
+    LocalInfo:= recformat<prime,idealinL,field,mapLLp,thetaL,mapsLL,i0jk,tauL,gammalistL,epslistL,delta1L,delta2L, delta1Lp,delta2Lp,ihat,logihat,betalist,largePrec,smallbound>;
+    
+   
     /////
     //To DO: temp!
         // pprecs:= padicprecision(primelist, L);      // estimated required precision 
@@ -1656,6 +1513,19 @@ a:= 1;
     t1:= Cputime();
     UpperBounds(fieldKinfo,clist,primelist,a,~alphgamlist,ComplexPrec);
     printf "Done! Duration: %o\n", Cputime(t1);
+    CField<i>:= ComplexField(ComplexPrec);
+    LintoC:= hom< L -> CField | Conjugates(L.1)[1] >; 
+   
+ 
+ ////////////////////////////////////
+ // take log, then if doesn't work, multiply by 1.3 for lv
+ // see how many iterations can do like this
+ 
+ // go to until get no sol
+ // redo each iteration until get sol
+ // decrease by 1 for now // waiting for Rafael for function here
+ 
+ 
  
     // begin cycling through cases
     CaseNo:= 1;
@@ -1673,34 +1543,97 @@ a:= 1;
         HeightBoundInfo:= recformat<heightgammalist,heightepslist>;
         HeightBounds:= rec<HeightBoundInfo | heightgammalist:= [Case`bound : i in [1..nu]],heightepslist:= [Case`bound : i in [1..#AutL]]>;
         
+        LocalinfoList:= [];
+        for i in [1..nu] do
+            p:= CasePrimes[i];
+            idealinL:= (Factorisation(p*OL))[1][1];
+            LocalinfoList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL>;
+            pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case,1);
+            
+            if assigned LocalinfoList[i]`smallbound then
+            ///////////////////////////////////////////////////
+            ///// check if smallbound is met ///////////////////
+            ////////////////////////////////////////////////////// 
+            end if;
+           
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            ijkLp:= LocalinfoList[i]`i0jk;
+            initialPrec:= LocalinfoList[i]`largePrec;
+            
+            ///////////////////////////////////////////////////
+            ///// choose lv ///////////////////////////////////
+            ////////////////////////////////////////////////////// 
+            lv:= Max(cp,(1.3)*Log(Case`bound));
+            ////////////////////////////////////////////////////// 
+            
+            assert lv ge cp;
+            assert HeightBounds`heightgammalist[i] gt Max(0,cp);
+            
+            mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+            precmultiplier:= 1;
+            
+            while (mu+100) gt initialPrec do       // recompute deltas with new pAdicPrec:= 3*mu
+                precmultiplier:= precmultiplier + 1;
+                print precmultiplier;
+                pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case,precmultiplier);
+                initialPrec:= LocalinfoList[i]`largePrec;
+                print LocalinfoList[i]`largePrec;
+                delta1Lp:= LocalinfoList[i]`delta1Lp;
+                delta2Lp:= LocalinfoList[i]`delta2Lp;
+                assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
+                // assert that cp has not changed
+                assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            end while;
+            assert (mu+100) le initialPrec;
+            // now go into pAdicLatticePrep;
+            // we now should have high enough precision to keep going because 
+            
+            matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,localpinfoList[i],AutL,mapsLL,HeightBounds,RealPrec);
+            
+            
+            pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfo: UseSmallBound:=true);
+            
+            matBtmatB, vecc, boundForNormSquared:= pLattice(fieldLinfo,localpinfoList[i],pAdicPrec,mu);
+            
+            boundForNormSquared;
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=100,lllReduce:=true, breakSymmetry:= true);
+            #solutionsList;
+              
+    
+        
+        
+        
          //pprecs:= padicprecision(primelist, L);      // estimated required precision 
         // generate a record to store relevant local info
 
 // padic: 
-    pCaseInfo:= recformat<prime,idealinL,Lp,mapLLp,smallbound,ijkLp,delta1inQp,delta2inQp,ihat,logihat,betalist>;
-    //printf "Computing all roots of f in Cp...";
-        t3:= Cputime();
-    localpinfoList:= [];
+//    pCaseInfo:= recformat<prime,idealinL,Lp,mapLLp,smallbound,ijkLp,delta1inQp,delta2inQp,ihat,logihat,betalist>;
+//    //printf "Computing all roots of f in Cp...";
+//        t3:= Cputime();
+//    localpinfoList:= [];
         
 
-UseSmallBound:= false;  // still to include
-pAdicPrec:= 100; 
-// higher precision here means that the pAdicLog is slower, 
-//      // in particular, in pAdicLog, computing Log at the end is slow
-//though possibly so is generating the Lp,mapLLp field and map
+//UseSmallBound:= false;  // still to include
+//pAdicPrec:= 100; 
+//// higher precision here means that the pAdicLog is slower, 
+////      // in particular, in pAdicLog, computing Log at the end is slow
+////though possibly so is generating the Lp,mapLLp field and map
 
 
-RealPrec:= 100;
+//RealPrec:= 100;
 
 
-// run through all possible combos of embeddings 
+//// run through all possible combos of embeddings 
 
-Prec:= [pAdicPrec,RealPrec];
-    
+//Prec:= [pAdicPrec,RealPrec];
+    LocalinfoList:= [];
     for i in [1..nu] do
         p:= CasePrimes[i];
         idealinL:= (Factorisation(p*OL))[1][1];
-        localpinfoList[i]:=rec< pCaseInfo | prime:= p, idealinL:= idealinL>;
+        LocalinforList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL>;
         // generate delta1, delta2 in Qp
         deltasinQp(fieldKinfo,fieldLinfo,Case,localpinfoList[i],ijkL,AutL,Prec);
         
