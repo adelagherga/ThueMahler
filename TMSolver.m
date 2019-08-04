@@ -1557,7 +1557,7 @@ a:= 1;
             hp:= HeightBounds`heightgammalist[i];
             idealinL:= (Factorisation(p*OL))[1][1];
             
-            LocalinfoList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL, precMultiple:= 1.3^10>;
+            LocalinfoList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL, precMultiple:= 1.3^5>;
             pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);   
             
             if assigned LocalinfoList[i]`smallbound then
@@ -1573,7 +1573,7 @@ a:= 1;
             ijkLp:= LocalinfoList[i]`i0jk;
             pAdicPrec:= LocalinfoList[i]`precision;
             PrecMultiplier:= LocalinfoList[i]`precMultiple;
-            lp:= Max(cp,(1.3)^8*Log(Case`bound)); // heuristic for initial value of lv; lv >= cp
+            lp:= Max(cp,(1.3)^3*Log(Case`bound)); // heuristic for initial value of lv; lv >= cp
             mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
             
             assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
@@ -1648,6 +1648,7 @@ a:= 1;
                 bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
                 assert bufferWasBigEnough and (#solutionsList eq 0);
             end if;
+            
             
             print "BEFRORE mu,lp", mu, lp;
             while (#solutionsList eq 0) and (mu gt Max(0,Valuation(delta2Lp) - Valuation(logihat))) do
