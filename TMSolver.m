@@ -594,15 +594,16 @@ prep2:=function(fieldKinfo,ClK,afplist,primelist);
     return alphgamlist;
 end function;
 
-ijkAutL:= procedure(~fieldLinfo,fieldKinfo);
+ijkAutL:= procedure(fieldKinfo,~fieldLinfo);
     L:= fieldLinfo`field;
     tl:= fieldLinfo`gen;
     th:= fieldKinfo`gen;
+    
     G,Aut,tau:= AutomorphismGroup(L);
     assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
 
     ijk:= [];
-    if Order(G.1) eq 3 then
+    if Order(G.1) eq 3 then     // is G is the alternating group, this is automatically true
         assert G.1^3 eq Id(G);
         if (tau(G.1))(tl[1]) eq tl[2] then
             ijk[1]:= tau(G.1);
@@ -637,10 +638,77 @@ ijkAutL:= procedure(~fieldLinfo,fieldKinfo);
     
     fieldLinfo`automorphisms:= AutL;
     fieldLinfo`ijk:= ijk;
+    
 end procedure;
 
 
-UpperBounds:=procedure(fieldKinfo,clist,primelist,a,~alphgamlist,ComplexPrec);
+ComplexFieldInfo:= procedure(fieldKinfo,fieldLinfo,~fieldCinfo);
+    th:= fieldKinfo`gen;
+    f:= fieldKinfo`minpoly;
+    L:= fieldLinfo`field;
+    tl:= fieldLinfo`gen;
+    ijk:= fieldLinfo`ijk;
+    heuristicPrec:= fieldCinfo`precision; 
+    
+    CField<i>:= ComplexField(heuristicPrec);
+    
+    // choose an embedding of L.1 into C by selecting a conjugate of L.1
+    L1C:= Roots(MinimalPolynomial(L.1), CField)[1][1];
+    mapLC:= hom< L -> CField | L1C >;       
+    thetaL:= [[ijk[j](L!th)] : j in [1..3]];
+    
+    // note here that we take ijk as sigma, sigma^2, id
+    // it does not matter that ijk corresponds to roots of gp here
+    assert #Conjugates(th) eq 3;
+    // Conjugates(th) with heuristicPrec
+    temp:= [Roots(MinimalPolynomial(th), CField)[j][1] : j in [1..3]]; 
+    smallno:= 10^(Floor(-heuristicPrec+10));
+
+    // verify that thetaC is the same as Conjugate(th) with heuristicPrec
+    for j in [1..3] do
+        vals, ind:= Min([Abs(mapLC(thetaL[k][1]) - temp[j]) : k in [1..3]]);
+        assert (vals lt smallno);
+    end for;
+    
+    // verify that thetaL in C are roots of f 
+    assert &and[Abs(Evaluate(f,mapLC(thetaL[j][1]))) lt smallno : j in [1..#thetaL]];
+   
+    mapsLL:= [[ijk[1]], [ijk[2]], [ijk[3]]];
+    i0:= [1,1];
+    jj:= [2,1];
+    kk:= [3,1];
+    
+    fieldCinfo`idealinL:= L1C;
+    fieldCinfo`field:= CField;
+    fieldCinfo`mapLLp:= mapLC;
+    fieldCinfo`thetaL:= thetaL;
+    fieldCinfo`mapsLL:= mapsLL;
+    fieldCinfo`i0jk:= [i0,jj,kk];
+    
+end procedure;
+   
+
+// for each Case, padic:
+
+ImageInL:=function(mapsLL,elt);
+    /*
+    eltK:= an element in K or L
+    This operation applies the ijk: L -> L maps to the element in K or L, elt
+    */  
+    
+    ImageUnderMap:= [];
+    for i in [1..#mapsLL] do
+        ImageUnderMap[i]:= [];
+        for j in [1..#mapsLL[i]] do
+            ImageUnderMap[i][j]:= mapsLL[i][j](elt);
+        end for;
+    end for;
+    
+    return ImageUnderMap;
+end function;
+
+
+UpperBounds:=procedure(fieldKinfo,fieldLinfo,~fieldCinfo,clist,primelist,a,~alphgamlist);
     /*
     */
     assert &and[IsPrime(p) : p in primelist];
@@ -670,44 +738,337 @@ UpperBounds:=procedure(fieldKinfo,clist,primelist,a,~alphgamlist,ComplexPrec);
     n:=Degree(NumberField(OK));
     assert n eq Degree(f);
     
-    thetaC:= Conjugates(th);
-    assert n eq #thetaC;
-    CField<i>:= ComplexField(ComplexPrec);
+    L:= fieldLinfo`field;
+    PrecMultiplier:= fieldCinfo`precMultiple;
+    heuristicPrec:= fieldCinfo`precision;
+   
+    runningPrecloop:= true;
+    while runningPrecloop do
+        CField:= fieldCinfo`field;
+        mapLC:= fieldCinfo`mapLLp;
+        mapsLL:= fieldCinfo`mapsLL;
+        thetaL:= fieldCinfo`thetaL;
+        i0jk:= fieldCinfo`i0jk;
+        
+        thetaC:= [mapLC(thetaL[j]) : j in [1..n]];
+        assert #thetaC eq 3;
+        
+        if &or[thC[1] eq CField!0 : thC in thetaC] then // if any thetas get mapped to 0 in C
+            fieldCinfo`precMultiple:= (10)*PrecMultiplier;
+            ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCinfo);
+        else
+            hth:= (1/n)*&+[Max( Log(Abs(thetaC[j][1])), 0) : j in [1..n]];      // computes the Weil height of theta
+            gam:= 2*hth + 2*Log(2) + 4*(2*mS*Log(mS) + 172*hpoly);
+            
+            alphalistC:= [];
+            for j in [1..#alphgamlist] do
+                alphaL:= ImageInL(mapsLL,L!alphgamlist[j]`alpha);
+                alphaC:= [mapLC(alphaL[k])[1] : k in [1..n]];
+                alphalistC:= alphalistC cat alphaC;  // generate image of all alpha in C under mapLC
+            end for;
+                         
+            if &or[alphaC eq CField!0 : alphaC in alphalistC] then // if any alphas are mapped to 0 in C
+                PrecMultiplier:= 10*PrecMultiplier;
+                heuristicPrec:= Floor(PrecMultiplier*167);
+                
+                fieldCinfo`precMultiple:= PrecMultiplier;
+                fieldCinfo`precision:= heuristicPrec;
+                ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCinfo);
+            else
+                runningPrecloop:= false;
+            end if;
+        end if;
+    end while;
     
-    taus:=[hom< K -> CField | thetaC[i] > : i in [1..n]];
-    hth:= (1/n)*&+[Max((Log(Abs(taus[i](th)))), 0) : i in [1..n]];      // computes the Weil height of theta
-    gam:= 2*hth + 2*Log(2) + 4*(2*mS*Log(mS) + 172*hpoly);
-    
-    for i in [1..#alphgamlist] do
-        alpha:= alphgamlist[i]`alpha;
-        halpha:= (1/n)*&+[Max((Log(Abs(taus[j](alpha)))), 0) : j in [1..n]];
-        alphgamlist[i]`bound:= Ceiling(gam + 2*halpha);
+    for j in [1..#alphgamlist] do
+        alphaL:= ImageInL(mapsLL,L!alphgamlist[j]`alpha);
+        alphaC:= [mapLC(alphaL[k])[1] : k in [1..n]];
+        halpha:= (1/n)*&+[Max( Log(Abs(alphaC[k])), 0) : k in [1..n]];
+        alphgamlist[j]`bound:= Ceiling( Degree(K,Rationals())*(gam + 2*halpha) );
     end for;
-     
+        
 end procedure;
 
-
-
-// for each Case, padic:
-
-ImageInL:=function(mapsLL,elt);
-    /*
-    eltK:= an element in K or L
-    This operation applies the ijk: L -> L maps to the element in K or L, elt
-    */  
+RealLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldCvinfo,Case);
     
-    ImageUnderMap:= [];
-    for i in [1..#mapsLL] do
-        ImageUnderMap[i]:= [];
-        for j in [1..#mapsLL[i]] do
-            ImageUnderMap[i][j]:= mapsLL[i][j](elt);
+    K:= fieldKinfo`field;
+    OK:= fieldKinfo`ringofintegers;
+    th:= fieldKinfo`gen;
+    f:= fieldKinfo`minpoly;
+    zeta:= fieldKinfo`zeta;
+    epslist:= fieldKinfo`fundamentalunits;
+    assert Degree(K) eq 3;
+    
+    L:= fieldLinfo`field;
+    OL:= fieldLinfo`ringofintegers;
+    tl:= fieldLinfo`gen;
+    
+    gammalist:= Case`gammalist;
+    fplist:= Case`ideallist;
+    alpha:= Case`alpha;
+    nu:= #gammalist;
+    r:= #epslist;
+    assert r eq 2;
+    
+    v:= fieldCvinfo`place;
+    PrecMultiplier:= fieldCvinfo`precMultiple;
+    heuristicPrec:= Floor(PrecMultiplier*(Log(Case`bound)));
+    
+    fieldCvinfo`precMultiple:= PrecMultiplier;
+    fieldCvinfo`precision:= heuristicPrec;
+    ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCvinfo);// update precMultiple since it now comes from Log(Case`bound)
+ 
+    runningPrecloop:= true;
+    while runningPrecloop do
+        CField:= fieldCvinfo`field;
+        mapLC:= fieldCvinfo`mapLLp;
+        mapsLL:= fieldCvinfo`mapsLL;
+        thetaL:= fieldCvinfo`thetaL;
+        i0:= fieldCvinfo`i0jk[1];
+        jj:= fieldCvinfo`i0jk[2];
+        kk:= fieldCvinfo`i0jk[3];
+        
+        tau:=alpha*zeta;
+        // generate images under the maps ijk: L-> L, th -> theta[i][1]
+        // here ijk are just sigma, sigma^2, id
+        tauL:=ImageInL(mapsLL,L!tau);
+        gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
+        epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
+
+         // verify that the prime ideals in L above gamma do not cancel
+         for i in [1..nu] do
+            faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
+            facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
+            fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
+            assert (#faci0 eq #facjj) and (#facjj eq #fackk);
+            assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
+            assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
+            assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
+        end for;
+    
+        fieldCvinfo`tauL:= tauL;
+        fieldCvinfo`gammalistL:= gammalistL;
+        fieldCvinfo`epslistL:= epslistL;
+        
+        // check if we can bound Nail early (Lemma 6.5)
+        delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
+        delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
+        delta1Cv:= mapLC(v(delta1L));   // apply auto v:L -> L, then map into C
+        delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
+        delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
+        delta2Cv:= mapLC(v(delta2L));    // apply auto v:L -> L, then map into C
+        
+        Logdelta1:= Log(Abs(delta1Cv));
+        Loggammalist:=[Log(Abs(mapLC(v( gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]] )))) : i in [1..nu]];
+        Logepslist:=[Log(Abs(mapLC(v( epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]] )))) : i in [1..r]];
+        LogList:= Loggammalist cat Logepslist;
+        assert #LogList eq (nu+r);
+        
+        // assert things don't get mapped to 0 in C
+        if (delta1Cv eq CField!0) or (delta2Cv eq CField!0) or &or[LogList[i] eq CField!0 : i in [1..nu+r]] then
+            PrecMultiplier:= (1.3)*PrecMultiplier;
+            heuristicPrec:= Floor(PrecMultiplier*(Log(Case`bound)));  // restart with higher precision
+            
+            fieldCvinfo`precMultiple:= PrecMultiplier;
+            fieldCvinfo`precision:= heuristicPrec;
+            ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCvinfo);
+        else
+            runningPrecloop:= false;
+        end if;
+        
+    end while;
+
+    fieldCvinfo`delta1L:= delta1L;
+    fieldCvinfo`delta2L:= delta2L;
+    fieldCvinfo`delta1Lp:= delta1Cv;
+    fieldCvinfo`delta2Lp:= delta2Cv;
+    fieldCvinfo`betalist:= [*Logdelta1,Loggammalist,Logepslist*];
+    fieldCvinfo`precision:= heuristicPrec;  
+    fieldCvinfo`precMultiple:= PrecMultiplier;  
+             
+end procedure;   
+
+
+Ellipsoid:= function(fieldKinfo,fieldLinfo,fieldCinfo,Case,Localinfo,HeightBounds: Place:="NonArch");
+
+    K:= fieldKinfo`field;
+    L:= fieldLinfo`field;
+    AutL:= fieldLinfo`automorphisms;
+    
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    matA:= Case`matA;
+    HeightBoundonGammalist:= HeightBounds`heightgammalist;
+    HeightBoundonEpslist:= HeightBounds`heightepslist;
+    
+    //print "Ellipsoid HeightBounds", HeightBoundonGammalist, HeightBoundonEpslist;
+    
+    tauL:= Localinfo`tauL;
+    gammalistL:= Localinfo`gammalistL;
+    epslistL:= Localinfo`epslistL;
+    ijk:= Localinfo`i0jk;
+    
+    nu:= #gammalistL;
+    r:= #epslistL;
+       
+    i0:= ijk[1];
+    jj:= ijk[2];
+    kk:= ijk[3];
+    assert nu eq #Case`gammalist;
+    assert nu eq #CasePrimes;
+    assert r eq #fieldKinfo`fundamentalunits;
+    
+    mapLC:= fieldCinfo`mapLLp;
+    PrecMultiplier:= fieldCinfo`precMultiple;
+    heuristicPrec:= fieldCinfo`precision;
+    
+    runningPrecloop:= true;
+    while runningPrecloop do
+        mapLC:= fieldCinfo`mapLLp;
+        CField:= fieldCinfo`field;
+    
+        for i1 in [1..#AutL] do
+            for i2 in [i1 + 1..#AutL] do
+                a:= (AutL[i1])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
+                a:= Log(Abs(mapLC(a)));
+                
+                b:= (AutL[i1])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
+                b:= Log(Abs(mapLC(b)));
+                
+                c:= (AutL[i2])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
+                c:= Log(Abs(mapLC(c))); 
+                
+                d:= (AutL[i2])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
+                d:= Log(Abs(mapLC(d))); 
+                if (a*d - b*c) ne 0 then
+                    iotalist:= [i1,i2];
+                    break i1;
+                end if;
+            end for;
+        end for;
+        
+        matR:= Matrix(CField,2,2,[a,b,c,d]);
+        tR, matRinv:= IsInvertible(matR);
+        tA, matAinv:= IsInvertible(matA);
+        assert tR and tA;
+        i1:= iotalist[1];
+        i2:= iotalist[2];
+        
+        // compute iota 1 gammas and iota 2 in definition of wgamlklist
+        gamlistLi1:= [ mapLC( (AutL[i1])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ) : k in [1..nu]];
+        gamlistLi2:= gamlistLi1 cat [ mapLC( (AutL[i2])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ) : k in [1..nu]];
+       
+        if &or[gamLi1 eq CField!0 : gamLi1 in gamlistLi1] then // if any alphas are mapped to 0 in C
+            PrecMultiplier:= 10*PrecMultiplier;
+            heuristicPrec:= Floor(PrecMultiplier*167);
+            
+            fieldCinfo`precMultiple:= PrecMultiplier;
+            fieldCinfo`precision:= heuristicPrec;
+            ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCinfo);
+        else
+            runningPrecloop:= false;
+        end if;
+    end while;
+             
+    // compute iota 1 gammas and iota 2 in definition of wgamlklist
+    logamlistLi1:= [ Log(Abs(mapLC( (AutL[i1])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
+    logamlistLi2:= [ Log(Abs(mapLC( (AutL[i2])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
+    
+    // compute the coefficients w_{gam,l,k} in the bound for Beps
+    wgamlklist:= [];
+    for l in [1..r] do
+        wgamlklist[l]:= [];
+        for k in [1..nu] do
+            alphagamlk:= matRinv[l,1]*(&+[matAinv[i][k]*logamlistLi1[i] : i in [1..nu]]); 
+            alphagamlk:= alphagamlk + matRinv[l,2]*(&+[matAinv[i][k]*logamlistLi2[i] : i in [1..nu]]);
+            wgamlklist[l][k]:= Abs(alphagamlk)*Degree(K, Rationals())/Log(CasePrimes[k]);
         end for;
     end for;
     
-    return ImageUnderMap;
+    // compute the coefficients w_{eps,l,k} in the bound for Beps
+    if #AutL eq 6 then
+        b:= 2;
+    elif #AutL eq 3 then
+        b:= 1;
+    end if;
+    wepsllist:= [];
+    for l in [1..r] do
+        m:= Max(Abs(matRinv[l,1]), Abs(matRinv[l,2]));
+        wepsllist[l]:= ((b+1)*m*(Degree(L, Rationals())))/b;
+    end for;
+        
+    Bgam:= Ceiling((1/Log(2)^2)*&+[ h^2 : h in HeightBoundonGammalist]);
+    
+    // compute bound b_eps; since r = 2, there is only 1 such b_eps where eps =! eps^*
+        // choose eps^* = epslist[2]; hence l = 1 here
+    Beps:= [];
+    for l in [1..r] do
+        Beps[l]:= ((1/Degree(K,Rationals()))*&+[HeightBoundonGammalist[k]*wgamlklist[l][k] : k in [1..nu]]);
+        Beps[l]:= (Beps[l] + ((wepsllist[l]*b)/Degree(K,Rationals()))*Max(HeightBoundonEpslist))^2;
+    end for;
+     
+    if Place eq "Real" then
+        // bound on lin form in log
+        wepslat:= (wepsllist[1] + wepsllist[2]);
+        wgamlatlist:= [];
+        for k in [1..nu] do
+            abar:= &+[Abs(matAinv[j,k]) : j in [1..nu]];
+            wgamlatlist[k]:= wgamlklist[1][k] + wgamlklist[2][k] + abar*Degree(K,Rationals())/Log(CasePrimes[k]);
+        end for;
+    
+        // compute bound b_eps^*; since r = 2, there is only 1 such b_eps where eps =! eps^*
+        // choose eps^* = epslist[2]; hence l = 2 here// default to last element of Beps
+        Beps[r]:= ((1/Degree(K,Rationals()))*&+[HeightBoundonGammalist[k]*wgamlatlist[k] : k in [1..nu]]);
+        Beps[r]:= (Beps[r] + ((wepslat*b)/Degree(K,Rationals()))*Max(HeightBoundonEpslist))/2 + 1/2;
+        // add the ck_taue^{-l_t} outside of this function
+    end if;
+        
+    return Bgam,Beps;
 end function;
 
 
+RealLattice:= function(fieldCvinfo,Case,Bgam,BepsList,mu);
+    
+    v:= fieldCvinfo`place;
+    CField:= fieldCvinfo`field;
+    Logdelta1:= fieldCvinfo`betalist[1];
+    Loggammalist:= fieldCvinfo`betalist[2];
+    Logepslist:= fieldCvinfo`betalist[3];
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    matA:= Case`matA;
+   
+    r:= #Logepslist;
+    nu:= #Loggammalist;
+    
+     // generate matrix M^TM
+    matD:= DiagonalMatrix(Integers(), [ Floor(Log(p)^2/Log(2)^2) : p in CasePrimes]); 
+    matM:= IdentityMatrix(Integers(),nu+r);
+    InsertBlock(~matM, (&*[Ceiling(BepsList[l]) : l in [1..r]])*(Transpose(matA)*matD*matA), 1, 1);
+    for l in [1..r] do
+        matM[nu+l,nu+l]:= Bgam*(&*[Ceiling(BepsList[k]) : k in [1..r] | k ne l]);
+    end for;
+    
+    betalist:= [Round(mu*Loggam) : Loggam in Loggammalist] cat [Round(mu*Logeps) : Logeps in Logepslist];
+    beta1:= Round(mu*Logdelta1);
+    
+     // define matrix
+    matAm:= IdentityMatrix(Rationals(), (nu+r));
+    for i in [1..nu+r] do
+        matAm[nu+r,i]:= betalist[i];
+    end for;
+     // generates Transpose(matB)*matB
+    matBtmatB:= Transpose(matAm)*matM*matAm;
+    
+    vecc:= ZeroMatrix(Rationals(), nu+r, 1);
+    vecc[nu+r,1]:= -beta1/betalist[r];
+    
+    boundForNormSquared:= Ceiling((1+r)*(Bgam*&*BepsList));
+    
+    return matBtmatB, vecc, boundForNormSquared;
+ 
+end function;
+
+
+// padic reduction procedures and functions
 pAdicLog:=function(elt,p);
     // DETAILS TO ADD
     //Input: p = rational prime, x = p-adic unit belonging to a finite extension of Q_p
@@ -729,7 +1090,6 @@ pAdicLog:=function(elt,p);
     return Log( elt^(r*p^k) )/(r*p^k);
 end function;   
 
-
 pAdicLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case);
 
     K:= fieldKinfo`field;
@@ -747,11 +1107,10 @@ pAdicLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case);
     gammalist:= Case`gammalist;
     fplist:= Case`ideallist;
     alpha:= Case`alpha;
-    heightbound:= Case`bound;
     nu:= #gammalist;
     r:= #epslist;
     
-    p:= fieldLpinfo`prime;
+    p:= fieldLpinfo`place;
     PrecMultiplier:= fieldLpinfo`precMultiple;
     // iniital precision heuristic
     heuristicPrec:= Floor(PrecMultiplier*(Log(Case`bound)));        // placeholder
@@ -898,7 +1257,6 @@ pAdicLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case);
                     fieldLpinfo`ihat:= ihat;
                     fieldLpinfo`logihat:= logihat;
                     fieldLpinfo`betalist:= [*beta1,betalist*];
-                    fieldLpinfo`loglist:= [*Logdelta1,Loggammalist,Logepslist*]; 
                     fieldLpinfo`precision:= heuristicPrec;  
                     fieldLpinfo`precMultiple:= PrecMultiplier;  
                                        
@@ -925,309 +1283,26 @@ pAdicLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case);
     end while;
 end procedure;
 
-
-RealLatticePrep:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case);
-            prime,idealinL,field,mapLLp,thetaL,mapsLL,i0jk,tauL,gammalistL,epslistL,delta1L,delta2L, delta1Lp,delta2Lp,loglist,ihat,logihat,betalist,precision,precMultiple,smallbound
-
-    K:= fieldKinfo`field;
-    OK:= fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    f:= fieldKinfo`minpoly;
-    zeta:= fieldKinfo`zeta;
-    epslist:= fieldKinfo`fundamentalunits;
-    assert Degree(K) eq 3;
+CheckpAdicPrecision:= procedure(fieldKinfo,fieldLinfo,~fieldLpinfo,Case,mu,cp);
+    p:= fieldLpinfo`place;
+    ijkLp:= fieldLpinfo`i0jk;
+    precision:= fieldLpinfo`precision;
     
-    L:= fieldLinfo`field;
-    OL:= fieldLinfo`ringofintegers;
-    ijkL:= fieldLinfo`ijk;
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    heightbound:= Case`bound;
-    nu:= #gammalist;
-    r:= #epslist;
-    
-    PrecMultiplier:= fieldLpinfo`precMultiple;
-    // iniital precision heuristic
-    heuristicPrec:= Floor(PrecMultiplier*(Log(Case`bound)));        // placeholder
-    
-    runningPrecloop:= true;
-    while runningPrecloop do
-        Lp, mapLLp:= Completion(L, idealinL : Precision:= heuristicPrec);
-        fieldLpinfo`field:= Lp;
-        fieldLpinfo`mapLLp:= mapLLp;
+    while (mu+100) gt precision do       // recompute deltas with new pAdicPrec:= 3*mu
+        //print "+1";
+        fieldLpinfo`precMultiple:= (1.3)*fieldLpinfo`precMultiple;
+        pAdicLatticePrep(fieldKinfo, fieldLinfo,~fieldLpinfo,Case);
+        precision:= fieldLpinfo`precision;
+        delta1Lp:= fieldLpinfo`delta1Lp;
+        delta2Lp:= fieldLpinfo`delta2Lp;
         
-        fprs:=[f[1] : f in Factorisation(p*OK)];        // the prime ideals above p
-
-        thetaL:=[];
-        mapsLL:=[]; 
-        for i in [1..#fprs] do      // runs through each prime ideal above p
-            thetaL[i]:=[];
-            mapsLL[i]:=[];       // the preimage of thetap in L 
-                                        // ie. for th in L, mLp(ijk(th)) is one of the thetap in Lp 
-            Kp, mKp:= Completion(K,fprs[i] : Precision:= heuristicPrec);
-            gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
-            temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
-            for j in [1..#temp] do
-                vals, ind:= Max([Valuation(mapLLp(ijkL[k](L!th)) - temp[j][1]) : k in [1..3]]);
-                mapsLL[i][j]:= ijkL[ind];        // mLp(ijk[i][j](th)) maps to thetap[i][j]
-                thetaL[i][j]:= ijkL[ind](L!th);
-            end for;
-        end for;
-        
-        assert Degree(K) eq &+[#thetaL[i] : i in [1..#fprs]];       // check we have the correct number of thetas
-        Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
-        check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-        // verify that thetap[i][j] are roots of f 
-        assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-        // verify the precision has not been changed by the above test
-        assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
-        // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
-            // Note: this correspondence will not generate the roots in the correct order
-            // This is due to the fact that we cannot work in the algebraic closure of Qp, but only in one Lp
-            // ideally, we would be working in each Lp above each prime ideal over p in K, 
-            // but Magma does not allow this
-            
-        assert (#thetaL eq 2) or (#thetaL eq 3);
-        fieldLpinfo`thetaL:= thetaL;
-        fieldLpinfo`mapsLL:= mapsLL;
-
-        inds:= [];  // stores the indices of the unbounded primes in fplist
-        // verifies there is a prime ideal above p in fplist
-        assert &or[fq in fplist : fq in fprs];     
-        for i in [1..#fplist] do
-            fp:= fplist[i];
-            for j in [1..#fprs] do
-                fq:= fprs[j];
-                if fq eq fp then
-        // index of prime ideal above p appearing in fplist
-                    Append(~inds, j);   
-                end if;
-            end for;
-        end for;
-        assert #inds eq 1;  // this is i0
-        i0:=[inds[1],1];    // root of g_inds(t), first (and only) element
-        // verifies the unbounded ideal corresponds to deg(gp) = 1
-        assert #thetaL[i0[1]] eq 1;    
-        assert fprs[i0[1]] in fplist;
-        
-        // chooses j,k where g(t) = g_1(t)g_2(t), deg(g_1) = 1, deg(g_2) = 2
-        indjk:= [i : i in [1..#thetaL] | i ne inds[1]];
-        if #thetaL eq 2 then
-            assert #indjk eq 1;
-            assert #thetaL[indjk[1]] eq 2;
-            jj:= [indjk[1],1];
-            kk:= [indjk[1],2];
-        elif #thetaL eq 3 then
-            assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
-            assert #indjk eq 2;
-            jj:= [indjk[1],1];
-            kk:= [indjk[2],1];
-        end if;
-        
-        assert thetaL[jj[1]][jj[2]] ne thetaL[kk[1]][kk[2]]; 
-        fieldLpinfo`i0jk:= [i0,jj,kk];
-
-        tau:=alpha*zeta;
-
-        // generate images under the maps ijk: L-> L, th -> theta[i][j]
-        tauL:=ImageInL(mapsLL,L!tau);
-        gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
-        epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
-
-        // verify that the prime ideals in L above gamma do not cancel
-        for i in [1..nu] do
-            faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
-            facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
-            fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
-            assert (#faci0 eq #facjj) and (#facjj eq #fackk);
-            assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
-            assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
-            assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
-        end for;
-        
-        fieldLpinfo`tauL:= tauL;
-        fieldLpinfo`gammalistL:= gammalistL;
-        fieldLpinfo`epslistL:= epslistL;
-        
-        // check if we can bound Nail early (Lemma 6.5)
-        delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
-        delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
-        delta1Lp:= mapLLp(delta1L);
-        delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
-        delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
-        delta2Lp:= mapLLp(delta2L);
-        
-        fieldLpinfo`delta1L:= delta1L;
-        fieldLpinfo`delta2L:= delta2L;
-        fieldLpinfo`delta1Lp:= delta1Lp;
-        fieldLpinfo`delta2Lp:= delta2Lp;
-              
-        if (Valuation(delta1Lp) eq 0) then
-            cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-            if heuristicPrec lt cp then
-                PrecMultiplier:= (1.3)*PrecMultiplier;
-                heuristicPrec:= Floor(PrecMultiplier*(Log(Case`bound)));  // restart loop with higher precision
-            else
-                runningPrecloop:= false;        // exit loop after the following commands
-                Logdelta1:= pAdicLog(delta1Lp,p); 
-                Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
-                Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
-                LogList:= Loggammalist cat Logepslist;
-                assert #LogList eq (nu+r);
-        
-                minval,ihat:= Min([Valuation(LogList[i]) :i in [1..nu+r]]);
-                if (Valuation(Logdelta1) ge minval) then
-                    // if the program makes it this far, there are no small bounds on Nail
-                    // arising from Lemma 6.5 and Lemma 6.9
-                    // hence the code must enter the FP process to reduce the bounds
-                    // generates the linear forms in p-adic logs elements for the Special Case
-                        
-                    logihat:= LogList[ihat];  // offset the first term, Logdelta1
-                    betalist:= [-LogList[i]/logihat : i in [1..nu+r]];
-                    // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
-                    beta1:= -Logdelta1/logihat;
-                    assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
-                    
-                    fieldLpinfo`ihat:= ihat;
-                    fieldLpinfo`logihat:= logihat;
-                    fieldLpinfo`betalist:= [*beta1,betalist*];
-                    fieldLpinfo`loglist:= [*Logdelta1,Loggammalist,Logepslist*]; 
-                    fieldLpinfo`precision:= heuristicPrec;  
-                    fieldLpinfo`precMultiple:= PrecMultiplier;  
-                                       
-                else // Lemma 2 holds; early bound
-                    smallbound:= Max([Floor((1/(p-1) - Valuation(delta2Lp))),Ceiling(minval - Valuation(delta2Lp))-1]);
-                    if smallbound ge 0 then
-                        fieldLpinfo`smallbound:= smallbound;
-                    else
-                        fieldLpinfo`smallbound:= -1;     // negative bound; Case can be removed
-                    end if;
-                    
-                end if;
-            end if;
-        else        //Lemma holds; (Valuation(delta1Lp) ne 0), early bound
-            smallbound:= Min[Valuation(delta1Lp),0] - Valuation(delta2Lp);
-            if smallbound ge 0 then
-                fieldLpinfo`smallbound:= smallbound;
-            else
-                fieldLpinfo`smallbound:= -1;     // negative bound; Case can be removed
-            end if;
-            runningPrecloop:= false;    // exit loop
-        end if;
-        
+        // assert that i0,j,k has not changed
+        assert fieldLpinfo`i0jk eq ijkLp;  
+        // assert that cp has not changed
+        assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
     end while;
-end procedure;           
-
-
-Ellipsoid:= function(fieldKinfo,fieldLinfo,Case,Localinfo,HeightBounds,RealPrec,LintoC);
-
-    K:= fieldKinfo`field;
-    L:= fieldLinfo`field;
-    AutL:= fieldLinfo`automorphisms;
-    
-    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
-    matA:= Case`matA;
-    HeightBoundonGammalist:= HeightBounds`heightgammalist;
-    HeightBoundonEpslist:= HeightBounds`heightepslist;
-    
-    tauL:= Localinfo`tauL;
-    gammalistL:= Localinfo`gammalistL;
-    epslistL:= Localinfo`epslistL;
-    ijk:= Localinfo`i0jk;
-    
-    nu:= #gammalistL;
-    r:= #epslistL;
-       
-    i0:= ijk[1];
-    jj:= ijk[2];
-    kk:= ijk[3];
-    assert nu eq #Case`gammalist;
-    assert nu eq #CasePrimes;
-    assert r eq #fieldKinfo`fundamentalunits;
-    
-    RField:= RealField(RealPrec);
-    SetDefaultRealField(RField); 
-    
-    for i1 in [1..#AutL] do
-        for i2 in [i1 + 1..#AutL] do
-            a:= (AutL[i1])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
-            a:= RField!(Log(Abs(LintoC(a))));
-            
-            b:= (AutL[i1])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
-            b:= Log(Abs(LintoC(b)));
-            
-            c:= (AutL[i2])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
-            c:= Log(Abs(LintoC(c))); 
-            
-            d:= (AutL[i2])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
-            d:= Log(Abs(LintoC(d))); 
-            if (a*d - b*c) ne 0 then
-                iotalist:= [i1,i2];
-                break i1;
-            end if;
-        end for;
-    end for;
-            
-    matR:= Matrix(ComplexField(RealPrec),2,2,[a,b,c,d]);
-    tR, matRinv:= IsInvertible(matR);
-    tA, matAinv:= IsInvertible(matA);
-    assert tR and tA;
-    i1:= iotalist[1];
-    i2:= iotalist[2];
-    
-    // compute iota 1 gammas and iota 2 in definition of wgamlklist
-    logamlistLi1:= [ Log(Abs(LintoC( (AutL[i1])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
-    logamlistLi2:= [ Log(Abs(LintoC( (AutL[i2])(gammalistL[k][jj[1]][jj[2]]/gammalistL[k][i0[1]][i0[2]]) ))) : k in [1..nu]];
-    
-    // compute the coefficients w_{gam,l,k} in the bound for Beps
-    wgamlklist:= [];
-    for l in [1..r] do
-        wgamlklist[l]:= [];
-        for k in [1..nu] do
-            alphagamlk:= matRinv[l,1]*(&+[matAinv[i][k]*logamlistLi1[i] : i in [1..nu]]); 
-            alphagamlk:= alphagamlk + matRinv[l,2]*(&+[matAinv[i][k]*logamlistLi2[i] : i in [1..nu]]);
-            wgamlklist[l][k]:= Abs(alphagamlk)*Degree(K, Rationals())/Log(CasePrimes[k]);
-        end for;
-    end for;
-    
-    // compute the coefficients w_{eps,l,k} in the bound for Beps
-    wepslklist:= [];
-    for l in [1..r] do
-        wepslklist[l]:= [];
-        m:= Max(Abs(matRinv[l,1]), Abs(matRinv[l,2]));
-        for i in [1..#AutL] do
-            if i eq i1 then
-                wepslklist[l][i]:= (m+Abs(matRinv[l,1]))*(Degree(L, Rationals()));
-            elif i eq i2 then
-                wepslklist[l][i]:= (m+Abs(matRinv[l,2]))*(Degree(L, Rationals()));
-            else
-                wepslklist[l][i]:= m*(Degree(L, Rationals()));
-            end if;
-        end for;
-    end for;
-    
-    Bgam:= Ceiling((1/Log(2)^2)*&+[ h^2 : h in HeightBoundonGammalist]);
-    
-    // compute bound b_eps; since r = 2, there is only 1 such b_eps where eps =! eps^*
-        // choose eps^* = epslist[2]; hence l = 1 here
-    Beps:= [];
-    for l in [1..r] do
-        Beps[l]:= ((1/Degree(K,Rationals()))*&+[HeightBoundonGammalist[k]*wgamlklist[l][k] : k in [1..nu]]);
-        Beps[l]:= (Beps[l] + (1/Degree(L,Rationals()))*&+[HeightBoundonEpslist[k]*wepslklist[l][k] : k in [1..#AutL]])^2;
-    end for;
-
-    matD:= DiagonalMatrix(Integers(), [ Floor(Log(p)^2/Log(2)^2) : p in CasePrimes]); 
-    matM:= IdentityMatrix(Integers(),nu+r);
-    InsertBlock(~matM, (&*[Ceiling(Beps[l]) : l in [1..r]])*(Transpose(matA)*matD*matA), 1, 1);
-    for l in [1..r] do
-        matM[nu+l,nu+l]:= Bgam*(&*[Ceiling(Beps[k]) : k in [1..r] | k ne l]);
-    end for;
-    
-    return matM,Bgam,Beps,[*wgamlklist, wepslklist*];
-end function;
-
+    assert ((mu+100) le precision);
+end procedure;
 
 pInteger:= function(Lp,p,mu,pAdicPrec,elt);
     /* thought i didn't need this. I definitely do
@@ -1311,29 +1386,41 @@ pInteger:= function(Lp,p,mu,pAdicPrec,elt);
     return y;
 end function;
 
-
-pLattice:= function(fieldLpinfo,matM,Bgam,BepsList,pAdicPrec,mu);
+pAdicLattice:= function(fieldLpinfo,Case,Bgam,BepsList,mu);
     
-    p:= fieldLpinfo`prime;
+    p:= fieldLpinfo`place;
     Lp:= fieldLpinfo`field;
     beta1:= fieldLpinfo`betalist[1];
     betalist:= fieldLpinfo`betalist[2];
     ihat:= fieldLpinfo`ihat;
+    PrecMultiplier:= fieldLpinfo`precMultiple;
+    precision:= fieldLpinfo`precision;
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    matA:= Case`matA;
+    
     //matM,Bgam,Bepslist:= Ellipsoid(fieldLinfo,Case,Localinfo,HeightBounds,RealPrec);
     r:= #BepsList;
-    nuplusr:= #betalist;
+    nu:= #CasePrimes;
+    
+     // generate matrix M^TM
+    matD:= DiagonalMatrix(Integers(), [ Floor(Log(p)^2/Log(2)^2) : p in CasePrimes]); 
+    matM:= IdentityMatrix(Integers(),nu+r);
+    InsertBlock(~matM, (&*[Ceiling(BepsList[l]) : l in [1..r]])*(Transpose(matA)*matD*matA), 1, 1);
+    for l in [1..r] do
+        matM[nu+l,nu+l]:= Bgam*(&*[Ceiling(BepsList[k]) : k in [1..r] | k ne l]);
+    end for;
     
     //assert &and[mu le Precision(beta) : be
-    betalist:= [pInteger(Lp,p,mu,pAdicPrec,beta) : beta in betalist];
+    betalist:= [pInteger(Lp,p,mu,precision,beta) : beta in betalist];
     // asserts that beta_ihat = -alpha_ihat/alpha_ihat = -1
     assert (betalist[ihat] eq (p^mu)-1);
     
     betalist[ihat]:= p^mu;
-    beta1:= pInteger(Lp,p,mu,pAdicPrec,beta1);
+    beta1:= pInteger(Lp,p,mu,precision,beta1);
     
     // define matrix
-    matAm:= IdentityMatrix(Rationals(), (nuplusr));
-    for i in [1..nuplusr] do
+    matAm:= IdentityMatrix(Rationals(), (nu+r));
+    for i in [1..nu+r] do
         matAm[ihat,i]:= betalist[i];
     end for;
     assert matAm[ihat,ihat] eq p^mu;
@@ -1341,7 +1428,7 @@ pLattice:= function(fieldLpinfo,matM,Bgam,BepsList,pAdicPrec,mu);
     // generates Transpose(matB)*matB
     matBtmatB:= Transpose(matAm)*matM*matAm;
     
-    vecc:= ZeroMatrix(Rationals(), nuplusr, 1);
+    vecc:= ZeroMatrix(Rationals(), nu+r, 1);
     vecc[ihat,1]:= -beta1/p^mu;
     boundForNormSquared:= Ceiling((1+r)*(Bgam*&*BepsList));
    
@@ -1546,44 +1633,166 @@ My_FinckePohst:= function(matA,boundForNormSquared: center:=0,maxNumSolutions:=-
 end function;
 
 
-//Gamma:= Matrix(Integers(),4,4,[1,5,3,4,3,1,2,3,4,1,2,3,4,5,6,7]);
-//print "Gamma:";
-//print Gamma;
-
-////The associated Gram matrix:
-//matA:= Transpose(Gamma)*Gamma;
-//print "A:";
-//print matA;
-
-//center:= Matrix(Rationals(),4,1,[0,0,0,6/7]);
-//print "center of ellipsoid:",center;
-
-//boundForNormSquared:= 2;
-//maxNumSolutions:= 100;
-//bufferWasBigEnough, solutionsList:= My_FinckePohst(matA,boundForNormSquared:center:=center, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
-
-
-
-//// extra for real lattice
-//    /////////////////////////////////////////////////
-//    ///////////// if localinfo is p-adic or real/complex ////////////////
-//    if (assigned Localinfo`prime) and (Localinfo`prime ne Infinity()) then 
-//    ///////////////////////////
+pAdicReduction:= function(fieldKinfo, fieldLinfo, fieldCinfo, fieldLpinfo,Case,HeightBounds,cp,lp,hp,solutionsList,decreaseFactor: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
+    p:= fieldLpinfo`place;
+    delta1Lp:= fieldLpinfo`delta1Lp;
+    delta2Lp:= fieldLpinfo`delta2Lp;
+    logihat:= fieldLpinfo`logihat;
+    precision:= fieldLpinfo`precision;
     
- 
-//        tauL:= fieldLpinfo`tauL;
-//        gammalistL:= fieldLpinfo`gammalistL;
-//        epslistL:= fieldLpinfo`epslistL;
-//        ijk:= fieldLpinfo`i0jk;
-        
-//        nu:= #gammalistL;
-//        r:= #epslistL;
-//    elif (assigned Localinfo`prime) and (Localinfo`prime eq Infinity()) then 
-//    /////////////////////////////
-//    ///////real /////////////////
-//    /////////////////////////////
-//    end if;
+    if decreaseMethod eq "divide" then
+        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
+            lp:= lp/(decreaseFactor);
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+            assert (cp le lp) and (lp lt hp);
+            assert ((mu+100) le precision);
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:= NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        end while; // exits when lp is found such that there are no solutions
+        lp:= lp*decreaseFactor;  // smallest value of lp such that there are 0 solutions
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
+    elif decreaseMethod eq "subtract" then
+        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
+            lp:= lp -  decreaseFactor;
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+            assert (cp le lp) and (lp lt hp);
+            assert ((mu+100) le precision);
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        end while; // exits when lp is found such that there are no solutions
+        lp:= lp + decreaseFactor;  // smallest value of lp such that there are 0 solutions
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
+    end if;
+    return lp, solutionsList;
+end function;
 
+
+// procedure starts here
+pAdicReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,Case,HeightBounds,~NewHeightBounds: iterationNo:= 1);
+
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    nu:= #Case`gammalist;
+    assert #CasePrimes eq nu;
+    aBound:= [];
+    r:= #fieldKinfo`fundamentalunits;
+
+    if iterationNo eq 1 then
+        for i in [1..nu] do
+            p:= LocalinfoList[i]`place;
+            hp:= HeightBounds`heightgammalist[i];
+            pAdicLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);   
+            
+            if assigned LocalinfoList[i]`smallbound then
+                print "Small bound met: still need to add code for this";
+            ///////////////////////////////////////////////////
+            ///// check if smallbound is met ///////////////////
+            ////////////////////////////////////////////////////// 
+            end if;
+            
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            lp:= Max(cp,(1.3)^5*Log(hp)); // heuristic for initial value of lv; lv >= cp
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+            
+            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+            assert (cp le lp) and (lp lt hp);
+            assert (hp gt Max(0,cp));
+            CheckpAdicPrecision(fieldKinfo,fieldLinfo,~LocalinfoList[i],Case,mu,cp);
+            // redifine constants (with better precision)
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            
+            // we now should have high enough precision to keep rum through FP at least once
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            
+            // initial reduction to ensure that lp is chosen so that no solutions appear
+            if (#solutionsList ne 0) then
+            // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+                while (#solutionsList ne 0) and (cp le lp) and (lp lt hp) do
+                  //  print "*1";
+                    lp:= lp*(1.3);        // decrease lv
+                    mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+                    assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+                    if (cp gt lp) or (lp gt hp) then
+                        lp:= lp/(1.3);
+                        mu:=Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+                        break;
+                    end if;
+                    assert (cp le lp) and (lp lt hp);
+                    // ensure that precision is high enough
+                    CheckpAdicPrecision(fieldKinfo,fieldLinfo,~LocalinfoList[i],Case,mu,cp);
+                    
+                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
+                    matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+                end while; // exits when lp is found such that there are no solutions
+            end if;
+            
+            // decrease lp by dividing by 1.3
+            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],1.3: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
+            // decrease lp by subtracting by Log(p)
+            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],Log(p): NumSolutionsInLoop:= 0, decreaseMethod:= "subtract");
+     
+            NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
+            aBound[i]:= BepsList;
+        end for;
+        aBound;
+        
+        for j in [1..r] do
+            NewHeightBounds`infheightepslist[j]:= Min([aBound[i][j] : i in [1..nu]]);
+        end for;
+    end if;
+end procedure;
+
+
+// LEFT OFF HERE; NEED TO TEST THIS CONVERSION OF SOLUTIONS TO SAMIRS;
+// ALSO NEED TO TEST OUT WHAT HAPPENS to reduction
+// include Samir's sieve at the end
+infNorm:= function(HeightBounds, Case, BepsList);
+    
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    nu:= #Case`gammalist;
+    assert #CasePrimes eq nu;
+    
+    VectorInfNorm:= Max([HeightBounds`heightgammalist[i]/Log(CasePrimes[i]) : i in [1..nu]]);
+    
+    // compute the infinity norm of matAinv (max row sum)
+    matA:= Case`matA;
+    tf,matAinv:= IsInvertible(matA);
+    assert tf;
+    
+    n:= NumberOfRows(matAinv);
+    RowSum:= [];
+    for i in [1..n] do
+        RowSum[i]:=  &+[Abs(matAinv[i,j]) : j in [1..n]];
+    end for;
+    MatrixInfNorm:= Max(RowSum);
+    
+    nBound:= MatrixInfNorm*VectorInfNorm;
+
+    return nBound;
+end for;
+
+    
+    
+    
 
 
 
@@ -1612,7 +1821,7 @@ clist:= [1,17,23,-27];
 primelist:= [2,3,5,7,1987,1999]; 
 a:= 1; 
   
- 
+
  
  
  
@@ -1633,7 +1842,8 @@ a:= 1;
     printf "-"^(80) cat "\n" cat "-"^(80) cat "\n"; 
     
     // generate a record to store relevant field info
-    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits,automorphisms,ijk>;
+    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits,automorphisms,ijk,LintoC>;
+    LocalInfo:= recformat<place,idealinL,field,mapLLp,thetaL,mapsLL,i0jk,tauL,gammalistL,epslistL,delta1L,delta2L,delta1Lp,delta2Lp,ihat,logihat,betalist,precision,precMultiple,smallbound,solutions>;
     
     alist, afplist, fieldKinfo:=prep1(clist, primelist, a);
     K:= fieldKinfo`field;
@@ -1693,577 +1903,850 @@ a:= 1;
     assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
     
     fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
-    ijkAutL(~fieldLinfo,fieldKinfo);
+    ijkAutL(fieldKinfo,~fieldLinfo);
     AutL:= fieldLinfo`automorphisms;
     
-    LocalInfo:= recformat<prime,idealinL,field,mapLLp,thetaL,mapsLL,i0jk,tauL,gammalistL,epslistL,delta1L,delta2L, delta1Lp,delta2Lp,loglist,ihat,logihat,betalist,precision,precMultiple,smallbound>;
-    
-   
-    /////
-    //To DO: temp!
-        // pprecs:= padicprecision(primelist, L);      // estimated required precision 
-        // precision calculations
-    ///// 
-    // generate a record to store relevant p-adic field info
-    
-    pAdicPrec:= 400;
-    RealPrec:= 100;
-    ComplexPrec:= 100;
-    // compute the initial height bound: change me
+    fieldCinfo:= rec<LocalInfo | precMultiple:= 1, precision:= 167>;
+    ComplexFieldInfo(fieldKinfo,fieldLinfo,~fieldCinfo);
+ 
+    // compute the initial height bound
     printf "Computing initial height bounds...";
     t1:= Cputime();
-    UpperBounds(fieldKinfo,clist,primelist,a,~alphgamlist,ComplexPrec);
+    UpperBounds(fieldKinfo,fieldLinfo, ~fieldCinfo,clist,primelist,a,~alphgamlist);
     printf "Done! Duration: %o\n", Cputime(t1);
-    CField<i>:= ComplexField(ComplexPrec);
-    LintoC:= hom< L -> CField | Conjugates(L.1)[1] >; 
-   
- 
- ////////////////////////////////////
- // take log, then if doesn't work, multiply by 1.3 for lv
- // see how many iterations can do like this
- 
- // go to until get no sol
- // redo each iteration until get sol
- // decrease by 1 for now // waiting for Rafael for function here
- 
- 
  
     // begin cycling through cases
     CaseNo:= 1;
     for Case in alphgamlist do
-//Case:= alphgamlist[1];
-
+        printf "-"^(80) cat "\n"; 
+       // printf "Case: %o\n", CaseNo;
+        printf "Initial height bound: %o\n", Case`bound;
+        
         CasePrimes:= [Norm(fp) : fp in Case`ideallist];
         nu:= #Case`gammalist;
         assert #CasePrimes eq nu;
         assert &and[p in primelist : p in CasePrimes];
-        printf "-"^(80) cat "\n"; 
-        printf "Case: %o\n", CaseNo;
-        printf "Initial height bound: %o\n", Case`bound;
-        
-        HeightBoundInfo:= recformat<heightgammalist,heightepslist>;
+        HeightBoundInfo:= recformat<heightgammalist,heightepslist,infheightepslist>;
         ///////////////////////////////////////////////////
         ///// can we write the heightbounds more concisely/
         ///////////////////////////////////////////////////
-        HeightBounds:= rec<HeightBoundInfo | heightgammalist:= [Case`bound : i in [1..nu]],heightepslist:= [Case`bound : i in [1..#AutL]]>;
-        
+        HeightBounds:= rec<HeightBoundInfo | heightgammalist:= [Case`bound : i in [1..nu]],heightepslist:= [Case`bound : i in [1..#fieldLinfo`ijk]], infheightepslist:= []>;
+        NewHeightBounds:= HeightBounds;
+        // nonarchimedean
         LocalinfoList:= [];
         for i in [1..nu] do
             p:= CasePrimes[i];
-            hp:= HeightBounds`heightgammalist[i];
             idealinL:= (Factorisation(p*OL))[1][1];
+            LocalinfoList[i]:=rec< LocalInfo | place:= p, idealinL:= idealinL, precMultiple:= 1.3^5>;
+        end for;
+        
+        // nonArchimedean initial reduction
+        pAdicReductionIteration(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,Case,HeightBounds,~NewHeightBounds);
+    
+        
+//////////////// Archimedean ///////////////////////////        
+        for i in [1..#fieldLinfo`ijk] do      //[1..#AutL] do // just need to run through i0,j,k
+            v:= fieldLinfo`ijk[i];      // this corresponds to i0,j,k
+            //AutL[i];
+            hv:= HeightBounds`heightepslist[i];
             
-            LocalinfoList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL, precMultiple:= 1.3^5>;
-            pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);   
+            LocalinfoList[i+nu]:=rec< LocalInfo | place:= v, precMultiple:= 1.3^5>;
+            RealLatticePrep(fieldKinfo,fieldLinfo,~LocalinfoList[i+nu],Case);        
             
-            if assigned LocalinfoList[i]`smallbound then
-            ///////////////////////////////////////////////////
-            ///// check if smallbound is met ///////////////////
-            ////////////////////////////////////////////////////// 
-            end if;
+            // ensure that v is the correct automorphism of i0,jk,
+            assert v eq LocalinfoList[i+nu]`mapsLL[LocalinfoList[i+nu]`i0jk[i][1]][LocalinfoList[i+nu]`i0jk[i][2]];
+            delta1Cv:= LocalinfoList[i+nu]`delta1Lp;
+            delta2Cv:= LocalinfoList[i+nu]`delta2Lp;
+            cv:= Log(Max( 2*Abs(delta2Cv),1 ));
+            lv:= Max([Log(2),cv,(1.3)^3*Log(Case`bound)]); // heuristic for initial value of lv; lv >= cp
+            mu:= Exp(lv);
             
-            delta1Lp:= LocalinfoList[i]`delta1Lp;
-            delta2Lp:= LocalinfoList[i]`delta2Lp;
-            logihat:= LocalinfoList[i]`logihat;
-            cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-            ijkLp:= LocalinfoList[i]`i0jk;
-            pAdicPrec:= LocalinfoList[i]`precision;
-            PrecMultiplier:= LocalinfoList[i]`precMultiple;
-            lp:= Max(cp,(1.3)^3*Log(Case`bound)); // heuristic for initial value of lv; lv >= cp
-            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            assert hv gt cv;
             
-            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-            assert (cp le lp) and (lp lt hp);
-            assert (hp gt Max(0,cp));
-
-            while (mu+100) gt pAdicPrec do       // recompute deltas with new pAdicPrec:= 3*mu
-                print "+1";
-                LocalinfoList[i]`precMultiple:= (1.3)*LocalinfoList[i]`precMultiple;
-                pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);
-                pAdicPrec:= LocalinfoList[i]`precision;
-                delta1Lp:= LocalinfoList[i]`delta1Lp;
-                delta2Lp:= LocalinfoList[i]`delta2Lp;
-                logihat:= LocalinfoList[i]`logihat;
-                assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
-                // assert that cp has not changed
-                assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-                PrecMultiplier:= LocalinfoList[i]`precMultiple;
-            end while;
-            assert ((mu+100) le pAdicPrec);
-            
-            // we now should have high enough precision to keep rum through FP at least once
-            matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-            matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
             bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
             
             if (#solutionsList ne 0) then
             // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
-                while (#solutionsList ne 0) and (cp le lp) and (lp lt hp) do
+                while (#solutionsList ne 0) and (cv le lv) and (lv lt hv) do
                   //  print "*1";
-                    lp:= lp*(1.3);        // decrease lv
-                    mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-                    assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-                    assert (cp le lp) and (lp lt hp);
-                    // ensure that precision is high enough
-                    while (mu+100) gt pAdicPrec do       // recompute deltas with new pAdicPrec:= 3*mu
-                       // print "+1";
-                        LocalinfoList[i]`precMultiple:= (1.3)*LocalinfoList[i]`precMultiple;
-                        pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);
-                        pAdicPrec:= LocalinfoList[i]`precision;
-                        delta1Lp:= LocalinfoList[i]`delta1Lp;
-                        delta2Lp:= LocalinfoList[i]`delta2Lp;
-                        logihat:= LocalinfoList[i]`logihat;
-                        assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
-                        // assert that cp has not changed
-                        assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-                        PrecMultiplier:= LocalinfoList[i]`precMultiple;
-                    end while;
-                    assert ((mu+100) le pAdicPrec);
-                    matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                    matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+                    lv:= lv*(1.3);        // decrease lv
+                    mu:= Exp(lv);
+                    assert mu gt 0;
+                    assert (cv le lv) and (lv lt hv);
+                    
+                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                    BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                    matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
                     bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
                 end while; // exits when lp is found such that there are no solutions
                 
             else // otherwise we have 0 solutions; try to find a smaller bound
             // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
-                while (#solutionsList eq 0) and (cp le lp) and (lp lt hp) do
+                while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
                     //print "/1";
-                    lp:= lp/(1.3);        // decrease lv
-                    mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-                    assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-                    assert (cp le lp) and (lp lt hp);
-                    assert ((mu+100) le pAdicPrec);
-                    matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                    matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+                    lv:= lv/(1.3);        // decrease lv
+                    mu:= Exp(lv);
+                    assert mu gt 0;
+                    assert (cv le lv) and (lv lt hv);
+                    
+                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                    BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                    matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
                     bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
                 end while; // exits when lp is found such that there are no solutions
-                lp:= lp*(1.3);  // smallest value of lp such that there are 0 solutions
-                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-                matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+                lv:= lv*(1.3);  // smallest value of lp such that there are 0 solutions
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
                 bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
                 assert bufferWasBigEnough and (#solutionsList eq 0);
             end if;
             
             
-            print "BEFRORE mu,lp", mu, lp;
-            while (#solutionsList eq 0) and (mu gt Max(0,Valuation(delta2Lp) - Valuation(logihat))) do
-                print "-mu";
-                mu:= mu - 1;
-                assert ((mu+100) le pAdicPrec);
-                matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+           // print "BEFRORE mu,lv", mu, lv;
+            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
+              //  print "-lv", lv;
+                //print "/1";
+                lv:= lv-1;        // decrease lv
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
                 bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-            end while;
-            mu:= mu + 1;        // smallest value of mu such that there are 0 solutions
-            lp:= Ceiling(Log(p)*(mu + Valuation(logihat) - Valuation(delta2Lp)));  
-            assert mu eq Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
-            matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-            matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
+            end while; // exits when lp is found such that there are no solutions
+            lv:= lv+1;  // smallest value of lp such that there are 0 solutions
+            mu:= Exp(lv);
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
             bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
             assert bufferWasBigEnough and (#solutionsList eq 0);
         
-            print "mu,lp", mu, lp;
-        end for;
-        
-        for i in [1..#AutL] do
-            hv:= HeightBounds`heightepslist[i];
-
-            LocalinfoList[i]:=rec< LocalInfo | precMultiple:= 1.3^5>;
-            RealLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);   
-        end for;
-    
-                            
-    CaseNo:= CaseNo + 1;
+     //   print "lv", lv;
+        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
     end for;
-
- 
-            
-            
-            
-            stillEnumerating:= true;
-            
-            while stillEnumerating do
-                // increase lv until solutions appear or lv is no longer in range and (Max(0,cp) lt lv) and (lv lt hp) and (mu gt muBound) 
-                
-                
-                // change lv until solutions appear or lv is no longer in range
-                while (#solutionsList eq 0) and (Max(0,cp) lt lv) and (lv lt hp) and (mu gt muBound) then
-                    if (#solutionsList eq 0) then
-                        lv:= lv/1.3;        // decrease lv
-                    else
-                        lv:= lv*(1.3);
-                    end if;
-                    mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-                    // ensure that precision is high enough
-                    while ((mu+100) gt pAdicPrec) and (lv gt pAdicPrec) do       // recompute deltas with new pAdicPrec:= 3*mu
-                        PrecMultiplier:= PrecMultiplier + 1;
-                        pLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case,1.3^(PrecMultiplier));
-                        pAdicPrec:= LocalinfoList[i]`largePrec;
-                        delta1Lp:= LocalinfoList[i]`delta1Lp;
-                        delta2Lp:= LocalinfoList[i]`delta2Lp;
-                        logihat:= LocalinfoList[i]`logihat;
-                        assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
-                        // assert that cp has not changed
-                        assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-                    end while;
-                    matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                    matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
-                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=10,lllReduce:=true, breakSymmetry:= true);
-                end while;
-                
-                
-                
-                while (#solutionsList eq 0) and (Max(0,cp) lt lv) and (lv lt hp) and (mu gt muBound) then
-                    mu:= mu - 1;
-                    assert ((mu+100) gt pAdicPrec) and (lv gt pAdicPrec);
-                    matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,LocalinfoList[i],HeightBounds,RealPrec, LintoC);
-                    matBtmatB, vecc, boundForNormSquared:= pLattice(LocalinfoList[i],matM,Bgam,BepsList,pAdicPrec,mu);
-                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=10,lllReduce:=true, breakSymmetry:= true);
-                end while;
-                
-                
-                
-            end while;
-            
     
-        
-        
-        
-        
-        
-        
-        
-         //pprecs:= padicprecision(primelist, L);      // estimated required precision 
-        // generate a record to store relevant local info
-
-// padic: 
-//    pCaseInfo:= recformat<prime,idealinL,Lp,mapLLp,smallbound,ijkLp,delta1inQp,delta2inQp,ihat,logihat,betalist>;
-//    //printf "Computing all roots of f in Cp...";
-//        t3:= Cputime();
-//    localpinfoList:= [];
-        
-
-//UseSmallBound:= false;  // still to include
-//pAdicPrec:= 100; 
-//// higher precision here means that the pAdicLog is slower, 
-////      // in particular, in pAdicLog, computing Log at the end is slow
-////though possibly so is generating the Lp,mapLLp field and map
-
-
-//RealPrec:= 100;
-
-
-//// run through all possible combos of embeddings 
-
-//Prec:= [pAdicPrec,RealPrec];
-    LocalinfoList:= [];
+    // update Height Bounds; ie set the vector h to the vector l and continue
+    // from here on out, we will obtain solutions when using Fincke-Pohst
+    HeightBounds:= NewHeightBounds;     
+    
+    
+    pAdicReductionIteration(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,Case,HeightBounds,~NewHeightBounds: iterationNo:= 1);
+    
+    
+    // ROUND 2
+ ////////////////////////////////////////////////////////////////////////////////////////////////
     for i in [1..nu] do
         p:= CasePrimes[i];
+        hp:= HeightBounds`heightgammalist[i];
         idealinL:= (Factorisation(p*OL))[1][1];
-        LocalinforList[i]:=rec< LocalInfo | prime:= p, idealinL:= idealinL>;
-        // generate delta1, delta2 in Qp
-        deltasinQp(fieldKinfo,fieldLinfo,Case,localpinfoList[i],ijkL,AutL,Prec);
         
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        ijkLp:= localpinfoList[i]`ijkLp;
-        
-        // choose lv
-        lv:= 1000;
-        assert lv ge cp;
-        assert HeightBounds`heightgammalist[i] gt Max(0,cp);
-        mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2));
-        
-        if 2*mu gt pAdicPrec then       // recompute deltas with new pAdicPrec:= 3*mu
-            Prec:= [3*mu,RealPrec];
-            deltasinQp(fieldKinfo,fieldLinfo,Case,localpinfoList[i],ijkL,AutL,Prec);
-            delta1:= localpinfoList[i]`delta1inQp;
-            delta2:= localpinfoList[i]`delta2inQp;
-            assert localpinfoList[i]`ijkLp eq ijkLp; // assert that i0,j,k has not changed 
+        delta1Lp:= LocalinfoList[i]`delta1Lp;
+        delta2Lp:= LocalinfoList[i]`delta2Lp;
+        logihat:= LocalinfoList[i]`logihat;
+        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+        ijkLp:= LocalinfoList[i]`i0jk;
+        precision:= LocalinfoList[i]`precision;
+        PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        lp:= Max(cp,hp - 10*Log(p)); // decrease mu by 1 (so degrease lp by Log(p) from original hp)
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+       // print "MU", mu;
+        assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+        assert (cp le lp) and (lp lt hp);
+        assert (hp gt Max(0,cp));
+
+        while (mu+100) gt precision do       // recompute deltas with new pAdicPrec:= 3*mu
+        //    print "+1";
+            LocalinfoList[i]`precMultiple:= (1.3)*LocalinfoList[i]`precMultiple;
+            pAdicLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);
+            precision:= LocalinfoList[i]`precision;
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
             // assert that cp has not changed
-            assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        end if;
-        assert 2*mu lt pAdicPrec;
-        // now go into pAdicLatticePrep;
-        // we now should have high enough precision to keep going because 
+            assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        end while;
+        assert ((mu+100) le precision);
         
-        matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,localpinfoList[i],AutL,mapsLL,HeightBounds,RealPrec);
+        // we now should have high enough precision to keep rum through FP at least once
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
         
-        
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfo: UseSmallBound:=true);
-        
-        matBtmatB, vecc, boundForNormSquared:= pLattice(fieldLinfo,localpinfoList[i],pAdicPrec,mu);
-        
-        boundForNormSquared;
-        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=100,lllReduce:=true, breakSymmetry:= true);
-        #solutionsList;
-          
+        if (#solutionsList ne 0) and (bufferWasBigEnough) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+           print "TEST SOLUTIONS";
+           LocalinfoList[i]`solutions:= solutionsList; 
             
-            // keep going
         
         
-      
-        
-          
-            
-              
-                
-                  
-                    
-                      
-                          
-procedure(fieldKinfo,fieldLinfo,Case,~localpinfo,ijkL,AutL,HeightBounds,Prec : UseSmallBound:=true, Setup:= true);
-    
-
-
-
-        // compute thetas, relevant maps for each prime in the TM equation
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound, Setup:= true);        
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        assert lv ge cp;
-        assert HeightBounds`heightgammalist[i] gt Max(0,cp);
-        
-        mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2));
-        Prec:= [3*mu, RealPrec];
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound, Setup:= false);        
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        
-        
-        if (assigned localpinfoList[i]`smallbound) and (UseSmallBound eq true) then
-            // reduce equation to move alpha into other cases
-            // should check if now, we are in one of the other cases
-            // ie shuffle throught the other cases to see if there is a match
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cp le lp) and (lp lt hp) and (lp gt Log(p)*(Valuation(logihat) - Valuation(delta2Lp))) do
+                print "/1";
+                lp:= lp - 10*Log(p);        // decrease lv
+                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+                assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+                assert (cp le lp) and (lp lt hp);
+                assert ((mu+100) le precision);
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+                matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lp:= lp + 10*Log(p);  // smallest value of lp such that there are 0 solutions
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
         end if;
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        logihat:= localpinfoList[i]`logihat;
         
-        
-        Valuation(delta1), Valuation(delta2);
-        
-        lv:= 200; 
-        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        assert lv ge cp;
-        assert HeightBounds`heightgammalist[i] gt Max(0,cp);
-        
-        mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2));
-        assert mu lt pAdicPrec;
-        print "mu:", mu;
-        //print "mu/Case`bound", RealField()!(mu/Case`bound);
-        matBtmatB, vecc, boundForNormSquared:= pLattice(fieldLinfo,localpinfoList[i],pAdicPrec,mu);
-        
-        boundForNormSquared;
-        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=100,lllReduce:=true, breakSymmetry:= true);
-        #solutionsList;
-        
-
+        NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
     end for;
-    printf "Done! Duration: %o\n", Cputime(t3);
     
-end for;
+    for i in [1..#fieldLinfo`ijk] do
+        v:= fieldLinfo`ijk[i];
+        hv:= HeightBounds`heightepslist[i];
         
-         
-         
-// COPY
-
-Prec:= [pAdicPrec,RealPrec];
+        delta1Cv:= LocalinfoList[i+nu]`delta1Lp;
+        delta2Cv:= LocalinfoList[i+nu]`delta2Lp;
+        cv:= Log(Max( 2*Abs(delta2Cv),1 ));
+        lv:= Max([Log(2),cv,hv - 5]); // heuristic for initial value of lv; lv >= cp
+        mu:= Exp(lv);
+        
+        assert mu gt 0;
+        assert (cv le lv) and (lv lt hv);
+        assert hv gt cv;
+        
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+        BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+        matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
+        
+        if (#solutionsList ne 0) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            print "TEST SOLUTIONS";
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
+                //print "/1";
+                lv:= lv-1;        // decrease lv
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lv:= lv+1;  // smallest value of lp such that there are 0 solutions
+            mu:= Exp(lv);
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
+        end if;
+        
+        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
+    end for;
+    
+    
+       // update Height Bounds; ie set the vector h to the vector l and continue
+    // from here on out, we will obtain solutions when using Fincke-Pohst
+    HeightBounds:= NewHeightBounds;     
+    
+    // ROUND 3
+ ////////////////////////////////////////////////////////////////////////////////////////////////
     for i in [1..nu] do
         p:= CasePrimes[i];
+        hp:= HeightBounds`heightgammalist[i];
         idealinL:= (Factorisation(p*OL))[1][1];
         
-        localpinfoList[i]:=rec< pCaseInfo | prime:= p, Lp:= Lp, mapLLp:= mapLLp>;
+        delta1Lp:= LocalinfoList[i]`delta1Lp;
+        delta2Lp:= LocalinfoList[i]`delta2Lp;
+        logihat:= LocalinfoList[i]`logihat;
+        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+        ijkLp:= LocalinfoList[i]`i0jk;
+        precision:= LocalinfoList[i]`precision;
+        PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        lp:= Max(cp,hp - 5*Log(p)); // decrease mu by 1 (so degrease lp by Log(p) from original hp)
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+        //print "MU", mu;
+        assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+        assert (cp le lp) and (lp lt hp);
+        assert (hp gt Max(0,cp));
 
-
-        // compute thetas, relevant maps for each prime in the TM equation
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound, Setup:= true);        
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        assert lv ge cp;
-        assert HeightBounds`heightgammalist[i] gt Max(0,cp);
+        while (mu+100) gt precision do       // recompute deltas with new pAdicPrec:= 3*mu
+            print "+1";
+            LocalinfoList[i]`precMultiple:= (1.3)*LocalinfoList[i]`precMultiple;
+            pAdicLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);
+            precision:= LocalinfoList[i]`precision;
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
+            // assert that cp has not changed
+            assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        end while;
+        assert ((mu+100) le precision);
         
-        mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2));
-        Prec:= [3*mu, RealPrec];
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound, Setup:= false);        
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
+        // we now should have high enough precision to keep rum through FP at least once
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
         
-        
-        if (assigned localpinfoList[i]`smallbound) and (UseSmallBound eq true) then
-            // reduce equation to move alpha into other cases
-            // should check if now, we are in one of the other cases
-            // ie shuffle throught the other cases to see if there is a match
+        if (#solutionsList ne 0) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+           print "TEST SOLUTIONS", #solutionsList;
+            
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cp le lp) and (lp lt hp) and (lp gt Log(p)*(Valuation(logihat) - Valuation(delta2Lp))) do
+                //print "/1";
+                lp:= lp - 5*Log(p);        // decrease lv
+                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+                assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+                assert (cp le lp) and (lp lt hp);
+                assert ((mu+100) le precision);
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+                matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lp:= lp + 5*Log(p);  // smallest value of lp such that there are 0 solutions
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
         end if;
-        delta1:= localpinfoList[i]`delta1inQp;
-        delta2:= localpinfoList[i]`delta2inQp;
-        logihat:= localpinfoList[i]`logihat;
         
-        
-        Valuation(delta1), Valuation(delta2);
-        
-        lv:= 200; 
-        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1)) - Valuation(delta2));
-        assert lv ge cp;
-        assert HeightBounds`heightgammalist[i] gt Max(0,cp);
-        
-        mu:= Floor(lv/Log(p) - Valuation(logihat) + Valuation(delta2));
-        assert mu lt pAdicPrec;
-        print "mu:", mu;
-        //print "mu/Case`bound", RealField()!(mu/Case`bound);
-        matBtmatB, vecc, boundForNormSquared:= pLattice(fieldLinfo,localpinfoList[i],pAdicPrec,mu);
-        
-        boundForNormSquared;
-        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=100,lllReduce:=true, breakSymmetry:= true);
-        #solutionsList;
-        
-
+        NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
     end for;
-    printf "Done! Duration: %o\n", Cputime(t3);
     
+    for i in [1..#AutL] do
+        v:= AutL[i];
+        hv:= HeightBounds`heightepslist[i];
+        
+        delta1Cv:= LocalinfoList[i+nu]`delta1Lp;
+        delta2Cv:= LocalinfoList[i+nu]`delta2Lp;
+        cv:= Log(Max( 2*Abs(delta2Cv),1 ));
+        lv:= Max([Log(2),cv,hv - 5]); // heuristic for initial value of lv; lv >= cp
+        mu:= Exp(lv);
+        
+        assert mu gt 0;
+        assert (cv le lv) and (lv lt hv);
+        assert hv gt cv;
+        
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+        BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+        matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
+        
+        if (#solutionsList ne 0) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            print "TEST SOLUTIONS", #solutionsList;
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
+                //print "/1";
+                lv:= lv-5;        // decrease lv
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lv:= lv+5;  // smallest value of lp such that there are 0 solutions
+            mu:= Exp(lv);
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
+        end if;
+        
+        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
+    end for;
+    HeightBounds:= NewHeightBounds;  
+    
+    
+////////////////////////////
+////////////////////////ROUND 4/////////////////
+while &or[HeightBounds`heightgammalist[i] gt 15 : i in [1..nu]] do
+  for i in [1..nu] do
+        p:= CasePrimes[i];
+        hp:= HeightBounds`heightgammalist[i];
+        idealinL:= (Factorisation(p*OL))[1][1];
+        
+        delta1Lp:= LocalinfoList[i]`delta1Lp;
+        delta2Lp:= LocalinfoList[i]`delta2Lp;
+        logihat:= LocalinfoList[i]`logihat;
+        cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+        ijkLp:= LocalinfoList[i]`i0jk;
+        precision:= LocalinfoList[i]`precision;
+        PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        lp:= Max(cp,hp - 2*Log(p)); // decrease mu by 1 (so degrease lp by Log(p) from original hp)
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
+        //print "MU", mu;
+        assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+        assert (cp le lp) and (lp lt hp);
+        assert (hp gt Max(0,cp));
+
+        while (mu+100) gt precision do       // recompute deltas with new pAdicPrec:= 3*mu
+            print "+1";
+            LocalinfoList[i]`precMultiple:= (1.3)*LocalinfoList[i]`precMultiple;
+            pAdicLatticePrep(fieldKinfo, fieldLinfo,~LocalinfoList[i], Case);
+            precision:= LocalinfoList[i]`precision;
+            delta1Lp:= LocalinfoList[i]`delta1Lp;
+            delta2Lp:= LocalinfoList[i]`delta2Lp;
+            logihat:= LocalinfoList[i]`logihat;
+            assert LocalinfoList[i]`i0jk eq ijkLp; // assert that i0,j,k has not changed 
+            // assert that cp has not changed
+            assert cp eq Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
+            PrecMultiplier:= LocalinfoList[i]`precMultiple;
+        end while;
+        assert ((mu+100) le precision);
+        
+        // we now should have high enough precision to keep rum through FP at least once
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
+        
+        if (#solutionsList ne 0) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+           print "TEST SOLUTIONS", #solutionsList;
+            
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cp le lp) and (lp lt hp) and (lp gt Log(p)*(Valuation(logihat) - Valuation(delta2Lp))) do
+                //print "/1";
+                lp:= lp - 2*Log(p);        // decrease lv
+                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+                assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+                assert (cp le lp) and (lp lt hp);
+                assert ((mu+100) le precision);
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+                matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lp:= lp + 2*Log(p);  // smallest value of lp such that there are 0 solutions
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds);
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
+        end if;
+        
+        NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
+    end for;
+    
+    for i in [1..#AutL] do
+        v:= AutL[i];
+        hv:= HeightBounds`heightepslist[i];
+        
+        delta1Cv:= LocalinfoList[i+nu]`delta1Lp;
+        delta2Cv:= LocalinfoList[i+nu]`delta2Lp;
+        cv:= Log(Max( 2*Abs(delta2Cv),1 ));
+        lv:= Max([Log(2),cv,hv - 1]); // heuristic for initial value of lv; lv >= cp
+        mu:= Exp(lv);
+        
+        assert mu gt 0;
+        assert (cv le lv) and (lv lt hv);
+        assert hv gt cv;
+        
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+        BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+        matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc,lllReduce:=true, breakSymmetry:= true);
+        
+        if (#solutionsList ne 0) then
+        // increase lv until there are no solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            print "TEST SOLUTIONS", #solutionsList;
+        else // otherwise we have 0 solutions; try to find a smaller bound
+        // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
+                //print "/1";
+                lv:= lv-1;        // decrease lv
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lv:= lv+1;  // smallest value of lp such that there are 0 solutions
+            mu:= Exp(lv);
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
+        end if;
+        
+        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
+    end for;
+    HeightBounds;
+    HeightBounds:= NewHeightBounds;
+    HeightBounds;      
+end while;
+    
+    
+    
+    
+    
+    
+            
+
+intrinsic ExtractTuplePadic(~bbb::SeqEnum[FldRatElt],~ExtractTuplePadicInput::List,~uuu::LatElt[RngInt])
+{}
+//Extract tuple (b_{JJJ[2]},...,b_{JJJ[nJJJ]})
+//ExtractTuplePadicInput:=[*bbb,l,ihat,istar,yyy,zzz,JJJ,nJJJ,nJ,W,B,v*];
+//bbb:=ExtractTuplePadicInput[1];
+l:=ExtractTuplePadicInput[2];
+ihat:=ExtractTuplePadicInput[3];
+istar:=ExtractTuplePadicInput[4];
+yyy:=ExtractTuplePadicInput[5];
+zzz:=ExtractTuplePadicInput[6];
+JJJ:=ExtractTuplePadicInput[7];
+nJJJ:=ExtractTuplePadicInput[8];
+nJ:=ExtractTuplePadicInput[9];
+W:=ExtractTuplePadicInput[10];
+B:=ExtractTuplePadicInput[11];
+v:=ExtractTuplePadicInput[12];
+
+bbb[1]:=1;
+if ihat[l] le 1+v then
+
+for i:=2 to istar[l]-1 do
+bbb[i]:=(uuu[i-1]-(yyy[i-1][1]-zzz[i-1][1]) + (1/2)*W[JJJ[i]]*B[JJJ[i]])/W[JJJ[i]];
 end for;
-        
-         
-// Real
-         
-         
-         
-         
-         
-// Real
- 
-        
- 
- bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=100,lllReduce:=true, breakSymmetry:= true);
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-        
-                // if r = 2:
-
-    
-Reallattice:
-          
-          
- compute wgamlatlist,wepslatlist, then matM, then:  and add Bepstar in 
-// generates real lattice matrix
-    ///////
-    // CHECK THAT CONDITIONS OF THE LEMMATA ARE MET; choose tau // shuffle through tau;
-    i:= 1;      // TEMP
-    tauAut:= AutL[i];
-    ctau:= Log(Max(1,2*Abs( LintoC(tauAut(delta2L)))));
-    assert hepslist[i] gt ctau; // MIGHT NEED TO BE AN IF STATEMENT
-    ktau:= (3/2)*Abs( LintoC(tauAut(delta2L))); // TEMP
-    ltau:= Floor(1/2*Log(quadbound));   //TEMP; try 1000
-    ltau:= 200;
-    c:= Ceiling(Exp(ltau)); // TEMP
-    // compute bound b
-    Bgam:= Ceiling((1/Log(2)^2)*&+[ h^2 : h in hgamlist]);
-    
-    // compute bound b_eps; since r = 2, there is only 1 such b_eps where eps =! eps^*
-        // choose eps^* = epslist[2]; hence l = 1 here
-    Beps:= ((1/Degree(K,Rationals()))*&+[hgamlist[k]*wgamlklist[1][k] : k in [1..nu]]);
-    Beps:= Ceiling((Beps + (1/Degree(L,Rationals()))*&+[hepslist[k]*wepslklist[1][k] : k in [1..#AutL]])^2);
-    
-    // compute bound b_eps^*; since r = 2, there is only 1 such b_eps where eps =! eps^*
-        // choose eps^* = epslist[2]; hence l = 2 here
-        
-    sum1:= (1/Degree(K,Rationals()))*&+[hgamlist[k]*wgamlatlist[k] : k in [1..nu]];
-    sum2:= (1/Degree(L,Rationals()))*&+[hepslist[k]*wepslatlist[k] : k in [1..#AutL]];
-    Bepstar:= Ceiling(((1/2)*(sum1 + sum2) + 1/2 + c*ktau*Exp(-ltau))^2);
-    
-    
-    /////////
-    // should make eps^* more explicit maybe
-
-    // compute alpha_{gam, k} for the lattice Gamma_tau
-    alpha0:= Round(c*Log(Abs(LintoC(tauAut(delta1L)))));     // might have to consider what Round is doing here
-    alphagamlist:= [Round(c*Log(Abs(LintoC( tauAut(gammalistLk[k]/gammalistLj[k]) )))) : k in [1..nu]];
-    
-    // compute alpha_{eps, 1} for the lattice Gamma_tau
-        // choose eps^* = epslist[2];
-    alphaepslist:= [Round(c*Log(Abs(LintoC( tauAut(epslistLk[k]/epslistLj[k]) )))) : k in [1..r]];
-    
-    // generate the matrix defining the lattice Gamma_tau
-    matGtau:= IdentityMatrix(Integers(),nu+r);
-    for i in [1..nu] do
-        matGtau[nu+r,i]:= alphagamlist[i];
-    end for;
-    for i in [nu+1..nu+r] do
-        matGtau[nu+r,i]:= alphaepslist[i-nu];
-    end for;
-    
-//            // TESTING TRANSLATED LATTICE
-//            matGtau:= IdentityMatrix(Rationals(),nu+r);
-//            for i in [1..nu] do
-//                matGtau[nu+r,i]:= alphagamlist[i];
-//            end for;
-//            for i in [nu+1..nu+r] do
-//                matGtau[nu+r,i]:= alphaepslist[i-nu];
-//            end for;
-    
-//             // generate the translation vector w_tau of the lattice Gamma_tau
-//            vecWtau:= ZeroMatrix(Rationals(),nu+r,1);
-//            vecWtau[nu+r,1]:= alpha0;
-//           // END OF TEST
-    
-    
-    
-    
-//            // generate the translation vector w_tau of the lattice Gamma_tau
-//            vecWtau:= ZeroMatrix(Integers(),nu+r,1);
-//            vecWtau[nu+r,1]:= alpha0;
-    
-    // generate the matrix representing the ellipsoid, M^T*M;
-    matM:= IdentityMatrix(Integers(),nu+r);
-    InsertBlock(~matM, (Beps*Bepstar)*(Transpose(matA)*matD*matA), 1, 1);
-    //InsertBlock(~matM, (Transpose(matA)*matD*matA), 1, 1); 
-    matM[nu+1, nu+1]:= Floor(Bgam*Bepstar);
-    matM[nu+2, nu+2]:= Floor(Bgam*Beps);
-    
-    // generate the matrix B^T*B
-    matB:= Transpose(matGtau)*matM*matGtau;
-    center:= ZeroMatrix(Rationals(), nu+r, 1);
-    center[nu+r,1]:= -alpha0/alphaepslist[r];
-    boundForNormSquared:= Ceiling((1+r)*(Bgam*Beps*Bepstar));
-
-return matB, boundForNormSquared, center;
-            maxNumSolutions:= 10;
-            bufferWasBigEnough, solutionsList:= My_FinckePohst(matB,boundForNormSquared:center:=center, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
-
-
-////////////////////////////////////////////////////////////////////////////////
-///// NON-ARCHIMEDEAN CASE /////////////////////////////////////////////////////
-////oh how i wish all of the code would fit in the lines properly///////////////
-
-
-
-prec:= 30; //placeholder
-Thetaps:= [];
-printf "Computing all roots of f in Cp...";
-t3:= Cputime();
-for i in [1..#gammalist] do
-    p:=primelist[i];
-    fprsL:= Factorisation(p*OL);
-    fprsL:= fprsL[1][1];
-    //prec:= pprecs[i];
-    Thetaps[i]:= thetas(th,p,prec,L,fprsL);
+bbb[istar[l]]:=(uuu[nJJJ-1]-(yyy[nJJJ-1][1]-zzz[nJJJ-1][1]) + (1/2)*W[JJJ[istar[l]]]*B[JJJ[istar[l]]])/W[JJJ[istar[l]]];
+for i:=istar[l]+1 to 1+nJ do
+bbb[i]:=(uuu[i-2]-(yyy[i-2][1]-zzz[i-2][1]) + (1/2)*W[JJJ[i]]*B[JJJ[i]])/W[JJJ[i]];
+end for;
+for i:=2+nJ to nJJJ do
+bbb[i]:=(uuu[i-2]-(yyy[i-2][1]-zzz[i-2][1]))/W[JJJ[i]];
 end for;
 
-// need Realijk here
+else //ihat[l] gt 1+v
 
+for i:=2 to 1+nJ do
+bbb[i]:=(uuu[i-1]-(yyy[i-1][1]-zzz[i-1][1]) + (1/2)*W[JJJ[i]]*B[JJJ[i]])/W[JJJ[i]];
+end for;
+for i:=2+nJ to istar[l]-1 do
+bbb[i]:=(uuu[i-1]-(yyy[i-1][1]-zzz[i-1][1]))/W[JJJ[i]];
+end for;
+bbb[istar[l]]:=(uuu[nJJJ-1]-(yyy[nJJJ-1][1]-zzz[nJJJ-1][1]))/W[JJJ[istar[l]]];
+for i:=istar[l]+1 to nJJJ do
+bbb[i]:=(uuu[i-2]-(yyy[i-2][1]-zzz[i-2][1]))/W[JJJ[i]];
+end for;
+
+end if;
+
+end intrinsic;
+
+//////////////////////////////////////////////////////////////////
+
+intrinsic TestTuplePadic(~bbb::SeqEnum[FldRatElt],~TestTuplePadicInput::List,~passes::BoolElt)
+{}
+//bbb:=TestTuplePadicInput[1];
+
+
+l:=TestTuplePadicInput[2];
+JJJ:=TestTuplePadicInput[3];
+nJJJ:=TestTuplePadicInput[4];
+nJ:=TestTuplePadicInput[5];
+jl:=TestTuplePadicInput[6];
+beta:=TestTuplePadicInput[7];
+hh:=TestTuplePadicInput[8];
+dd:=TestTuplePadicInput[9];
+p:=TestTuplePadicInput[10];
+SpecialCase:=TestTuplePadicInput[11];
+NewUpperBoundFornl:=TestTuplePadicInput[12];
+delta2:=TestTuplePadicInput[13];
+LogarithmicAlphap:=TestTuplePadicInput[14];
+B:=TestTuplePadicInput[15];
+I:=TestTuplePadicInput[16];
+
+while true do //this while loop is a hack to provide a way to "jump to line X" 
+
+for i:=2 to nJJJ do
+    if not IsIntegral(bbb[i]) then 
+        passes:=false; 
+        break; 
+    end if;
+end for;
+
+if passes eq false then 
+    break; 
+end if;
+
+for i:=2 to 1+nJ do
+    if bbb[i] gt B[JJJ[i]] or bbb[i] lt 0 then 
+        passes:=false; 
+        break; 
+    end if;
+end for;
+if passes eq false then 
+    break; 
+end if;
+
+for i:=2+nJ to nJJJ do
+    if bbb[i] gt B[JJJ[i]] or bbb[i] lt -B[JJJ[i]] then 
+        passes:=false; 
+        break; 
+    end if;
+end for;
+if passes eq false then 
+    break; 
+end if;
+
+
+/*test if tuple fits in the new box.  If so, throw it away (it's not exceptional).  Recall bbb[jl[l]] = b_{l+1} = n_l*/
+if bbb[jl[l]] le NewUpperBoundFornl then 
+    passes:=false; 
+    break; 
+end if;
+
+
+
+LAMBDAprime:=0;
+for i:=1 to nJJJ do 
+    LAMBDAprime:=LAMBDAprime + bbb[i]*beta[l][JJJ[i]];
+end for;
+if SpecialCase[l] eq true then
+    if Valuation(LAMBDAprime) ne bbb[jl[l]]*hh[l] + dd[l] then 
+        passes:=false; 
+        break; 
+    end if; 
+else //SpecialCase[l] eq false
+    if Valuation(LAMBDAprime) lt bbb[jl[l]]*hh[l] + dd[l] then 
+        passes:=false; 
+        break; 
+    end if;
+end if;
+
+
+// ADELA'S FUCKERY: have to remove this sieve (questionably, though), as it causes loss of solutions. 
+/*
+for ll in I do
+    if ll ne l then
+
+        LAMBDAprime:=0;
+        for i:=1 to nJJJ do 
+            LAMBDAprime:=LAMBDAprime + bbb[i]*beta[ll][JJJ[i]];
+        end for;
+        if SpecialCase[ll] eq true then
+            if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) ne bbb[jl[ll]]*hh[ll] + dd[ll] then
+                passes:=false; 
+                print "passes, 8688:", passes, ll;
+                break ll; 
+            end if;
+            if bbb eq [ 1, 0, 0, 1, 3, 2, 0, 0 ] then
+                print "yes, enters TestTuple, Line 8691";
+                print "passes?:", passes;
+            end if;
+            
+            
+        else //SpecialCase[ll] eq false
+            if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) lt bbb[jl[ll]]*hh[ll] + dd[ll] then
+                passes:=false;      
+                break ll;
+            end if;
+        end if;
+
+    end if;
+end for;
+*/
+if passes eq false then 
+    break; 
+end if;
+
+
+if SpecialCase[l] eq false then
+LAMBDA:=0;
+for i:=1 to nJJJ do
+LAMBDA:=LAMBDA + bbb[i]*LogarithmicAlphap[l][JJJ[i]];
+end for;
+if Valuation(LAMBDA) ne bbb[jl[l]]*hh[l] + Valuation(delta2[l]) then passes:=false; break; end if;
+end if; //end IF controlled by SpecialCase[l] 
+
+
+for ll in I do
+if ll ne l then
+if SpecialCase[ll] eq false then
+LAMBDA:=0;
+for i:=1 to nJJJ do 
+LAMBDA:=LAMBDA + bbb[i]*beta[ll][JJJ[i]];
+end for;
+if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDA) ne bbb[jl[ll]]*hh[ll] + Valuation(delta2[ll]) then
+passes:=false; break ll;
+end if;
+end if; //end IF controlled by SpecialCase[ll] 
+end if;
+end for;
+if passes eq false then break; end if;
+
+
+break;
+end while; //end hack while loop
+
+end intrinsic;
+
+////////////////////////////////////////////////////////////////////////////////////////////
+intrinsic ExtractTupleRealCase(~bbb::SeqEnum[FldRatElt],~ExtractTupleRealCaseInput::List,~uuu::LatElt[RngInt])
+{}
+//Extract tuple (b_{JJJ[2]},...,b_{JJJ[#JJJ]})
+//bbb:=ExtractTupleRealCaseInput[1];
+yyy:=ExtractTupleRealCaseInput[2];
+zzz:=ExtractTupleRealCaseInput[3];
+JJJ:=ExtractTupleRealCaseInput[4];
+nJJJ:=ExtractTupleRealCaseInput[5];
+nJ:=ExtractTupleRealCaseInput[6];
+W:=ExtractTupleRealCaseInput[7];
+B:=ExtractTupleRealCaseInput[8];
+phi:=ExtractTupleRealCaseInput[9];
+
+
+bbb[1]:=1;
+
+for i:=2 to 1+nJ do
+bbb[i] := (uuu[i-1] - (yyy[i-1][1]-zzz[i-1][1]) + (1/2)*W[JJJ[i]]*B[JJJ[i]])/W[JJJ[i]];
+end for;
+for i:=2+nJ to nJJJ-1 do
+bbb[i] := (uuu[i-1] - (yyy[i-1][1]-zzz[i-1][1]))/W[JJJ[i]];
+end for;
+sum:=0;
+for i:=1 to nJJJ-1 do
+sum:=sum+bbb[i]*phi[JJJ[i]];
+end for;
+bbb[nJJJ] := (uuu[nJJJ-1] - (yyy[nJJJ-1][1]-zzz[nJJJ-1][1]) - sum)/phi[JJJ[nJJJ]];
+
+end intrinsic;
+
+/////////////////////////////////////////////////////////////////////////////////
+
+intrinsic TestTupleRealCase(~bbb::SeqEnum[FldRatElt],~TestTupleRealCaseInput::List,~passes::BoolElt)
+{}
+//Test the tuple
+//bbb:=TestTupleRealCaseInput[1];
+JJJ:=TestTupleRealCaseInput[2];
+nJJJ:=TestTupleRealCaseInput[3];
+nJ:=TestTupleRealCaseInput[4];
+NewConditionalUpperBoundForAi0:=TestTupleRealCaseInput[5];
+jl:=TestTupleRealCaseInput[6];
+SpecialCase:=TestTupleRealCaseInput[7];
+p:=TestTupleRealCaseInput[8];
+delta2:=TestTupleRealCaseInput[9];
+hh:=TestTupleRealCaseInput[10];
+dd:=TestTupleRealCaseInput[11];
+B:=TestTupleRealCaseInput[12];
+I:=TestTupleRealCaseInput[13];
+beta:=TestTupleRealCaseInput[14];
+
+while true do //this while loop is a hack to provide a way to "jump to line X" 
+
+for i:=2 to nJJJ do
+if not IsIntegral(bbb[i]) then passes:=false; break; end if;
+end for;
+if passes eq false then break; end if;
+
+for i:=2 to 1+nJ do
+if bbb[i] gt B[JJJ[i]] or bbb[i] lt 0 then passes:=false; break; end if;
+end for;
+if passes eq false then break; end if;
+
+for i:=2+nJ to nJJJ do
+if bbb[i] gt B[JJJ[i]] or bbb[i] lt -B[JJJ[i]] then passes:=false; break; end if;
+end for;
+if passes eq false then break; end if;
+
+/*Test if the tuple fits in the new box.  If so, throw it away (it's not exceptional).*/
+FitsInTheNewBox:=true;
+for i:=2+nJ to nJJJ do
+if Abs(bbb[i]) gt NewConditionalUpperBoundForAi0 then 
+FitsInTheNewBox:=false; break i; 
+end if;
+end for;
+if FitsInTheNewBox eq true then passes:=false; break; end if;
+
+for ll in I do
+LAMBDAprime:=0;
+for i:=1 to nJJJ do 
+LAMBDAprime:=LAMBDAprime + bbb[i]*beta[ll][JJJ[i]];
+end for;
+if SpecialCase[ll] eq true then
+if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) ne bbb[jl[ll]]*hh[ll] + dd[ll] then
+passes:=false; break ll; 
+end if;
+else //SpecialCase[ll] eq false
+if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) lt bbb[jl[ll]]*hh[ll] + dd[ll] then
+passes:=false; break ll;
+end if;
+end if;
+end for;
+if passes eq false then break; end if;
+
+for ll in I do
+if SpecialCase[ll] eq false then
+LAMBDA:=0;
+for i:=1 to nJJJ do 
+LAMBDA:=LAMBDA + bbb[i]*beta[ll][JJJ[i]];
+end for;
+if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDA) ne bbb[jl[ll]]*hh[ll] + Valuation(delta2[ll]) then
+passes:=false; break ll;
+end if;
+end if;
+end for;
+if passes eq false then break; end if;
+
+
+break;
+end while; //end hack while loop
+
+end intrinsic;
+   
+            
+                     
+                              
+                                       
+                                                
+                                                                  
+       
 
 
 
@@ -2315,988 +2798,6 @@ pInteger:=function(elt,p,m,prec);
     return y;
 end function;
 
-
-
-
-           
-           
-
-
-latticeprep:=function(p,prec,L,fprsL,eps,zeta,thetap,quad);
-     /*
-    INPUT:
-        fa:= an ideal in OK such that
-            fa * fp_1^{n_1} * ... * fp_u^{n_u} = principal ideal
-        fplist:= a list of prime ideals
-        
-    OUTPUT:
-        tf, alpha, gammalist, matA, rr.
-	// Here tf is true or false. False means that [fa]^{-1} is not in the image
-	// of phi (in the notation of the letter) and so the equation has no solution.
-	// If tf is false then the other values return are all zero.
-	// If tf is true ([fa]^{-1} is in the image of phi),
-	// then alpha \in K^*
-	// gammalist is a list gamma_1,..,gamma_u, and these
-	// values are as in equation (4) of the letter.
-	// It also returns the matrix A, and the vector rr
-	// in the notation of the letter.
-	// If fplist is empty then it just returns tf, alpha, [], 0, 0
-	// where tf is true/false depending on whether fa is principal or not,
-	// and if so alpha will be a generator.
-    
-    REMARKS:
-        // I shouldn't start with this since this isn't the first thing we do...
-    
-    
-    EXAMPLE:
-    
-    // clist is a list of coefficients c_0,c_1,..,c_n.
-    // a is an integer.
-    // primelist is a list of the primes p_1,p_2,..,p_v.
-    // This returns a list of the possible quadruples [* alpha, gammalist, matA, r *] 
-    // where alpha in K^*, and gammalist is a list gamma_1,...,gamma_u 
-    // so that (c_0 X - th Y)OK =alpha*gamma_1^{m_1}*..*gamma_u^{m_u} (as in equation (4)).
-    // matA and rr are the matrix A and the vector rr, so that 
-    // nn = mm A + rr, where nn is the vector of exponents in (3)
-    // and mm is the vector of exponents in (4).
-    // DETERMINE PRECISION FOR P OUTSIDE LOOP
-    
-    // chooses d_l, ihat, h;
-    returns return MBnail, beta, h, ihat, dd, delta2;
-    */
-    K:=NumberField(Universe([quad[1]]));
-    OK:=MaximalOrder(K);
-    th:=K.1;
-    f:=MinimalPolynomial(th); 
-    assert &and[ c in Integers() : c in Coefficients(f) ];
-    assert IsMonic(f);
-    assert IsIrreducible(f);
-    n:=Degree(NumberField(OK));
-    assert n eq Degree(f);
-    f:=MinimalPolynomial(th); 
-    Lp, mLp:= Completion(L, fprsL : Precision:=prec);
-    Nail, i0jk:= pAdicjk(p,prec,L,fprsL,eps,zeta,thetap,quad);
-    // verify Lemma 6.5
-    if (Nail ne -1) and (i0jk ne [[],[],[]]) then
-        assert Nail ge 0;
-        //return Nail,[],0,0,0;
-    end if;        
-    assert #i0jk eq 3;
-   // assert (zeta eq K![-1,0,0,0] or zeta eq K![1,0,0,0]);
-    alpha:= quad[1];
-    gammalist:= quad[2];
-    v:= #gammalist;
-    // image of gamma under th -> thetap[i][j]
-    gammap:= [ImageInp(th,thetap,gamma) : gamma in gammalist];
-    fprs:= Factorisation(p*OK);
-    fprs:=[fact[1] : fact in fprs];     // the prime ideals above p
-    assert &and[#thetap[i] eq RamificationDegree(fprs[i])*InertiaDegree(fprs[i]) : i in [1..#fprs]];
-    // image of eps under th -> thetap[i][j]
-    epsp:= ImageInp(th,thetap,eps);    
-    tau:=alpha*zeta;
-    // image of tau under th -> thetap[i][j]
-    taup:= ImageInp(th,thetap,tau); 
-    i0:= i0jk[1];
-    jj:= i0jk[2];
-    kk:= i0jk[3];
-    assert #thetap[i0][1] eq 1;
-    delta1:=(thetap[i0][1] - thetap[j[1]][j[2]])/(thetap[i0][1] - thetap[k[1]][k[2]]);
-    delta1:= delta1*(taup[k[1]][k[2]]/taup[j[1]][j[2]]);
-    assert Valuation(delta1) eq 0;
-    delta2:=(thetap[j[1]][j[2]] - thetap[k[1]][k[2]])/(thetap[k[1]][k[2]] - thetap[i0][1]);
-    delta2:= delta2*(taup[i0][1]/taup[j[1]][j[2]]);
-    logalph:= pAdicLog(delta1,p); 
-    assert IsZeroLocal(logalph,AbsoluteDegree(Lp)) eq false;   
-    temp1:=[pAdicLog(gammap[i][k[1]][k[2]]/gammap[i][j[1]][j[2]], p) : i in [1..v]];
-    temp2:=[pAdicLog(epsp[k[1]][k[2]]/epsp[j[1]][j[2]], p)];
-    logalph:= [logalph] cat temp1 cat temp2;
-    assert #logalph eq (v+2);
-    // verify Lemma 6.9(i)
-    vals:= Min([Valuation(logalph[i]) : i in [2..(v+2)]]);
-    if Valuation(logalph[1]) lt vals then
-        Nail:=Max([Floor((1/(p-1) - Valuation(delta2))), Ceiling(vals - Valuation(delta2))-1]);
-        if Nail ge 0 then
-            return Nail,[],0,0,0;
-        else
-            return 0,[],0,0,0;
-        end if;
-    end if;
-    // verify Lemma 6.9(ii)
-    cals:= [LpType(la,p,Lp)[2] : la in logalph];        // coefficients of alpha_{ih}
-    u:= LpType(logalph[1],p,Lp)[1];
-    temph:= 1;
-    for h in [1..AbsoluteDegree(Lp)] do
-        nailh:=[];      // stores bounds for each h, where they exist
-        if IsZeroLocal(cals[1][h],AbsoluteDegree(Lp)) eq false then
-            temph:= h;
-            valsh:= Min([Valuation(cals[i][h]) : i in [2..v+2]]);
-            if Valuation(cals[1][h]) lt valsh then
-                Append(~nailh, Max([Floor((1/(p-1) - Valuation(delta2))), Ceiling(valsh - Valuation(delta2) + u)-1]));
-            end if;
-        end if;
-    end for;
-    if #nailh ge 1 then // holds for at least 1 h
-        Nail:= Min(nailh);
-        if Nail ge 0 then
-            return Nail,[],0,0,0;
-        else
-            return 0,[],0,0,0;
-        end if;
-    end if;
-    // if the program makes it this far, there are no small bounds on Nail
-        // arising from Lemma 6.5 and Lemma 6.9
-        // hence the code must enter the LLL process to reduce the bounds
-    // generates the linear forms in p-adic logs elements for the Special Case
-    if SpecialCase eq true then
-        min:=Valuation(logalph[2]);
-        vals, ihat:= Min([Valuation(logalph[i]) : i in [2..(v+2)]]);
-        ihat:= ihat + 1;
-        assert Valuation(logalph[1]) ge vals;     
-        assert Valuation(logalph[ihat]) eq vals;
-        beta:= [-logalph[i]/logalph[ihat] : i in [1..v+2]];
-        beta:= [LpType(b,p,Lp)[2][1] : b in beta];
-        dl:= Valuation(delta2) - Valuation(logalph[ihat]);
-        return -1, beta, ihat, dl, delta2;
-    // generates the linear forms in p-adic logs elements for the General Case
-    else
-        cals:= [LpType(la,p,Lp)[2] : la in logalph];        // coefficients of alpha_{ih}
-        u:= LpType(logalph[1],p,Lp)[1];
-        h:= temph;  // fix h in [1..AbsoluteDegree(Lp)] arbitrarily to be temph
-        assert IsZeroLocal(cals[1][h],AbsoluteDegree(Lp)) eq false; 
-        valsh, ihat:= Min([Valuation(cals[i][h]) : i in [2..v+2]]);
-        ihat:= ihat + 1;
-        assert Valuation(cals[1][h]) ge valsh;
-        assert Valuation(cals[ihat][h]) eq valsh;
-        assert IsZeroLocal(cals[ihat][h],AbsoluteDegree(Lp)) eq false;
-        beta:= [-cals[i][h]/cals[ihat][h] : i in [1..v+2]];
-        dl:= Valuation(delta2) - Valuation(logalph[ihat]) - u;
-        return -1, beta, ihat, dl, delta2;
-    end if; 
-end function;
-
-
-    
-    sc1:= false;        // placeholder to verify Lemma 6.5
-    for jk in pairs do
-        j:= jk[1];
-        k:=jk[2];
-        delta1:=(thetap[i0][1] - thetap[j[1]][j[2]])/(thetap[i0][1] - thetap[k[1]][k[2]]);
-        delta1:= delta1*(taup[k[1]][k[2]]/taup[j[1]][j[2]]);
-        if Valuation(delta1) ne 0 then
-            delta2:=(thetap[j[1]][j[2]] - thetap[k[1]][k[2]])/(thetap[k[1]][k[2]] - thetap[i0][1]);
-            delta2:= delta2*(taup[i0][1]/taup[j[1]][j[2]]);
-            Nail:= Min[Valuation(delta1),0] - Valuation(delta2);
-            if Nail ge 0 then
-                //sc1:= true;
-                // OLD
-                // return Nail, [[],[],[]], false;
-                print Nail;
-                break jk;
-            else
-    // no solutions are possible from this S-unit equation
-        // set default bound to 0
-                sc1:= true;
-                print 0;
-                //OLD
-                //return 0, false;
-                break jk;
-            end if;
-        end if;
-    end for;
-    assert (sc1 eq false);      // else the program will have ended
-
-     -1, [[i0,1],j,k], false;
-        
-            
-                
-                    
-//        // if f has at least 3 linear factors in Qp[t]; 
-//        // choose j,k to correspond to the roots of these linear factors
-//        // NB. each factor corresponds to a prime ideal above p
-//    if (&+[1 : i in [1..#fprs] | #thetap[i] eq 1] ge 3) then 
-//        jsks:= [[j,k] : j in [1..#fprs], k in [1..#fprs] | (j ne k) and (j ne i0) and (k ne i0)];
-//        jsks:= [jk : jk in jsks | (#thetap[jk[1]] eq 1) and (#thetap[jk[2]] eq 1)];         
-//        j:= [jsks[1][1],1];
-//        k:= [jsks[1][2],1];
-//        assert (#thetap[j[1]] eq 1) and (#thetap[k[1]] eq 1);
-//        assert (j[1] ne k[1]) and (j[1] ne i0) and (k[1] ne i0);
-//        SpecialCase:= true;
-//        return -1, [[i0,1],j,k], SpecialCase;
-//    // if f has an irreducible factor in Qp[t] of degree 2
-//        // choose j,k to correspond to the roots of this quadratic factor
-//    elif (2 in [#thetap[i] : i in [1..#fprs]]) then
-//    // determines the index of the degree 2 linear factor
-//        jk:= Index([#thetap[i] : i in [1..#fprs]], 2);  
-//        assert #thetap[jk] eq 2;
-//        j:= [jk,1];
-//        k:= [jk,2];
-//        SpecialCase:= true;
-////        return -1, [[i0,1],j,k], SpecialCase;
-////    // we are not in the special case
-////        // choose j,k to correspond to the roots of the same irred. factor in Qp[t]
-////    else
-////    // the upper bound on deg(gp) < [Lp:Qp]
-////        Lpdeg:= Degree(Lp,PrimeField(Lp));
-////        for i in [1..#fprs] do
-////            RI:= RamificationIndex(fprs[i]);
-////            ID:= InertiaDegree(fprs[i]);
-////            if (RI*ID gt 1) and (RI*ID lt Lpdeg) then
-////                Lpdeg:= RI*ID;
-////                j:= [i,1];
-////                k:= [i,2];
-////            end if;
-////        end for;
-////        assert #thetap[j[1]] gt 2;
-////        return -1, [[i0,1],j,k], false;
-
-//    assert &and[thetap[jk[1][1]][jk[1][2]] ne thetap[jk[2][1]][jk[2][2]] : jk in pairs]; 
-    
-
-    
-    
-//      if (&+[1 : i in [1..#fprs] | #thetap[i] eq 1] ge 3) then 
-//        jsks:= [[j,k] : j in [1..#fprs], k in [1..#fprs] | (j ne k) and (j ne i0) and (k ne i0)];
-//        jsks:= [jk : jk in jsks | (#thetap[jk[1]] eq 1) and (#thetap[jk[2]] eq 1)];         
-//        j:= [jsks[1][1],1];
-//        k:= [jsks[1][2],1];
-//        assert (#thetap[j[1]] eq 1) and (#thetap[k[1]] eq 1);
-//        assert (j[1] ne k[1]) and (j[1] ne i0) and (k[1] ne i0);
-//        SpecialCase:= true;
-//        return -1, [[i0,1],j,k], SpecialCase;
-//    // if f has an irreducible factor in Qp[t] of degree 2
-//        // choose j,k to correspond to the roots of this quadratic factor
-//    elif (2 in [#thetap[i] : i in [1..#fprs]]) then
-//    // determines the index of the degree 2 linear factor
-//        jk:= Index([#thetap[i] : i in [1..#fprs]], 2);  
-//        assert #thetap[jk] eq 2;
-//        j:= [jk,1];
-//        k:= [jk,2];
-//        SpecialCase:= true;
-    
-    
-//    jsks:= [[j,jj] : jj in [1..#thetap[j]], j in [1..#thetap] | j ne i0 ];
-//    // generates all possible pairs (embeddings) j,k
-//    pairs:= [[j,k] : j in jsks, k in jsks | j ne k ];
-//    npairs:= [];
-//    for jk in pairs do
-//        if (jk notin npairs) and ([jk[2],jk[1]] notin npairs) then
-//            Append(~npairs, jk);        // removes repetition
-//        end if;
-//    end for;
-//    pairs:=npairs;
-//    assert &and[thetap[jk[1][1]][jk[1][2]] ne thetap[jk[2][1]][jk[2][2]] : jk in pairs]; 
-    //end if;
-end function;
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///// OTHER/OLD TESTS/IDEAS FOR NON- ARCHIMEDEAN CASE //////////////////////////
-
-
-//// theres a possibility that my elements in L may be moving around - should avoid this
-//Realprep:= function(L, OL, AutL, Realijk, quad, tl, epslist, prc)
-//    K:=NumberField(Universe([quad[1]]));
-//    OK:=MaximalOrder(K);
-//    th:=K.1;
-//    f:=MinimalPolynomial(th); 
-//    assert &and[ c in Integers() : c in Coefficients(f) ];
-//    assert IsMonic(f);
-//    n:=Degree(NumberField(OK));
-//    assert n eq Degree(f);
-//    tf,mapKL:= IsSubfield(K,L);
-//    assert tf;
-//    assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-    
-//    alpha:= quad[1];
-//    gammalist:= quad[2];
-//    matA:= quad[3];
-//    fplist:= quad[5];
-//    quadprimes:= [Norm(fp) : fp in fplist];
-//    assert #quadprimes eq #gammalist;
-    
-//    r:= #epslist;
-//    assert r eq 2;
-    
-//    // apply automorphisms i,j,k: L -> L on the units
-//    epslistLi:= [Realijk[1](L!eps) : eps in epslist];
-//    epslistLj:= [Realijk[2](L!eps) : eps in epslist];
-//    epslistLk:= [Realijk[3](L!eps) : eps in epslist];
-//    // apply automorphisms i,j,k: L -> L on the elements gamma of the S-unit equation
-//    gammalistLi:= [Realijk[1](L!gamma) : gamma in gammalist];
-//    gammalistLj:= [Realijk[2](L!gamma) : gamma in gammalist];
-//    gammalistLk:= [Realijk[3](L!gamma) : gamma in gammalist];
-       
-//    gammafacLi:= [Factorization(ideal<OL|gammaL>) : gammaL in gammalistLi];
-//    gammafacLj:= [Factorization(ideal<OL|gammaL>) : gammaL in gammalistLj];
-//    gammafacLk:= [Factorization(ideal<OL|gammaL>) : gammaL in gammalistLk];
-        
-//    // ensure that the prime ideals in L above gamma don't cancel
-//    for i in [1..#gammalist] do
-//        assert (#gammafacLi[i] eq #gammafacLj[i]) and (#gammafacLj[i] eq #gammafacLk[i]);
-//        assert &and[gammafacLi[i][j] ne gammafacLj[i][j] : j in [1..#gammafacLi[i]]];
-//        assert &and[gammafacLi[i][j] ne gammafacLk[i][j] : j in [1..#gammafacLi[i]]];
-//        assert &and[gammafacLj[i][j] ne gammafacLk[i][j] : j in [1..#gammafacLj[i]]];
-//    end for;
-        
-//    CField<i>:= ComplexField(prc);
-//    LintoC:= hom< L -> CField | Conjugates(L.1)[1] >; 
-    
-//    for i1 in [1..#AutL] do
-//        for i2 in [i1 + 1..#AutL] do
-//            a:= (AutL[i1])(epslistLj[1]/epslistLi[1]);
-//            a:= Log(Abs(LintoC(a)));
-            
-//            b:= (AutL[i1])(epslistLj[2]/epslistLi[2]);
-//            b:= Log(Abs(LintoC(b)));
-            
-//            c:= (AutL[i2])(epslistLj[1]/epslistLi[1]);
-//            c:= Log(Abs(LintoC(c))); 
-            
-//            d:= (AutL[i2])(epslistLj[2]/epslistLi[2]);
-//            d:= Log(Abs(LintoC(d))); 
-//            if (a*d - b*c) ne 0 then
-//                iotalist:= [i1,i2];
-//                break i1;
-//            end if;
-//        end for;
-//    end for;
-//    matR:= Matrix(ComplexField(),r,r,[a,b,c,d]);
-//    tR, matRinv:= IsInvertible(matR);
-//    tA, matAinv:= IsInvertible(matA);
-//    assert tR and tA;
-//    i1:= iotalist[1];
-//    i2:= iotalist[2];
-    
-//    // iota 1 gammas and iota 2
-//    loggammalistLi1:= [ Log(Abs(LintoC( (AutL[i1])(gammalistLj[k]/gammalistLi[k]) ))) : k in [1..#gammalist]];
-//    loggammalistLi2:= [ Log(Abs(LintoC( (AutL[i2])(gammalistLj[k]/gammalistLi[k]) ))) : k in [1..#gammalist]];
-    
-//    wgammalist:= [];
-//    for l in [1..r] do
-//        wgammalist[l]:= [];
-//        for k in [1..#gammalist] do
-//            alphalk:= matRinv[l,1]*&+[matAinv[i,k]*loggammalistLi1[i] : i in [1..#gammalist]];
-//            alphalk:= alphalk + matRinv[l,2]*&+[matAinv[i,k]*loggammalistLi2[i] : i in [1..#gammalist]];
-//            wgammalist[l][k]:= Abs(alphalk)*Degree(K, Rationals())/Log(quadprimes[k]);
-//        end for;
-//    end for;
-            
-//    wepslist:= [];
-//    for l in [1..r] do
-//        wepslist[l]:= [];
-//        m:= Max(Abs(matRinv[l,1]), Abs(matRinv[l,2]));
-//        for i in [1..#AutL] do
-//            if i eq i1 then
-//                wepslist[l][i]:= (m+Abs(matRinv[l,1]))*(Degree(L, Rationals()));
-//            elif i eq i2 then
-//                wepslist[l][i]:= (m+Abs(matRinv[l,2]))*(Degree(L, Rationals()));
-//            else
-//                wepslist[l][i]:= m*(Degree(L, Rationals()));
-//            end if;
-//        end for;
-//    end for;
-    
-//    // bound on lin form in log
-//    wepslatlist:= [];
-//    wgammalatlist:= [];
-//    for i in [1..#AutL] do
-//        sig:= AutL[i];
-//        wepslatlist[i]:= (wepslist[1][i] + wepslist[2][i])/2;
-//    end for;
-//    for k in [1..#gammalist] do
-//        wgammalatlist[k]:= (wgammalist[1][k] + wgammalist[2][k])/2;
-//        abar:= &+[Abs(matAinv[j,k]) : j in [1..#gammalist]];
-//        wgammalatlist[k]:= wgammalatlist[k] + (Degree(K, Rationals()))/(2*Log(quadprimes[k]))*abar;
-//    end for;
-        
-        
-    
-//    return wepslist, wgammalist, wepslatlist, wgammalatlist;
-//end function;
-
-
-//Reallattice:= function(L, OL, AutL, Realijk, quad, tl, epslist, h, prc)
-//    K:=NumberField(Universe([quad[1]]));
-//    OK:=MaximalOrder(K);
-//    th:=K.1;
-//    f:=MinimalPolynomial(th); 
-//    assert &and[ c in Integers() : c in Coefficients(f) ];
-//    assert IsMonic(f);
-//    n:=Degree(NumberField(OK));
-//    assert n eq Degree(f);
-//    tf,mapKL:= IsSubfield(K,L);
-//    assert tf;
-//    assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-    
-//    alpha:= quad[1];
-//    gammalist:= quad[2];
-//    matA:= quad[3];
-//    fplist:= quad[5];
-//    quadprimes:= [Norm(fp) : fp in fplist];
-//    assert #quadprimes eq #gammalist;
-    
-//    r:= #epslist;
-//    assert r eq 2;
-    
-//    diag:= [ ((Log(p))^2)/Degree(K,Rationals()) : p in quadprimes];
-//    matD2:= DiagonalMatrix(ComplexField(), diag);
-    
-
-
-
-    
-//    // compute the bound on |a_l|^2
-//    alsquarebound:= [];
-//    for l in [1..r] do
-//        al1:= 0;
-//        for i in [1..#AutL] do
-//            al1:= al1 + wepslist[l][i]*h[i];
-//        end for;
-//        al1:= (1/(Degree(L, Rationals())))*al1;
-        
-//        al2:= 0;
-//        for i in [1..#gammalist] do
-//            al2:= al2 + (1/Degree(K, Rationals()))*wgammalist[l][i]*h[#AutL+i];
-//        end for;
-//        alsquarebound[l]:= (al1 + al2)^2;
-//    end for;
-        
-        
-        
-        
-        
-//        lin2bound:= [];
-//        for l in [1..r] do
-//            if #AutL eq 3 then
-//                al1:= (2/(Degree(L, Rationals())))* Max([wsiglist[l][i]*h[i] : i in [1..#AutL]]);
-//            else
-//                al1:= (1/(Degree(L, Rationals())))* Max([wsiglist[l][i]*h[i] : i in [1..#AutL]]);
-//            end if;
-//            for i in [1..#gammalist] do
-//                al1:= al1 + (1/Degree(K, Rationals()))*wklist[l][i]*h[i];
-//            end for;
-//            kappa:= 3/2;
-            
-            
-//            al1:= al1 + 1/2 + c*kappa*e^ltau // LEFT OFF HERE   
-            
-            
-//            lin2bound[l]:= al1^2;
-//        end for;
-
-
-
-Dec:= Decomposition(OL,p);
-for fp in Dec do
-    fprsL:= fp[1];
-    Lp, mLp:= Completion(L, fprsL : Precision:=prec);
-    fprs:=Factorisation(p*OK);
-    fprs:=[fact[1] : fact in fprs];     // the prime ideals above p
-    thetap:=[];
-    ths:= [mLp( ijk[i](th)) : i in [1..3]];
-    for i in [1..#fprs] do      // runs through each prime ideal above p
-        thetap[i]:= [* *];
-        Kp, mKp:= Completion(K,fprs[i] : Precision:=prec);
-        gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
-        gp_i;
-        temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
-        for j in [1..#temp] do
-            thetap[i][j]:= temp[j][1];
-        end for;
-    end for;
-    print thetap;
-    print ths;
-    print "=====================";
-end for;
-    
-// rearrange ijks so that L!th eq Realijk[1](th) (identity operation)
-// ensure that for deg1 prime ideal, we choose the ideal in L above it for fprsL
-// is it possible that magma's initial choice of representative for th is the wrong one?
-    
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///// OTHER/OL TESTS/IDEAS FOR ARCHIMEDEAN CASE ////////////////////////////////
-
-// using symmetry
-            center[nu+r,1]:= -alpha0;
-            boundForNormSquared:= Ceiling((1+r)*(alphaepslist[r]^2*Bgam*Beps*Bepstar));
-            
-            
-// OLD BOUND THING
-            vTv:= (Transpose(vecWtau)*matM*vecWtau)[1,1];
-            
-            Bound:= Ceiling(Abs( (1+r)*(Bgam*Beps*Bepstar) + vTv ) + 2*Abs(alpha0)*Bgam*Beps*Sqrt(Bepstar));
-            //Bound:= (Abs( Bgam + Beps + Bepstar) + vTv ) + 2*Abs(alpha0)*Bepstar*Sqrt(Bepstar);
-            NoSol:= 100;
-            
-            M, z, maxReached:= FinckePohst(matB,Bound,NoSol);
-          //  M, z, maxReached:= FinckePohst(matM,Bound,NoSol);
-            //M, z, maxReached:= FinckePohst(matM,Integers()! (Abs( (1+r)*(Bgam*Beps*Bepstar))),NoSol);
-            #z;
-            
-        // TEST: new ellipsoid
-            matGtau:= IdentityMatrix(Integers(),nu+r+1);
-            for i in [1..nu] do
-                matGtau[nu+r+1,i+1]:= alphagamlist[i];
-            end for;
-            for i in [1..r] do
-                matGtau[nu+r+1,nu+i+1]:= alphaepslist[i];
-            end for;
-            matGtau[nu+r+1,1]:= alpha0;
-            
-            matM:= IdentityMatrix(Integers(),nu+r+1);
-            InsertBlock(~matM, (Beps*Bepstar)*(Transpose(matA)*matD*matA), 2, 2);
-            //InsertBlock(~matM, (Transpose(matA)*matD*matA), 1, 1); 
-            matM[1,1]:= Floor(Bgam);
-            matM[nu+2, nu+2]:= Floor(Bgam*Bepstar);
-            matM[nu+3, nu+3]:= Floor(Bgam*Beps);
-            
-            matB:= Transpose(matGtau)*matM*matGtau; 
-            Bound:= Ceiling(Abs( (1+1+r)*(Bgam*Beps*Bepstar)));
-            //Bound:= (Abs( Bgam + Beps + Bepstar) + vTv ) + 2*Abs(alpha0)*Bepstar*Sqrt(Bepstar);
-            NoSol:= 100;
-            
-            M, z, maxReached:= FinckePohst(matB,Bound,NoSol);
-          //  M, z, maxReached:= FinckePohst(matM,Bound,NoSol);
-            //M, z, maxReached:= FinckePohst(matM,Integers()! (Abs( (1+r)*(Bgam*Beps*Bepstar))),NoSol);
-            #z;
-          
-   
-            // for some reason, the bound T in short vectors becomes negative
-            // still can't figure out why we have so many sols though
-
-
-////////////////////////////////////////////////////////////////////////////////
-///// NON ARCHIMEDEAN CASE /////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-SmallBoundsCheck:= procedure(fieldKinfo,fieldLinfo,Case,~pCaseInfoList[i],prec);
-    K:=fieldKinfo`field;
-    OK:=fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    zeta:= fieldKinfo`zeta;
-    epslist:= fieldKinfo`fundamentalunits;
-    n:= Degree(K);
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    nu:= #gammalist;
-    r:= #epslist;
-    
-    p:= localpinfo`prime;
-    Lp:= localpinfo`Lp;
-    thetaL:= localpinfo`thetas;
-    mapLL:= localpinfo`mapLL;
-    mapLLp:= localpinfo`mapLLp;
-
-
-    // add conditional function to either do the quick exists or not
-    
-    tau:=alpha*zeta;
-    
-    // generate images under the maps ijk: L-> L, th -> theta[i][j]
-    tauL:=ImageInL(localpinfo,L!tau);
-    gammalistL:= [ImageInL(localpinfo,L!gamma) : gamma in gammalist];
-    epslistL:= [ImageInL(localpinfo,L!eps) : eps in epslist];
-
-    // check if we can bound Nail early (Lemma 6.5)
-    delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
-    delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
-    delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
-    delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
-    
-    pCaseinfo
-    
-    
-    if (Valuation(mapLLp(delta1L)) ne 0) then
-        Nail:= Min[Valuation(mapLLp(delta1L)),0] - Valuation(mapLLp(delta2L));
-        if Nail ge 0 then
-            return Nail,0,
-        else
-        
-        Nail,beta,ihat,dl,delta2
-        
-            localpinfo`Nail:= -1;
-        end if;
-    else
-        Logdelta1:= pAdicLog(mapLLp(delta1L),p); 
-        Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
-        Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
-        assert (1+#Loggammalist+#Logepslist) eq (1+nu+r);
-        
-        minval,ihat:= Min([Valuation(eps) : eps in Logepslist]cat[Valuation(gam) : gam in Loggammalist]);
-        if ihat le r then
-            ihat:= Logepslist[ihat];
-        else
-            ihat:= Loggammalist[ihat-r];
-        end if;
-        
-        if Valuation(Logdelta1) lt minval then
-            Nail:= Max([Floor((1/(p-1) - Valuation(mapLLp(delta2L)))),Ceiling(minval - Valuation(mapLLp(delta2L)))-1]);
-            if Nail ge 0 then
-                localpinfo`Nail:= Nail;
-            else
-                localpinfo`Nail:= -1;
-            end if;
-         // if the program makes it this far, there are no small bounds on Nail
-        // arising from Lemma 6.5 and Lemma 6.9
-        // hence the code must enter the LLL process to reduce the bounds
-    // generates the linear forms in p-adic logs elements for the Special Case
-        else
-            // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
-            assert &and[-loggam/ihat in pAdicRing(p): loggam in Loggammalist];
-            assert &and[-logeps/ihat in pAdicRing(p): logeps in Logepslist];
-            assert -Logdelta1/ihat in pAdicRing(p);
-            gammabetalist:= [-loggam/ihat : loggam in Loggammalist];
-            epsbetalist:= [-logeps/ihat : logeps in Logepslist];
-            delta1beta:= -Logdelta1/ihat;
-            localpinfo`i0jjkk:= [i0,jj,kk];
-            localpinfo`linearpform:= [delta1beta] cat gammabetalist cat epsbetalist;
-        end if;
-    end if;
-           
-end function;
-
-
-ail,beta,ihat,dl,delta2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-            
-function FinckePohst(B,C,Bound)
-//    A:= Transpose(B)*B;         // symmetric, positive-definite matrix B
-    A:= B;
-    n:= NumberOfColumns(A);     // computes dimension of square input matrix A
-    A1:= ZeroMatrix(IntegerRing(),n,n);        // creates matrix A1, intentionally not positive-definite
-    A1[2,1]:= -1;      // changes matrix A1 so that it is not symmetric; nb. n >= 2 since S contains at least 3 primes
-    prc0:= Integers()!Max( [ Max([ A[i,j] : j in [1..n] ]) : i in [1..n] ] );      // computes the largest integer in the matrix A 
-    prc:= Max(100,#IntegerToString(prc0));      // sets precision for the Cholesky decomposition based on the number of digits in the largest integer in the matrix A
-    
-    while IsSymmetric(A1) eq false do
-        R:= Transpose(Cholesky(A, RealField(prc))); // applies Cholesky Decomposition to the input matrix
-        t,Ri:= IsInvertible(R);             // computes R^{-1} (easy to compute since R is upper triangular)
-        Si,Ui:= LLL(Ri);            // computes row-reduced version S^{-1} of R^{-1}, along with U^{-1}, where S^{-1} = U^{-1}*R^{-1}
-        
-        t,U:=IsInvertible(Ui);      // computes inverse U of U^{-1}
-        S:= R*U;
-
-        norms:= [Sqrt(Norm(Si[i])) : i in [1..n]];        // computes norms of rows of S^{-1}
-        order:= Reverse(Sort(norms));                     // sorts norms by decreasing size
-        per:= [Index(norms, i) : i in order];       // computes the permutation on (1..n) for which the n rows of S^{-1} have decreasing norms
-        for i in [1..n] do                          
-            a:=  &+[1: x in per | x eq i];    // counts repetition of index i
-            if a gt 1 then                    // corrects repetition in per, ie. in the event any two norms are equal
-                for j in [1..a-1] do
-                    Ind:= Index(per,i);       // computes index of i in per 
-                    per[Index(per[Ind + 1..n],i) + Ind]:= i + 1;    // replaces repeated index, if any
-                end for;
-            end if;
-        end for;    
-        
-        P:= Transpose(PermutationMatrix(IntegerRing(),per));        // computes the permutation matrix corresponding to the permutation, per
-        S1:= S*P;           // rewrites S with columns rearranged by the permutation per, above
-        A10:= Transpose(S1)*S1;     // symmetric, positive-definite matrix A1, with entries significantly smaller than those of A
-        A1:= Matrix(IntegerRing(),n,n,[IntegerRing()! Round(A10[i][j]) : j in [1..n], i in [1..n]]);        // converts matrix parent (RealField()) of A10 to IntegerRing()
-        prc:= prc + 5;  // increases precision on RealField until A1 is Symmetric
-    end while;
-    
-    while IsPositiveDefinite(A1) eq false do
-        R:= Transpose(Cholesky(A, RealField(prc))); // applies Cholesky Decomposition to the input matrix
-        t,Ri:= IsInvertible(R);             // computes R^{-1} (easy to compute since R is upper triangular)
-        Si,Ui:= LLL(Ri);            // computes row-reduced version S^{-1} of R^{-1}, along with U^{-1}, where S^{-1} = U^{-1}*R^{-1}
-        
-        t,U:=IsInvertible(Ui);      // computes inverse U of U^{-1}
-        S:= R*U;
-
-        norms:= [Sqrt(Norm(Si[i])) : i in [1..n]];        // computes norms of rows of S^{-1}
-        order:= Reverse(Sort(norms));                     // sorts norms by decreasing size
-        per:= [Index(norms, i) : i in order];       // computes the permutation on (1..n) for which the n rows of S^{-1} have decreasing norms
-        for i in [1..n] do                          
-            a:=  &+[1: x in per | x eq i];    // counts repetition of index i
-            if a gt 1 then                    // corrects repetition in per, ie. in the event any two norms are equal
-                for j in [1..a-1] do
-                    Ind:= Index(per,i);       // computes index of i in per 
-                    per[Index(per[Ind + 1..n],i) + Ind]:= i + 1;    // replaces repeated index, if any
-                end for;
-            end if;
-        end for;    
-        
-        P:= Transpose(PermutationMatrix(IntegerRing(),per));        // computes the permutation matrix corresponding to the permutation, per
-        S1:= S*P;           // rewrites S with columns rearranged by the permutation per, above
-        A10:= Transpose(S1)*S1;     // symmetric, positive-definite matrix A1, with entries significantly smaller than those of A
-        A1:= Matrix(IntegerRing(),n,n,[IntegerRing()! Round(A10[i][j]) : j in [1..n], i in [1..n]]);        // converts matrix parent (RealField()) of A10 to IntegerRing()
-        prc:= prc + 5;  // increases precision on RealField until A1 is PositiveDefinite
-    end while;
-        
-    assert IsSymmetric(A1);     // verification that indeed A1 is a symmetric matrix; if false, there is an error in FinckePohst.m
-    assert IsPositiveDefinite(A1);      // verification that indeed A1 is a positive definite matrix; if false, there is an error in FinckePohst.m
-    
-    //maxReached:= false;     // TEMPORARY TEST!!!!!
-    //L:= LatticeWithGram(A1);
-    //z1:= ShortVectorsMatrix(L,C);
-    //delete L;
-    //z:= [Matrix(z1[i]) : i in [1..NumberOfRows(z1)]];       // END TEST
-    
-    z,maxReached:= ShortVectors(A1,C,Bound);     // computes coefficient matrix of lattice points x in L with norm(x) <= C. ie. x*A1*Transpose(x) = [y], where y <= C; maxReached
-    M:= U*P;      // computes permutation matrix B*U*P such that y:= Transpose(B*U*P*Transpose(z[i])) is a short lattice vector, for z[i] a short coefficient vector
-    
-    return M, z, maxReached;    // returns associated lattice matrix, M; short coefficient vectors, z; whether Bound was reached before the algorithm terminated, maxReached
-   
-end function;
-            
-for x in z do
-    y:= Transpose(M*Transpose(x));
-    y*Transpose(y);
-end for;
-            
-            
-            
-            
-        
-        // code for now, r = 2
-    
-    
-    alpha:= quad[1];
-    gammalist:= quad[2];
-    matA:= quad[3];
-    fplist:= quad[5];
-    quadprimes:= [Norm(fp) : fp in fplist];
-    assert #quadprimes eq #gammalist;
-    
-    r:= #epslist;
-    assert r eq 2;
-    
-   
-    
-    
-    // TEMP lower bound on eps star, c, embedding into C;
-    ltau:= Floor(1/2*Log(quadbound));
-    assert ltau ge Log(2);
-    kappatau:= 3/2;
-    c:= 1000;
-    taus:= AutL[1]; // we run over all taus
-    // then run over all eps
-    bepsno:= 1;         // TEMP choice of eps*
-    
-    bepstar:= (bepstar + (1/2) + c*kappatau*Exp(-ltau))^2;
-        
-    // pick one l in r to reduce the bound of     
-    // for a given l, lowerbound, eps star (??)
-     
-    
-    CField<i>:= ComplexField(prc);
-    LintoC:= hom< L -> CField | Conjugates(L.1)[1] >; 
-    
-    delta1L:= (Realijk[1](L!th) - Realijk[2](L!th))/(Realijk[1](L!th) - Realijk[3](L!th));
-    delta1L:= delta1L*(Realijk[3](L!taus*alpha)/Realijk[1](L!tau*alpha));
-    
-    alpha0:= Round(c*Log(Abs(LintoC(taus(delta1L)))));     // might have to consider what Round is doing here
-
-    alphagam:= [];
-    for i in [1..#gammalist] do
-        alphagam[i]:= Round(c*Log(Abs(LintoC(taus(Realijk[3](gammalist[i])/Realijk[2](gammalist[i]))))));
-    end for;
-    
-    alphaeps:= [];
-    for i in [1..r] do
-        alphaeps[i]:= Round(c*Log(Abs(LintoC(taus(Realijk[3](epslist[i])/Realijk[2](epslist[i]))))));
-    end for;
-    // swap eps so that eps_* is at the end
-    Remove(~alphaeps,bepsno);
-    alphaeps[r]:= Round(c*Log(Abs(LintoC(taus(Realijk[3](epslist[bepsno])/Realijk[2](epslist[bepsno]))))));
-    
-    Gam:= IdentityMatrix(Integers(),#gammalist+r);
-    for i in [1.. #gammalist] do
-        Gam[#gammalist+r,i]:= alphagam[i];
-    end for;
-    for i in [#gammalist+1..#gammalist + r] do
-        Gam[#gammalist+r,i]:= alphaeps[i-#gammalist];
-    end for;
-            
-    // compute matrix D^2
-   
-    // shit, this is taking logs, so it cannot be an integral matrix
-    // in the notes, I need to change the matrix D back to the way it was
-        D2:= DiagonalMatrix(ComplexField(), ds);       
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        //wepslist, wgammalist, wepslatlist, wgammalatlist:= Realprep(L, OL, AutL, Realijk, quad, tl, epslist, h, prc);
-        
-            
-            
-        
-        
-        ds:= [ ((Log(p))^2)/Degree(K,Rationals()) : p in plist];
-        D2:= DiagonalMatrix(ComplexField(), ds);
-        
-        
-        
-        
-        
-        
-        
-        D2:= Matrix(ComlpexField(),#gammalist, #gammalist, [ 
-         R:= Matrix(ComplexField(),r,r, [a,b,c,d]);
-      
-        delta1L:= (ijk[1](L!th) - ijk[2](L!th))/(ijk[1](L!th) - ijk[3](L!th));
-        delta1L:= delta1L*(ijk[3](L!tau)/ijk[1](L!tau));
-        
-        
-        
-        
-        
-        
-            
-    
-    // then use embeddings into C to embedd elts of L into C;
-    // assert that the tls go to the same things as conjugates of th
-    // find invertible matrix R in C
-    
-    // compute betas
-    // compute alphas
-    
-    // compute w's
-    // bound on al^2 (using local bound h_sigma?) - beps
-    // bound on lin form in log
-    // all of this is for the bound to use FP with.
-    
-    
-    // then define matrix
-    
-    
-    
-    thetaC:= Conjugates(th);
-    assert #thetaC eq n;
-    L, tl:= SplittingField(f);
-     // choose an embedding of L.1 into C by selecting a conjufate of L.1
-    L1C:= Conjugates(L.1)[1]; 
-    tlC:= [];
-    CField<i>:= ComplexField(prc);
-    for j in [1..n] do
-        tempf:= hom< K -> CField | L1C[j] >;      
-        tlC[j]:= tempf(tl[j]);
-    end for;
-    
-    // determine the preimage in L of thetaC[i] under the embedding L -> C
-    ijkC:= [];
-    min:=Abs(thetaC[1] - tlC[1]);
-    for i in [1..n] do
-        if Abs(thetaC[1] - tlC[i]) lt min then
-            min:=Abs(thetaC[1] - tlC[i]);
-            ijkC[1]:= i;
-        end if;
-    end for;
-    
-    min:=Abs(thetaC[2] - tlC[1]);
-    for i in [1..n] do
-        if Abs(thetaC[2] - tlC[i]) lt min then
-            min:=Abs(thetaC[2] - tlC[i]);
-            ijkC[2]:= i;
-        end if;
-    end for;
-    
-    min:=Abs(thetaC[3] - tlC[1]);
-    for i in [1..n] do
-        if Abs(thetaC[3] - tlC[i]) lt min then
-            min:=Abs(thetaC[3] - tlC[i]);
-            ijkC[3]:= i;
-        end if;
-    end for;
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        tauC:= ImageInC(th,thetaC,tau);
-        epslistC:= [ImageInC(th,thetaC,eps) : eps in epslist]; 
-        gammalistC:= [ImageInC(th,thetaC,gamma) : gamma in gammalist];
-        
-        
-        if r eq 2 then
-            delta1C:= (thetaC[1] - thetaC[2])/(thetaC[1] - thetaC[3]);
-            delta1C:= delta1C*(tauC[3]/tauC[2]);
-            
-            delta2C:= (thetaC[2] - thetaC[3])/(thetaC[3] - thetaC[1]);
-            delta2C:= delta2C*(tauC[1]/tauC[2]);
-            
-            
-            
-            
-            
-            
-        
-        // verify that mathfark{P}s dont cancel...?
-        // and that the exponents make sense like we did in GESolver 
-        
-        // choose an embedding of L into C to get invertible matrix R
-        
-        // define quadratic form qf(n) (and associated matrix)
-        
-    
     
     
     // DO A THING IF THE LIST OF ALPHGAMMLIST IS EMPTY, ie. 
@@ -3432,177 +2933,7 @@ end function;
   
   
   
-  
-  // old pLatticePrep
-  
-  
-    pAdicPrec:= Prec[1];
-    RealPrec:= Prec[2];
     
-    K:= fieldKinfo`field;
-    OK:= fieldKinfo`ringofintegers;
-    th:= fieldKinfo`gen;
-    f:= fieldKinfo`minpoly;
-    L:= fieldLinfo`field;
-    OL:= fieldLinfo`ringofintegers;
-    zeta:= fieldKinfo`zeta;
-    epslist:= fieldKinfo`fundamentalunits;
-    n:= Degree(K);
-    
-    p:= localpinfo`prime;
-    idealinL:= localpinfo`idealinL;
-    Lp, mapLLp:= Completion(L, idealinL : Precision:=pAdicPrec);
-    //fprsL:= localpinfo`idealinL;
-    
-    gammalist:= Case`gammalist;
-    fplist:= Case`ideallist;
-    alpha:= Case`alpha;
-    nu:= #gammalist;
-    r:= #epslist;
-    
-    //Lp, mapLLp:= Completion(L, fprsL : Precision:=pAdicPrec);
-    fprs:=[f[1] : f in Factorisation(p*OK)];        // the prime ideals above p
-    
-    thetaL:=[];
-    mapsLL:=[]; 
-    for i in [1..#fprs] do      // runs through each prime ideal above p
-        thetaL[i]:=[];
-        mapsLL[i]:=[];       // the preimage of thetap in L 
-                                    // ie. for th in L, mLp(ijk(th)) is one of the thetap in Lp 
-        Kp, mKp:= Completion(K,fprs[i] : Precision:=pAdicPrec);
-        gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
-        temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
-        for j in [1..#temp] do
-            vals, ind:= Max([Valuation(mapLLp(ijkL[k](L!th)) - temp[j][1]) : k in [1..3]]);
-            mapsLL[i][j]:= ijkL[ind];        // mLp(ijk[i][j](th)) maps to thetap[i][j]
-            thetaL[i][j]:= ijkL[ind](L!th);
-        end for;
-    end for;
-
-    assert n eq &+[#thetaL[i] : i in [1..#fprs]];       // check we have the correct number of thetas
-    Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
-    check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-    // verify that thetap[i][j] are roots of f 
-    assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
-    // verify the precision has not been changed by the above test
-    assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
-    // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
-        // Note: this correspondence will not generate the roots in the correct order
-        // This is due to the fact that we cannot work in the algebraic closure of Qp, but only in one Lp
-        // ideally, we would be working in each Lp above each prime ideal over p in K, 
-        // but Magma does not allow this
-        
-    assert (#thetaL eq 2) or (#thetaL eq 3);
  
-    inds:= [];  // stores the indices of the unbounded primes in fplist
-    // verifies there is a prime ideal above p in fplist
-    assert &or[fq in fplist : fq in fprs];     
-    for i in [1..#fplist] do
-        fp:= fplist[i];
-        for j in [1..#fprs] do
-            fq:= fprs[j];
-            if fq eq fp then
-    // index of prime ideal above p appearing in fplist
-                Append(~inds, j);   
-            end if;
-        end for;
-    end for;
-    assert #inds eq 1;  // this is i0
-    i0:=[inds[1],1];    // root of g_inds(t), first (and only) element
-    // verifies the unbounded ideal corresponds to deg(gp) = 1
-    assert #thetaL[i0[1]] eq 1;    
-    assert fprs[i0[1]] in fplist;
-    
-    // chooses j,k where g(t) = g_1(t)g_2(t), deg(g_1) = 1, deg(g_2) = 2
-    indjk:= [i : i in [1..#thetaL] | i ne inds[1]];
-    if #thetaL eq 2 then
-        assert #indjk eq 1;
-        assert #thetaL[indjk[1]] eq 2;
-        jj:= [indjk[1],1];
-        kk:= [indjk[1],2];
-    elif #thetaL eq 3 then
-        assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
-        assert #indjk eq 2;
-        jj:= [indjk[1],1];
-        kk:= [indjk[2],1];
-    end if;
-    
-    assert thetaL[jj[1]][jj[2]] ne thetaL[kk[1]][kk[2]]; 
-    tau:=alpha*zeta;
-    
-    // generate images under the maps ijk: L-> L, th -> theta[i][j]
-    tauL:=ImageInL(mapsLL,L!tau);
-    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
-    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
-
-    // verify that the prime ideals in L above gamma do not cancel
-    for i in [1..nu] do
-        faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
-        facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
-        fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
-        assert (#faci0 eq #facjj) and (#facjj eq #fackk);
-        assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
-        assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
-        assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
-    end for;
-    
-    // check if we can bound Nail early (Lemma 6.5)
-    delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
-    delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
-    delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
-    delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
-    
-    localpinfo`delta1inQp:= mapLLp(delta1L);
-    localpinfo`delta2inQp:= mapLLp(delta2L);
-    
-    if Setup eq true then
-        localpinfo`ijkLp:= [i0,jj,kk];
-    else
-        assert localpinfo`ijkLp eq [i0,jj,kk];
-            
-        if (Valuation(mapLLp(delta1L)) ne 0) then
-            smallbound:= Min[Valuation(mapLLp(delta1L)),0] - Valuation(mapLLp(delta2L));
-            if smallbound ge 0 then
-                localpinfo`smallbound:= smallbound;
-            else
-                localpinfo`smallbound:= -1;     // negative bound; Case can be removed
-            end if;
-        else
-            Logdelta1:= pAdicLog(mapLLp(delta1L),p); 
-            Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
-            Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
-            LogList:= Loggammalist cat Logepslist;
-            assert #LogList eq (nu+r);
-            
-            minval,ihat:= Min([Valuation(LogList[i]) :i in [1..nu+r]]);
-            
-            if Valuation(Logdelta1) lt minval then
-                smallbound:= Max([Floor((1/(p-1) - Valuation(mapLLp(delta2L)))),Ceiling(minval - Valuation(mapLLp(delta2L)))-1]);
-                if smallbound ge 0 then
-                    localpinfo`smallbound:= smallbound;
-                else
-                    localpinfo`smallbound:= -1;     // negative bound; Case can be removed
-                end if;
-        // if the program makes it this far, there are no small bounds on Nail
-        // arising from Lemma 6.5 and Lemma 6.9
-        // hence the code must enter the FP process to reduce the bounds
-        // generates the linear forms in p-adic logs elements for the Special Case
-            else
-                logihat:= LogList[ihat];  // offset the first term, Logdelta1
-                betalist:= [-LogList[i]/logihat : i in [1..nu+r]];
-                // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
-                beta1:= -Logdelta1/logihat;
-                assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
-                
-                localpinfo`ihat:= ihat;
-                localpinfo`logihat:= logihat;
-                localpinfo`betalist:= [*beta1,betalist*];
-                
-                matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,[i0,jj,kk],AutL,mapsLL,HeightBounds,RealPrec);
-                localpinfo`ellipsoid:= matM;
-                localpinfo`bgam:= Bgam;
-                localpinfo`bepslist:= BepsList;
-            end if;
-        end if;
-    end if;
-end procedure;
+  
+  
