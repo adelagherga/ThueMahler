@@ -1674,50 +1674,39 @@ end function;
 
 
 
-pAdicReduction:= function(fieldKinfo, fieldLinfo, fieldCinfo, fieldLpinfo,Case,HeightBounds,cp,lp,hp,solutionsList,decreaseFactor: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
-    p:= fieldLpinfo`place;
-    delta1Lp:= fieldLpinfo`delta1Lp;
-    delta2Lp:= fieldLpinfo`delta2Lp;
-    logihat:= fieldLpinfo`logihat;
-    precision:= fieldLpinfo`precision;
+pAdicSolutionTest:= function(fieldKinfo,Case, sol);
+    K:= fieldKinfo`field;
+    OK:= fieldKinfo`ringofintegers;
+    th:= fieldKinfo`gen;
+    zeta:= fieldKinfo`zeta;
+    epslist:= fieldKinfo`fundamentalunits;
+    assert Degree(K) eq 3;
     
-    if decreaseMethod eq "divide" then
-        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
-            lp:= lp/(decreaseFactor);
-            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-            assert (cp le lp) and (lp lt hp);
-            assert ((mu+100) le precision);
-            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
-            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
-            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:= NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
-        end while; // exits when lp is found such that there are no solutions
-        lp:= lp*decreaseFactor;  // smallest value of lp such that there are 0 solutions
-        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
-        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
-        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
-        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
-    elif decreaseMethod eq "subtract" then
-        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
-            lp:= lp -  decreaseFactor;
-            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-            assert (cp le lp) and (lp lt hp);
-            assert ((mu+100) le precision);
-            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
-            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
-            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
-        end while; // exits when lp is found such that there are no solutions
-        lp:= lp + decreaseFactor;  // smallest value of lp such that there are 0 solutions
-        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
-        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
-        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
-        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
-    end if;
-    return lp, solutionsList;
+    gammalist:= Case`gammalist;
+    fplist:= Case`ideallist;
+    alpha:= Case`alpha;
+    nu:= #gammalist;
+    r:= #epslist;
+    assert r eq 2;
+  
+    tau:= alpha*zeta;
+    candidateSol:= [];
+    for y in sol do
+        z:= tau*&*[gammalist[i]^(Integers()!y[1,i]) : i in [1..nu]]*epslist[1]^(Integers()!y[1,nu+1])*epslist[2]^(Integers()!y[1,nu+2]);    
+        if z[3] eq 0 then
+            Append(~candidateSol,[*y,z*]);
+        end if;
+        y2:= -y;
+        z:= tau*&*[gammalist[i]^(Integers()!y2[1,i]) : i in [1..nu]]*epslist[1]^(Integers()!y2[1,nu+1])*epslist[2]^(Integers()!y2[1,nu+2]);    
+        if z[3] eq 0 then
+            Append(~candidateSol,[*y2,z*]);
+        end if;
+    end for;
+   
+    return candidateSol;
 end function;
+
+
 
 
 // procedure starts here
@@ -1728,8 +1717,8 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
     assert #CasePrimes eq nu;
     r:= #fieldKinfo`fundamentalunits;
     stillEnumerating:= true;
-    allSolutions:= [[] : i in [1..nu+#fieldLinfo`ijk]];
-    
+    candidateVectors:= [];
+       
     iterationNo:= 0;
     while stillEnumerating do
         iterationNo:= iterationNo + 1;
@@ -1965,7 +1954,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                 
             else        // if solutions appear
                 print "solutions found at p", p;
-                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=500,lllReduce:=true, breakSymmetry:= true);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
                 if bufferWasBigEnough eq false then
                     print "far too many solutions; terminate reduction";
                     stillEnumerating:= false;
@@ -1974,8 +1963,8 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                 
                 for x in solutionsList do
                     y:= x*Transpose(matAm) + Transpose(vecw);
-                    if y notin allSolutions[i] then
-                        Append(~allSolutions[i],y);
+                    if y notin candidateVectors then
+                        Append(~candidateVectors,y);
                     end if;
                 end for;
                 
@@ -2039,13 +2028,19 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                 
                 else        // if solutions appear
                     print "solutions found at v", i;
-                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=500,lllReduce:=true, breakSymmetry:= true);
+                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
                     if bufferWasBigEnough eq false then
                         print "far too many solutions; terminate reduction";
                         stillEnumerating:= false;
                         break i;
                     end if;
-                    allSolutions[i+nu]:= allSolutions[i+nu] cat solutionsList;
+                    //allSolutions[i+nu]:= allSolutions[i+nu] cat solutionsList;
+                    for x in solutionsList do
+                        if x notin candidateVectors then
+                            Append(~candidateVectors,x);
+                        end if;
+                    end for;
+                    
                 end if;
                 NewHeightBounds`heightepslist[i]:= Ceiling(lv);
                 allBeps[nu+i]:= [BepsList[1],-1];
@@ -2069,6 +2064,17 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
         end if;
     end while;
     
+    
+    
+    candidateSol:= pAdicSolutionTest(fieldKinfo,Case,candidateVectors);
+    
+    
+
+
+
+
+
+   // K!tau*&*[gammalist[i]^(Integers()!y[1,i]) : i in [1..nu]]*epslist[1]^(Integers()!y[1,nu+1])*epslist[2]^(Integers()!y[1,nu+2]);
 
 // To do: 
 // 1. organize first iteration and speed it up (maybe start with 10*Log(bound)) - DONE
@@ -2081,181 +2087,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
         // need to include next iteration where solutions are checked
         // need to include solutions checks
                 
-                    
-                            
-                            
-                            
-                            
-                                  
-            
-            
-            
-            
-        
-        
-            //else
-                // decrease lp by dividing by 1.3
-//                precision:= LocalinfoList[i]`precision;
-//                while (#solutionsList eq 0) do
-//                    lp:= lp/(1.3);        // decrease lv
-//                    mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-//                    assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
-//                    if (cp gt lp) or (lp gt hp) then
-//                        break;
-//                    end if;
-//                    assert (cp le lp) and (lp lt hp);
-//                    assert ((mu+100) le precision);
-                    
-//                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
-//                    matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
-//                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-//                end while; // exits when lp is found such that there are no solutions
-//                lp:= lp*(1.3);  // smallest value of lp such that there are 0 solutions
-//                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
-//                assert (cp le lp) and (lp lt hp);
-//                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
-//                matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
-//                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-//                assert bufferWasBigEnough and (#solutionsList eq 0);
-
-
-               
-    //            else // otherwise we have 0 solutions; try to find a smaller bound
-    //            // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
-    //                while (#solutionsList eq 0) do
-    //                    //print "/1";
-    //                    lv:= lv/(1.3);        // decrease lv
-    //                    mu:= Exp(lv);
-    //                    if (cv gt lv) or (lv gt hv) then
-    //                        break;
-    //                    end if;
-    //                    assert mu gt 0;
-    //                    assert (cv le lv) and (lv lt hv);
-                        
-    //                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
-    //                    BepsList[r]:= (BepsList[r] + mu*(3/2)*Exp(-lv))^2;
-    //                    matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
-    //                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-    //                end while; // exits when lp is found such that there are no solutions
-    //                lv:= lv*(1.3);  // smallest value of lp such that there are 0 solutions
-    //                mu:= Exp(lv);
-    //                assert mu gt 0;
-    //                assert (cv le lv) and (lv lt hv);
-                    
-    //                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
-    //                BepsList[r]:= (BepsList[r] + mu*(3/2)*Exp(-lv))^2;
-    //                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
-    //                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-    //                assert bufferWasBigEnough and (#solutionsList eq 0);
-            
-            
-            
-            
-            
-           // print "BEFRORE mu,lv", mu, lv;
-            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
-              //  print "-lv", lv;
-                //print "/1";
-                lv:= lv-1;        // decrease lv
-                mu:= Exp(lv);
-                assert mu gt 0;
-                assert (cv le lv) and (lv lt hv);
-                
-                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
-                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
-                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
-                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-            end while; // exits when lp is found such that there are no solutions
-            lv:= lv+1;  // smallest value of lp such that there are 0 solutions
-            mu:= Exp(lv);
-            assert mu gt 0;
-            assert (cv le lv) and (lv lt hv);
-            
-            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
-            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
-            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
-            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
-            assert bufferWasBigEnough and (#solutionsList eq 0);
-        
-     //   print "lv", lv;
-        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
-    end for;
-    
-    // update Height Bounds; ie set the vector h to the vector l and continue
-    // from here on out, we will obtain solutions when using Fincke-Pohst
-    HeightBounds:= NewHeightBounds;     
-    
-    
-        
-        
-        
-        for j in [1..r] do
-            NewHeightBounds`infheightepslist[j]:= Min([aBound[i][j] : i in [1..nu]]);
-        end for;
-        
-        
-
-
-
-            
-            
-      //  end if;
-            
-            // decrease lp by dividing by 1.3
-            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],1.3: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
-            // decrease lp by subtracting by Log(p)
-            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],Log(p): NumSolutionsInLoop:= 0, decreaseMethod:= "subtract");
-     
-            NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
-            aBound[i]:= BepsList;
-            
-        end for;
-        aBound;
-        
-        for j in [1..r] do
-            NewHeightBounds`infheightepslist[j]:= Min([aBound[i][j] : i in [1..nu]]);
-        end for;
-    end if;
-end procedure;
-
-
-// LEFT OFF HERE; NEED TO TEST THIS CONVERSION OF SOLUTIONS TO SAMIRS;
-// ALSO NEED TO TEST OUT WHAT HAPPENS to reduction
-// include Samir's sieve at the end
-infNorm:= function(HeightBounds,Case,allBeps);
-    
-    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
-    nu:= #Case`gammalist;
-    assert #CasePrimes eq nu;
-    
-    VectorInfNorm:= Max([HeightBounds`heightgammalist[i]/Log(CasePrimes[i]) : i in [1..nu]]);
-    
-    // compute the infinity norm of matAinv (max row sum)
-    matA:= Case`matA;
-    tf,matAinv:= IsInvertible(matA);
-    assert tf;
-    
-    n:= NumberOfRows(matAinv);
-    RowSum:= [];
-    for i in [1..n] do
-        RowSum[i]:=  &+[Abs(matAinv[i,j]) : j in [1..n]];
-    end for;
-    MatrixInfNorm:= Max(RowSum);
-    
-    nBound:= MatrixInfNorm*VectorInfNorm;
-    
-    // bound on a;
-    aBound:= [];
-    aBound[1]:= Ceiling(Min([Sqrt(allBeps[i][1]) : i in [1..#allBeps]]));
-    aBound[2]:= Ceiling(Min([Sqrt(allBeps[i][2]) : i in [1..nu]]));
-    
-    return Ceiling(nBound),Max(aBound);
-end function;
-
-    
-    
-    
-
+   
 
 
 // test:
@@ -2409,8 +2241,26 @@ a:= 1;
             LocalinfoList[i+nu]:=rec< LocalInfo | place:= v, precMultiple:= 1.3^5>;
         end for;
         
-        
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // nonArchimedean initial reduction
         pAdicReductionIteration(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,Case,HeightBounds,~NewHeightBounds);
     
@@ -3335,6 +3185,222 @@ end function;
   
   
     
- 
+                          
+                            
+                            
+                                  
+            
+            
+            
+            
+        
+        
+            //else
+                // decrease lp by dividing by 1.3
+//                precision:= LocalinfoList[i]`precision;
+//                while (#solutionsList eq 0) do
+//                    lp:= lp/(1.3);        // decrease lv
+//                    mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+//                    assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+//                    if (cp gt lp) or (lp gt hp) then
+//                        break;
+//                    end if;
+//                    assert (cp le lp) and (lp lt hp);
+//                    assert ((mu+100) le precision);
+                    
+//                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
+//                    matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+//                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+//                end while; // exits when lp is found such that there are no solutions
+//                lp:= lp*(1.3);  // smallest value of lp such that there are 0 solutions
+//                mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+//                assert (cp le lp) and (lp lt hp);
+//                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i],HeightBounds: Place:="NonArch");
+//                matBtmatB, vecc, boundForNormSquared:= pAdicLattice(LocalinfoList[i],Case,Bgam,BepsList,mu);
+//                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+//                assert bufferWasBigEnough and (#solutionsList eq 0);
+
+
+               
+    //            else // otherwise we have 0 solutions; try to find a smaller bound
+    //            // decrease lp until there are solutions or lp is no longer in range and (Max(0,cp) lt lv) and (lv lt hp)
+    //                while (#solutionsList eq 0) do
+    //                    //print "/1";
+    //                    lv:= lv/(1.3);        // decrease lv
+    //                    mu:= Exp(lv);
+    //                    if (cv gt lv) or (lv gt hv) then
+    //                        break;
+    //                    end if;
+    //                    assert mu gt 0;
+    //                    assert (cv le lv) and (lv lt hv);
+                        
+    //                    Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+    //                    BepsList[r]:= (BepsList[r] + mu*(3/2)*Exp(-lv))^2;
+    //                    matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+    //                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+    //                end while; // exits when lp is found such that there are no solutions
+    //                lv:= lv*(1.3);  // smallest value of lp such that there are 0 solutions
+    //                mu:= Exp(lv);
+    //                assert mu gt 0;
+    //                assert (cv le lv) and (lv lt hv);
+                    
+    //                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+    //                BepsList[r]:= (BepsList[r] + mu*(3/2)*Exp(-lv))^2;
+    //                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+    //                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+    //                assert bufferWasBigEnough and (#solutionsList eq 0);
+            
+            
+            
+            
+            
+           // print "BEFRORE mu,lv", mu, lv;
+            while (#solutionsList eq 0) and (cv le lv) and (lv lt hv) do
+              //  print "-lv", lv;
+                //print "/1";
+                lv:= lv-1;        // decrease lv
+                mu:= Exp(lv);
+                assert mu gt 0;
+                assert (cv le lv) and (lv lt hv);
+                
+                Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+                BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+                matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            end while; // exits when lp is found such that there are no solutions
+            lv:= lv+1;  // smallest value of lp such that there are 0 solutions
+            mu:= Exp(lv);
+            assert mu gt 0;
+            assert (cv le lv) and (lv lt hv);
+            
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,LocalinfoList[i+nu],HeightBounds: Place:="Real");
+            BepsList[r]:= BepsList[r] + mu*(3/2)*Exp(-lv);
+            matBtmatB, vecc, boundForNormSquared:= RealLattice(LocalinfoList[i+nu],Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
+            assert bufferWasBigEnough and (#solutionsList eq 0);
+        
+     //   print "lv", lv;
+        NewHeightBounds`heightepslist[i]:= Ceiling(lv);
+    end for;
+    
+    // update Height Bounds; ie set the vector h to the vector l and continue
+    // from here on out, we will obtain solutions when using Fincke-Pohst
+    HeightBounds:= NewHeightBounds;     
+    
+    
+        
+        
+        
+        for j in [1..r] do
+            NewHeightBounds`infheightepslist[j]:= Min([aBound[i][j] : i in [1..nu]]);
+        end for;
+        
+        
+
+
+
+            
+            
+      //  end if;
+            
+            // decrease lp by dividing by 1.3
+            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],1.3: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
+            // decrease lp by subtracting by Log(p)
+            lp, solutionsList:= pAdicReduction(fieldKinfo,fieldLinfo,fieldCinfo,LocalinfoList[i],Case,HeightBounds,cp,lp,hp,[],Log(p): NumSolutionsInLoop:= 0, decreaseMethod:= "subtract");
+     
+            NewHeightBounds`heightgammalist[i]:= Ceiling(lp);
+            aBound[i]:= BepsList;
+            
+        end for;
+        aBound;
+        
+        for j in [1..r] do
+            NewHeightBounds`infheightepslist[j]:= Min([aBound[i][j] : i in [1..nu]]);
+        end for;
+    end if;
+end procedure;
+
+pAdicReduction:= function(fieldKinfo, fieldLinfo, fieldCinfo, fieldLpinfo,Case,HeightBounds,cp,lp,hp,solutionsList,decreaseFactor: NumSolutionsInLoop:= 0, decreaseMethod:= "divide");
+    p:= fieldLpinfo`place;
+    delta1Lp:= fieldLpinfo`delta1Lp;
+    delta2Lp:= fieldLpinfo`delta2Lp;
+    logihat:= fieldLpinfo`logihat;
+    precision:= fieldLpinfo`precision;
+    
+    if decreaseMethod eq "divide" then
+        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
+            lp:= lp/(decreaseFactor);
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+            assert (cp le lp) and (lp lt hp);
+            assert ((mu+100) le precision);
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:= NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        end while; // exits when lp is found such that there are no solutions
+        lp:= lp*decreaseFactor;  // smallest value of lp such that there are 0 solutions
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
+    elif decreaseMethod eq "subtract" then
+        while (#solutionsList eq NumSolutionsInLoop) and (cp le lp) and (lp lt hp) do
+            lp:= lp -  decreaseFactor;
+            mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+            assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
+            assert (cp le lp) and (lp lt hp);
+            assert ((mu+100) le precision);
+            Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+            matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+            bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        end while; // exits when lp is found such that there are no solutions
+        lp:= lp + decreaseFactor;  // smallest value of lp such that there are 0 solutions
+        mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
+        Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,fieldCinfo,Case,fieldLpinfo,HeightBounds: Place:="NonArch");
+        matBtmatB, vecc, boundForNormSquared:= pAdicLattice(fieldLpinfo,Case,Bgam,BepsList,mu);
+        bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=NumSolutionsInLoop+1,lllReduce:=true, breakSymmetry:= true);
+        assert bufferWasBigEnough and (#solutionsList eq NumSolutionsInLoop);
+    end if;
+    return lp, solutionsList;
+end function;
+
+
+
+// LEFT OFF HERE; NEED TO TEST THIS CONVERSION OF SOLUTIONS TO SAMIRS;
+// ALSO NEED TO TEST OUT WHAT HAPPENS to reduction
+// include Samir's sieve at the end
+infNorm:= function(HeightBounds,Case,allBeps);
+    
+    CasePrimes:= [Norm(fp) : fp in Case`ideallist];
+    nu:= #Case`gammalist;
+    assert #CasePrimes eq nu;
+    
+    VectorInfNorm:= Max([HeightBounds`heightgammalist[i]/Log(CasePrimes[i]) : i in [1..nu]]);
+    
+    // compute the infinity norm of matAinv (max row sum)
+    matA:= Case`matA;
+    tf,matAinv:= IsInvertible(matA);
+    assert tf;
+    
+    n:= NumberOfRows(matAinv);
+    RowSum:= [];
+    for i in [1..n] do
+        RowSum[i]:=  &+[Abs(matAinv[i,j]) : j in [1..n]];
+    end for;
+    MatrixInfNorm:= Max(RowSum);
+    
+    nBound:= MatrixInfNorm*VectorInfNorm;
+    
+    // bound on a;
+    aBound:= [];
+    aBound[1]:= Ceiling(Min([Sqrt(allBeps[i][1]) : i in [1..#allBeps]]));
+    aBound[2]:= Ceiling(Min([Sqrt(allBeps[i][2]) : i in [1..nu]]));
+    
+    return Ceiling(nBound),Max(aBound);
+end function;
+
+    
+    
   
   
