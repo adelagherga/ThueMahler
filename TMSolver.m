@@ -1896,7 +1896,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
             delta2Lp:= LocalinfoList[i]`delta2Lp;
             logihat:= LocalinfoList[i]`logihat;
             cp:= Log(p)*(Max(1/(p-1),Valuation(delta1Lp)) - Valuation(delta2Lp));
-            lp:= Max(cp,hp - Log(p)); // heuristic for initial value of lv; lv >= cp
+            lp:= Max(cp,hp - 1); // heuristic for initial value of lv; lv >= cp
             mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp));
             
             if (mu le (Valuation(delta2Lp) - Valuation(logihat))) then
@@ -1921,7 +1921,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
             
             if (#solutionsList eq 0) then
                 while (#solutionsList eq 0) do
-                    lp:= lp - Log(p);        // continue to decrease lp until solutions appear
+                    lp:= lp - 1;        // continue to decrease lp until solutions appear
                     mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
                      if mu le (Valuation(delta2Lp) - Valuation(logihat)) then
                         print "mu is smaller than would allow; terminating reduction";
@@ -1943,7 +1943,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                     bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=1,lllReduce:=true, breakSymmetry:= true);
                 end while; // exits when lp is found such that there are no solutions
                 
-                lp:= lp + Log(p);  // smallest value of lp such that there are 0 solutions
+                lp:= lp + 1;  // smallest value of lp such that there are 0 solutions
                 mu:= Floor(lp/Log(p) - Valuation(logihat) + Valuation(delta2Lp)); // recompute mu
                 assert mu gt (Valuation(delta2Lp) - Valuation(logihat));
                 assert (cp le lp) and (lp lt hp);
@@ -1954,7 +1954,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                 
             else        // if solutions appear
                 print "solutions found at p", p;
-                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
+                bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=50000,lllReduce:=true, breakSymmetry:= true);
                 if bufferWasBigEnough eq false then
                     print "far too many solutions; terminate reduction";
                     stillEnumerating:= false;
@@ -2028,7 +2028,7 @@ ReductionIteration:= procedure(fieldKinfo,fieldLinfo,fieldCinfo,~LocalinfoList,C
                 
                 else        // if solutions appear
                     print "solutions found at v", i;
-                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=-1,lllReduce:=true, breakSymmetry:= true);
+                    bufferWasBigEnough, solutionsList:= My_FinckePohst(matBtmatB,boundForNormSquared:center:=vecc, maxNumSolutions:=50000,lllReduce:=true, breakSymmetry:= true);
                     if bufferWasBigEnough eq false then
                         print "far too many solutions; terminate reduction";
                         stillEnumerating:= false;
