@@ -1,0 +1,70 @@
+Understainding Kyle's reduction procedure, implemented after the PIRL.
+
+1. Iterate through each case.
+
+2. Generate image of zeta, alpha
+
+3. Determine i0,j,k based on when we can compute n_l, bound n_l, or use basic/refined reduction techniques.
+   For each prime p[l]:
+       a. Try to find i0,j,k so that we can compute n_l directly. If this is possible, absorb n_l
+          into alpha.
+       b. If (a) fails, try to find i0,j,k so that we can get a (smaller) bound on n_l
+   Generate the following sets:
+       JJ:= set of indices l in {1..v} such that there is an unbounded prime
+       J:= set of indices l in {1..v} such that there is an unbounded prime above p[l] and (a) is
+           not possible (can't compute n_l directly)
+       JJJ:= {1} cat {1+l : l in J} cat {1+v+i : i in {1..r}}, all indices needed for reduction
+       I:= set of l in J for which we (b) does not hold (can't compute small bound on n_l)
+       I2:= J\I, set of l in J for which (b) holds
+   Compute delta1, delta2 for each l in J, and the linear forms in p-adic logs
+   Determine if we are in the special case, alpha_i/alpha_ihat is in Qp for all i and some ihat
+       NB. this should always be true for deg 3
+
+4. Determine preimage of elements in Lp, C under the embedding L -> Lp, L -> C resp
+
+5. Determine large upper bound via Yu's lemma
+
+6. Initialize height bounds to be large upper bound, basic reduction
+
+7. Refined reduction, start loop:
+       ExceptionalTuples:= [];
+       Improvement:= true;
+       while Improvement do
+       Improvement:= false;
+
+   Check if number of tuples to sieve through is small; if < 5,000,000, jump directly to sieve via
+   "break".
+   Check if number of exceptional tuples has grown excessively large, > 100,000, jump directly to
+   sieve via "break".
+
+   p-Adic Reduction: for l in I do
+       Compute mu_0 using a heuristic
+       Start loop: increase m until p[l]-adic reduction yields a new upper bound for n_l or until
+       a number of increases has made no difference
+           flag:= true;
+	   RunThroughNumber:=0;
+	   while flag do
+	   Increase mu_0 if not the first attempt
+
+	   Compute new upper bound for n[l]; if better than old bound, proceed, else continue to
+	   next l
+
+	   Generate matrix Am, compute LLL matrix Bm
+	   Compute vector y, including ihat
+	   Find closest vector
+	   Construct lattice Gamma_m:= Lattice(Transpose(Bm));
+
+	   If the number of nodes is too large (proportional to time needed for enumeration),
+	   increase m and try the reduction procedure again. If several small increases of m fail
+	   to result in a small enough estimate for the number of nodes, move to next l in I,
+	   EnumerationCost.
+
+	   If EnumertaionCost > 6,000,000, RunThroughNumber:=+1;
+	       if RunThroughNumber eq 20, continue l; else flag:= false;
+	           ShortVectorProcess, extract tuples, add tuples to ExceptionalTuplesInsideLoop,
+		   basic tests
+
+		   Improvement:= true;
+		   UpperBoundForn:= NewUpperBound
+
+8. UpperBoundForN:= Max(UpperBoundForn);
