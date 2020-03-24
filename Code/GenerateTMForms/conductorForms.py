@@ -1,25 +1,24 @@
 #!/usr/bin/python
+# conductorForms.py
 
-# Author: Andrew Rechnitzer <andrewr@math.ubc.ca>
+# Author: Adela Gherga <adelagherga@gmail.com>, Andrew Rechnitzer <andrewr@math.ubc.ca>
+# Copyright © 2020, Adela Gherga, all rights reserved.
 # Created: 17 March 2020
 #
 # Description: This program iterates through each line of the files irred_pos.txt,
 #              irred_neg.txt, as compute by as computed by A. Rechnitzer.
 #              It takes as input discF c_1 .. c_4 and outputs
 #              on each line of FormsCond10To6.txt
-#              N [disc(F_1),c_1,..,c_4],..,[disc(F_n),c_1,..,c_4]
+#              N [disc(F),c_1,..,c_4]
 #
-# Commentary: This program only needs to be applied once
-#             Run with python3 ./conductorForms.py > FormsCond10To6.txt
+# Commentary: This program only needs to be applied once.
+#             Run with
+#             python3 /Users/adela016/Documents/Work/Postdoc/ThueMahler/Code/GenerateTMForms/conductorForms.py > /Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt
 #
 # To do list: N/A
 #
 # Example: N/A
 #
-
-
-# runs through every line of FormsCond10To6.txt
-# python3 /Users/adela016/Documents/Work/Postdoc/ThueMahler/Code/GenerateTMForms/conductorForms.py > /Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt
 
 
 import sys
@@ -83,8 +82,10 @@ def b_okay(b, b0):
 
 
 def fargle(X):
-    Y = X.replace(" ", ",").rstrip()
-    return "[%(Y)s]" % vars()
+    Y = []
+    for char in X.split():
+        Y.append(int(char))
+    return [Y]
 
 
 pos_forms = {}
@@ -93,14 +94,14 @@ neg_forms = {}
 for line in open("/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/Raw/irreduc_pos.txt"):
     conductor = int(line.split()[0])
     if conductor in pos_forms:
-        pos_forms[conductor] += "," + fargle(line)
+        pos_forms[conductor] = pos_forms[conductor] + fargle(line)
     else:
         pos_forms[conductor] = fargle(line)
 
 for line in open("/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/Raw/irreduc_neg.txt"):
     conductor = -int(line.split()[0])
     if conductor in neg_forms:
-        neg_forms[conductor] += "," + fargle(line)
+        neg_forms[conductor] = neg_forms[conductor] + fargle(line)
     else:
         neg_forms[conductor] = fargle(line)
 
@@ -120,7 +121,7 @@ for DF in sorted(pos_forms):
         b = threes[N0]
         if a_okay(a, a0) and b_okay(b, b0):
             if N0 in all_forms:
-                all_forms[N0] += "," + pos_forms[DF]
+                all_forms[N0] = all_forms[N0] + pos_forms[DF]
             else:
                 all_forms[N0] = pos_forms[DF]
 
@@ -135,9 +136,10 @@ for DF in sorted(neg_forms):
         b = threes[N0]
         if a_okay(a, a0) and b_okay(b, b0):
             if N0 in all_forms:
-                all_forms[N0] += "," + neg_forms[DF]
+                all_forms[N0] = all_forms[N0] + neg_forms[DF]
             else:
                 all_forms[N0] = neg_forms[DF]
 
 for key in sorted(all_forms):
-    print(key, all_forms[key])
+    for form in all_forms[key]:
+        print(key, form)
