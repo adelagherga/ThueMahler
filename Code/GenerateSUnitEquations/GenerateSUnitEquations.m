@@ -478,6 +478,8 @@ prep0:= function(OutFiles,LogFile,clist,N)
 		"Thue-Mahler equation has reduced to several Thue equations \n";
 	fprintf NoSUnitEqNeeded,
 		"All solutions thus computed via Magma built-in Thue solver \n";
+	fprintf NoSUnitEqNeeded,
+		"All solutions: \n%o\n", TMSolutions;
 	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
@@ -1175,7 +1177,7 @@ end procedure;
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
      Output:
      Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m &
+nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
 */
 
@@ -1237,7 +1239,6 @@ if (enterTM eq false) then
     printf "-"^(75) cat "\n";
 else
 
-    fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
     // generate a record to store relevant field K info
     FieldInfo:= recformat<field,gen,ringofintegers,
 			  minpoly,zeta,fundamentalunits>;
@@ -1338,6 +1339,8 @@ else
     if IsEmpty(afplistAll) then
 	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
 	fprintf NoSUnitEqNeeded, "No S-unit equations to resolve for this Thue-Mahler equation\n";
+	fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
+
 	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
     else
 
@@ -1376,6 +1379,7 @@ else
 	    fprintf SUnitEq, "S-unit equation rank:= %o\n",
 		    #Case`gammalist+#fieldKinfo`fundamentalunits;
 	    fprintf SUnitEq, "initial bound:= %o\n", Case`bound;
+	    fprintf SUnitEq, "solutions obtained via Thue equations: \n%o\n", TMSolutions;
 	    fprintf SUnitEq, "-"^(75) cat "\n";
 	end for;
     end if;

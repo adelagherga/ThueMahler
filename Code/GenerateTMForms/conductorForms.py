@@ -142,4 +142,4 @@ for DF in sorted(neg_forms):
 
 for key in sorted(all_forms):
     for form in all_forms[key]:
-        print(key, form)
+        print( "[" + str(key)+ "," + str(form).replace(" ","") + "]")
