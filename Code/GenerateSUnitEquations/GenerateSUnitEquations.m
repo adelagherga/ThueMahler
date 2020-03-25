@@ -1175,18 +1175,18 @@ end procedure;
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
      Output:
      Example: run with
-nohup cat /home/adela/Data/SortedFormsCond10To6.txt | parallel magma set:={} /home/adela/Code/GenerateSUnitEquations/GenerateSUnitEquations.m &
+nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m &
 
 */
 
 // convert bash input into magma integers, sets
 
-LogFile:= "/home/adela/Data/SUnitEqData/SUnitEqLogs/" cat set cat "Log.txt";
+LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs/" cat set cat "Log.txt";
 NoSUnitEqPossible:=
-    "/home/adela/Data/SUnitEqData/NoSUnitEqPossible/" cat set cat "NoSUnitEqPossible.txt";
+    "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible/" cat set cat "NoSUnitEqPossible.txt";
 NoSUnitEqNeeded:=
-    "/home/adela/Data/SUnitEqData/NoSUnitEqNeeded/" cat set cat "NoSUnitEqNeeded.txt";
-SUnitEq:= "/home/adela/Data/SUnitEqData/AllSUnitEq/" cat set cat "SUnitEq.txt";
+    "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded/" cat set cat "NoSUnitEqNeeded.txt";
+SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq/" cat set cat "SUnitEq.txt";
 
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];
