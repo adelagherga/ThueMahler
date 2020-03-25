@@ -1360,6 +1360,9 @@ else
 	UpperBounds(fieldKinfo,clist,~alphgamlistAll,ComplexPrec);
 	printf "Done! Duration: %o\n", Cputime(t1);
 
+	fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
+	fprintf SUnitEq, "solutions obtained via Thue equations: \n%o\n", TMSolutions;
+	fprintf SUnitEq, "-"^(75) cat "\n";
 	for Case in alphgamlistAll do
 	    fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
 	    fprintf SUnitEq, "minimal polynomial for K:= %o\n", f;
@@ -1379,7 +1382,6 @@ else
 	    fprintf SUnitEq, "S-unit equation rank:= %o\n",
 		    #Case`gammalist+#fieldKinfo`fundamentalunits;
 	    fprintf SUnitEq, "initial bound:= %o\n", Case`bound;
-	    fprintf SUnitEq, "solutions obtained via Thue equations: \n%o\n", TMSolutions;
 	    fprintf SUnitEq, "-"^(75) cat "\n";
 	end for;
     end if;
