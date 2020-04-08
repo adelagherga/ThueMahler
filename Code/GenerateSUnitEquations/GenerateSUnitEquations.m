@@ -132,38 +132,41 @@ localtest:= function(N,F,DiscF)
     for p in testPrimes do
 	// search for solutions (u,v) of F(u,v) mod p
 	// under the assumption that the exponent on p is > 0
-	posExpSol:= ModpCheck(F,testPrimes,p : qDividesRHS:= true);
-	if (p ge 3) and (Valuation(N,p) eq 1) and (DiscF mod p ne 0) then
-	    // verify local obstructions as per Theorem 1 of BeGhRe
-	    // ie. if Valuation(N,p) = 1 for p >= 3, then p | DiscF*F(u,v)
-	    // thus if DiscF != 0 mod p, then F(u,v) = 0 mod p for some (u,v)
-	    // if u = v = 0 mod p is the only solution, gcd(u,v) != 1
-	    // hence locMal obstruction at p
-	    if (posExpSol eq false) then
-		Append(~localObstruction, p);
-		return partialObstruction, localObstruction;
-	    end if;
-	elif (p le 13) or (p in [13..151] and (#testPrimes le 3)) then
-	    // verify local obstructions for primes possible on RHS
-	    // this includes divisors of N, and 2,3
-	    // the bound 151 is arbitrary, but serves to decrease search time
+	if (p le 13) or (p in [13..151] and (#testPrimes le 3)) then
+	    // the bounds 13,1513 are arbitrary, but serve to decrease search time
 
-	    // search for solutions (u,v) of F(u,v) mod p
-	    // under the assumption that the exponent on p is 0
-	    zeroExpSol:= ModpCheck(F,Exclude(testPrimes,p),p :
-				   qDividesRHS:=false);
-	    if (zeroExpSol eq false) and (posExpSol eq false) then
-		// if u = v = 0 mod p is the only solution in both cases
-		// gcd(u,v) != 1, hence local obstruction at p
-	    	Append(~localObstruction, p);
-		return partialObstruction, localObstruction;
-	    elif (zeroExpSol eq true) and (posExpSol eq false) then
-		// if a solution (u,v) != (0,0) mod p exists
-		// when the exponent on p is 0
-		// but u = v = 0 mod p is the only solution
-		// when the exponent on p is > 0
-		// partial obstruction at p; can remove p from primelist
-		Append(~partialObstruction, p);
+	    posExpSol:= ModpCheck(F,testPrimes,p : qDividesRHS:= true);
+	    if (p ge 3) and (Valuation(N,p) eq 1) and (DiscF mod p ne 0) then
+		// verify local obstructions as per Theorem 1 of BeGhRe
+		// ie. if Valuation(N,p) = 1 for p >= 3, then p | DiscF*F(u,v)
+		// thus if DiscF != 0 mod p, then F(u,v) = 0 mod p for some (u,v)
+		// if u = v = 0 mod p is the only solution, gcd(u,v) != 1
+		// hence locMal obstruction at p
+		if (posExpSol eq false) then
+		    Append(~localObstruction, p);
+		    return partialObstruction, localObstruction;
+		end if;
+	    else
+		// verify local obstructions for primes possible on RHS
+		// this includes divisors of N, and 2,3
+
+		// search for solutions (u,v) of F(u,v) mod p
+		// under the assumption that the exponent on p is 0
+		zeroExpSol:= ModpCheck(F,Exclude(testPrimes,p),p :
+				       qDividesRHS:=false);
+		if (zeroExpSol eq false) and (posExpSol eq false) then
+		    // if u = v = 0 mod p is the only solution in both cases
+		    // gcd(u,v) != 1, hence local obstruction at p
+	    	    Append(~localObstruction, p);
+		    return partialObstruction, localObstruction;
+		elif (zeroExpSol eq true) and (posExpSol eq false) then
+		    // if a solution (u,v) != (0,0) mod p exists
+		    // when the exponent on p is 0
+		    // but u = v = 0 mod p is the only solution
+		    // when the exponent on p is > 0
+		    // partial obstruction at p; can remove p from primelist
+		    Append(~partialObstruction, p);
+		end if;
 	    end if;
 	end if;
     end for;
@@ -248,10 +251,10 @@ prep0:= function(OutFiles,LogFile,clist,N)
     if (IsEmpty(localObstruction) eq false) then
 	// local obstructions present; do not enter TM solver
 	enterTM:= false;
-//	fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-//	fprintf NoSUnitEqPossible, "Local obstruction at primes:= %o \n",
+	fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
+	fprintf NoSUnitEqPossible, "Local obstruction at primes:= %o \n",
 		localObstruction;
-//	fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+	fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
     if (IsEmpty(partialObstruction) eq false) then
@@ -389,10 +392,11 @@ prep0:= function(OutFiles,LogFile,clist,N)
 		assert x`prime eq p;
 		if (assigned x`unbounded) and (x`alpha1 ge 1) then
 		    enterTM:= false;
-		   // fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-		  //  fprintf NoSUnitEqPossible,
-			    "Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-		   // fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+		    fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
+		    fprintf
+			NoSUnitEqPossible,
+			"Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
+		    fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
 		    return f, enterTM, TMSolutions, RemainingCasesAllAs;
 		elif (assigned x`unbounded) and (x`alpha1 eq 0) then
 		    delete x`unbounded; // update bound at p
@@ -406,11 +410,10 @@ prep0:= function(OutFiles,LogFile,clist,N)
 
 	if IsEmpty(psetNew) then
 	    enterTM:= false;
-	   // fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-	   // fprintf NoSUnitEqPossible,
-		    "Theorem 1 of BeReGh does not align with partial
-			 obstruction at p:= %o \n", p;
-	   // fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+	    fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
+	    fprintf NoSUnitEqPossible,
+		    "Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
+	    fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
 	    return f, enterTM, TMSolutions, RemainingCasesAllAs;
 	end if;
 	// verify pset now only includes the exponent 0 case at p
@@ -456,7 +459,7 @@ prep0:= function(OutFiles,LogFile,clist,N)
     // store Thue-Mahler equations to be solved
     // solve corresponding Thue equations, if any
     RemainingCases:=aprimelist;
-    Thuef:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
+    ThueF:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
 
     RHSlist:= [];
     for pset in aprimelist do
@@ -495,9 +498,9 @@ prep0:= function(OutFiles,LogFile,clist,N)
 
     // generate all Thue solutions
     for rhs in RHSlist do
-	sol:= Solutions(Thuef,rhs);
+	sol:= Solutions(ThueF,rhs);
 	for s in sol do
-	    if <s,rhs> notin TMSolutions then
+	    if (<s,rhs> notin TMSolutions) and (IsCoprime(s[1],s[2])) then
 		Append(~TMSolutions,<s,rhs>);
 	    end if;
 	end for;
@@ -506,14 +509,14 @@ prep0:= function(OutFiles,LogFile,clist,N)
     // if all cases are resolved via Thue equations
     if IsEmpty(RemainingCases) then
 	enterTM:=false;
-//	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
-//	fprintf NoSUnitEqNeeded,
+	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
+	fprintf NoSUnitEqNeeded,
 		"Thue-Mahler equation has reduced to several Thue equations \n";
-//	fprintf NoSUnitEqNeeded,
+	fprintf NoSUnitEqNeeded,
 		"All solutions thus computed via Magma built-in Thue solver \n";
-//	fprintf NoSUnitEqNeeded,
+	fprintf NoSUnitEqNeeded,
 		"All solutions: \n%o\n", TMSolutions;
-//	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
 
@@ -925,134 +928,57 @@ prep1:= function(fieldKinfo,clist,apset)
 	return afplist;
 end function;
 
-
-ijkAutL:= function(fieldLinfo)
+principalize:=function(fieldKinfo,ClK,ideal_a,fplist)
 
     /*
-     Description:
-     Input:
-     Output:
+     Description: convert ideal equation (3.8), given by ideal_a, fplist, into S-unit		 equations (3.9) via procedure of Section 3.4.2 of Gh
+     Input: fieldKinfo:= record of the field K = Q(th)
+            ClK:= record of relevant class group info of the field K = Q(th)
+            ideal_a:= the ideal as in (3.8) of Gh
+            fplist:= list of prime ideals as in (3.8) of Gh
+     Output: tf:= boolean value determining whether the ideal equation with ideal_a, fplist
+                  has solutions, determind by whether [ideal_a]^{-1} is in the image of phi
+                  if false, all other values return 0
+             alpha:= principal ideal generator as in (3.9) of Gh
+             gammalist:= list of principal ideal generators as in (3.9) of Gh
+             matA:= nu x nu matrix as in Section 3.4.2 of Gh
+             rr:= nu x 1 vector r as in Section 3.4.2 of Gh
      Example:
    */
 
-    L:= fieldLinfo`field;
-    tl:= fieldLinfo`gen;
-    G,Aut,tau:= AutomorphismGroup(L);
-    assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
-
-    ijk:= [];
-    if Order(G.1) eq 3 then
-        assert G.1^3 eq Id(G);
-        if (tau(G.1))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.1);
-            ijk[2]:= tau(G.1^2);
-        else
-            ijk[1]:= tau(G.1^2);
-            ijk[2]:= tau(G.1);
-        end if;
-        ijk[3]:= tau(G.1^3);    // identity map
-    elif Order(G.2) eq 3 then
-        assert G.2^3 eq Id(G);
-        if (tau(G.2))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.2);
-            ijk[2]:= tau(G.2^2);
-        else
-            ijk[1]:= tau(G.2^2);
-            ijk[2]:= tau(G.2);
-        end if;
-        ijk[3]:= tau(G.2^3);
-    end if;
-
-    AutL:= [];
-    for x in G do
-        Append(~AutL, tau(x));
-    end for;
-
-    // verify that i,j,k permutes the roots tl
-    assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3])
-	   and (ijk[3](tl[1]) eq tl[1]);
-    assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1])
-	   and (ijk[3](tl[2]) eq tl[2]);
-    assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2])
-	   and (ijk[3](tl[3]) eq tl[3]);
-
-    return ijk, AutL;
-end function;
-
-principalize:=function(fieldKinfo,ClK,fa,fplist)
-
-    /*
-     Description:
-     Input:
-     Output:
-     Example:
-   */
-						/*
-    INPUT:
-        fa:= an ideal in OK such that
-            fa * fp_1^{n_1} * ... * fp_u^{n_u} = principal ideal
-        fplist:= a list of prime ideals
-
-    OUTPUT:
-        tf, alpha, gammalist, matA, rr.
-	// Here tf is true or false. False means that [fa]^{-1} is not in the image
-	// of phi (in the notation of the letter) and so the equation has no solution.
-	// If tf is false then the other values return are all zero.
-	// If tf is true ([fa]^{-1} is in the image of phi),
-	// then alpha \in K^*
-	// gammalist is a list gamma_1,..,gamma_u, and these
-	// values are as in equation (4) of the letter.
-	// It also returns the matrix A, and the vector rr
-	// in the notation of the letter.
-	// If fplist is empty then it just returns tf, alpha, [], 0, 0
-	// where tf is true/false depending on whether fa is principal or not,
-	// and if so alpha will be a generator.
-
-    REMARKS:
-        // I shouldn't start with this since this isn't the first thing we do...
-
-    REFERENCE:
-    EXAMPLE:
-    alpha here has norm (x-1)^3 p_1^{t_1+r_1} \cdots p_v^{t_v+r_v}
-    */
     K:=fieldKinfo`field;
     OK:=fieldKinfo`ringofintegers;
+    nu:=#fplist;
+    assert nu ne 0;
+    Zu:=FreeAbelianGroup(nu);
 
-    u:=#fplist;
-    if u eq 0 then
-        tf,alpha:=IsPrincipal(fa);
-        if tf then
-            return tf, alpha, [K | ], 0, 0;
-        else
-            return tf, 0, 0, 0, 0;
-        end if;
-    end if;
-    Zu:=FreeAbelianGroup(u);
-    phi := hom< Zu -> ClK`classgroup | [ fp@@ClK`map : fp in fplist ]>;
-    img:=Image(phi);
-    if -fa@@ClK`map in img then
-        rr:=(-fa@@ClK`map)@@phi;
+    phi:= hom< Zu -> ClK`classgroup | [ fp@@ClK`map : fp in fplist ]>;
+    img:= Image(phi);
+    if -ideal_a@@ClK`map in img then
+        rr:=(-ideal_a@@ClK`map)@@phi;
         rr:=Eltseq(Zu!rr);
-	// to avoid precision errors
-	// updates rr to have only positive entries
+	// update vector r to have only positive entries, to avoid precision errors
         for i in [1..#rr] do
             while rr[i] lt 0 do
                 rr[i]:= rr[i]+ClK`classnumber;
             end while;
         end for;
-        ker:=Kernel(phi);
-	// A is a list of vectors for now
+        ker:= Kernel(phi);
+	// generate the list of vectors to comprise matrix A as in Section 3.4.2 of Gh
         A:=[Eltseq(Zu!a) : a in Generators(ker)];
-        assert #A eq u; // hence the kernel has rank u
-        matA:=Transpose(Matrix(Rationals(),A)); // the matrix A as denoted in Si
+        assert #A eq nu; // verify the kernel ker(phi) has rank nu
+	// generate the matrix A
+        matA:=Transpose(Matrix(Rationals(),A));
         assert AbsoluteValue(Determinant(matA)) eq #img;
-        fa2:=fa*&*[fplist[i]^rr[i] : i in [1..u]];
-        tf,alpha:=IsPrincipal(fa2);
-        assert tf; // the principal ideal with generator alpha
-	// computes the ideals as denoted by \mathfrak{c} in the Si
-        clist:=[ &*[fplist[i]^a[i] : i in [1..u] ]  : a in A ];
+	// generate the product ideal_a*ideal_tilde(p) as in Section 3.4.2 of Gh
+	ideal_atildep:= ideal_a*&*[fplist[i]^rr[i] : i in [1..nu]];
+	tf,alpha:=IsPrincipal(ideal_atildep); // generate principal ideal with generator alpha
+        assert tf;
+
+	// compute the ideals c_i as in Section 3.4.2 of Gh and their corresponding generators
+        ideal_clist:=[ &*[fplist[i]^a[i] : i in [1..nu] ]  : a in A ];
         gammalist:=[];
-        for fc in clist do
+        for fc in ideal_clist do
             tf, gamma:=IsPrincipal(fc);
             assert tf;
             Append(~gammalist,gamma);
@@ -1068,71 +994,38 @@ end function;
 prep2:=function(fieldKinfo,ClK,afplist)
 
     /*
-     Description:
-     Input:
-     Output:
+     Description: iterate through each ideal equation (3.8) to generate all S-unit equations
+     		  (3.9) of Gh
+     Input: fieldKinfo:= record of the field K = Q(th)
+            ClK:= record of relevant class group info of the field K = Q(th)
+            afplist:= [aset,primelist,ideal_a,prime_ideal_list] where
+                      ideal_a and prime_ideal_list are as in (3.8) of Gh
+     Output: alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
      Example:
    */
-
-   // INPUT:
-//        fa:= an ideal in OK such that
-  //          fa * fp_1^{n_1} * ... * fp_u^{n_u} = principal ideal
-    //    fplist:= a list of prime ideals
-
-//    OUTPUT:
-  //      tf, alpha, gammalist, matA, rr.
-	// Here tf is true or false. False means that [fa]^{-1} is not in the image
-	// of phi (in the notation of the letter) and so the equation has no solution.
-	// If tf is false then the other values return are all zero.
-	// If tf is true ([fa]^{-1} is in the image of phi),
-	// then alpha \in K^*
-	// gammalist is a list gamma_1,..,gamma_u, and these
-	// values are as in equation (4) of the letter.
-	// It also returns the matrix A, and the vector rr
-	// in the notation of the letter.
-	// If fplist is empty then it just returns tf, alpha, [], 0, 0
-	// where tf is true/false depending on whether fa is principal or not,
-	// and if so alpha will be a generator.
-
-    //REMARKS:
-        // I shouldn't start with this since this isn't the first thing we do...
-
-
-//    EXAMPLE:
-
-    // clist is a list of coefficients c_0,c_1,..,c_n.
-    // a is an integer.
-    // primelist is a list of the primes p_1,p_2,..,p_v.
-    // This returns a list of the possible quadruples [* alpha, gammalist, matA, r *]
-    // where alpha in K^*, and gammalist is a list gamma_1,...,gamma_u
-    // so that (c_0 X - th Y)OK =alpha*gamma_1^{m_1}*..*gamma_u^{m_u} (as in equation (4)).
-    // matA and rr are the matrix A and the vector rr, so that
-    // nn = mm A + rr, where nn is the vector of exponents in (3)
-    // and mm is the vector of exponents in (4).
-
 
     K:= fieldKinfo`field;
     OK:=fieldKinfo`ringofintegers;
 
-    // generate a record to store relevant case info
-    SUnitInfo:= recformat< primelist,avalue,du,alpha,
-			   gammalist,matA,vecR,ideallist,bound >;
+    // generate a record to store relevant S-unit equation info
+    SUnitInfo:= recformat< primelist,newa,adu,alpha,gammalist,matA,vecR,ideallist,bound >;
 
     alphgamlist:=[ ];
     for pr in afplist do
 	primelist:= pr[2];
-        af:=pr[3];
-        fplist:=pr[4];
+        ideal_a:= pr[3];
+        fplist:= pr[4];
 	v:= #primelist;
-        tf,alpha,gammalist,matA,rr:=principalize(fieldKinfo,ClK,af,fplist);
+        tf,alpha,gammalist,matA,rr:=principalize(fieldKinfo,ClK,ideal_a,fplist);
 	if tf then
+	    // sanity checks on exponents of alpha, ideal_a, and ideal generators gamma
             assert #gammalist eq #fplist;
             nu:= #fplist;
             Nm:= [Norm(fp) : fp in fplist];
             assert #Nm eq nu;
             assert &and[IsPrime(fp) : fp in Nm];
             rtest:= [];
-            for i in [1..#primelist] do
+            for i in [1..v] do
                 p:= primelist[i];
                 if p in Nm then
                     ind:= Index(Nm, p);
@@ -1141,33 +1034,32 @@ prep2:=function(fieldKinfo,ClK,afplist)
                     rtest[i]:= 0;
                 end if;
             end for;
-            tt:= [Valuation(Norm(af), primelist[i]) : i in [1..v]];
-            zz:= [Valuation(Norm(ideal<OK|alpha>), primelist[i]) :
-		  i in [1..v]];
-	    // sanity checks on exponents of alpha, ideal af, and gammas
+            tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+            zz:= [Valuation(Norm(ideal<OK|alpha>), primelist[i]) : i in [1..v]];
             assert [tt[i] + rtest[i] : i in [1..v]] eq zz;
             for i in [1..nu] do
                 gamma:= gammalist[i];
                 aa:= [Valuation(Norm(ideal<OK|gamma>), Nm[j]) : j in [1..nu]];
                 assert aa eq Eltseq(ColumnSubmatrixRange(matA,i,i));
             end for;
-
-            Append(~alphgamlist,
-		   rec< SUnitInfo|primelist:=primelist, avalue:=pr[1]`avalue,
-				  du:=pr[1]`du, alpha:=alpha,
-				  gammalist:=gammalist,matA:=matA,
-				  vecR:=rr,ideallist:=fplist>);
+	    temp:=rec<SUnitInfo|primelist:=primelist,newa:=pr[1]`newa,adu:=pr[1]`adu,
+				alpha:=alpha,gammalist:=gammalist,matA:=matA,vecR:=rr,
+				ideallist:=fplist>;
+            Append(~alphgamlist,temp);
         end if;
     end for;
     return alphgamlist;
 end function;
 
-UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,ComplexPrec)
+UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,complexPrec)
 
     /*
-     Description:
-     Input:
-     Output:
+     Description: appends upper bound on all S-unit equations as per Section 6.2 of Gh
+     Input: fieldKinfo:= record of the field K = Q(th)
+            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
+            complexPrec:= precision on complex field, C
+     Output: alphgamlist[i]`bound:= upper bound on ith S-unit equation as per Section 6.2 of Gh
      Example:
    */
 
@@ -1191,14 +1083,14 @@ UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,ComplexPrec)
 
     thetaC:= Conjugates(th);
     assert n eq #thetaC;
-    CField<i>:= ComplexField(ComplexPrec);
+    CField<i>:= ComplexField(complexPrec);
 
     taus:=[hom< K -> CField | thetaC[i] > : i in [1..n]];
     // compute the Weil height of theta
     hth:= (1/n)*&+[Max((Log(Abs(taus[i](th)))), 0) : i in [1..n]];
 
     for i in [1..#alphgamlist] do
-	a:= alphgamlist[i]`avalue;
+	a:= alphgamlist[i]`newa;
 	primelist:=alphgamlist[i]`primelist;
         alpha:= alphgamlist[i]`alpha;
 	NS:= &*[p : p in primelist];
@@ -1265,7 +1157,7 @@ assert #commas eq 4;
 Append(~brackets,i);
 
 // convert bash symbols of clist into integers
-discF:= StringToInteger(&cat[set[i] : i in [brackets[1]+1..commas[1]-1]]);
+DiscF:= 4*StringToInteger(&cat[set[i] : i in [brackets[1]+1..commas[1]-1]]);
 clist:=[];
 for j in [1..#commas-1] do
     n:= [set[i] : i in [(commas[j]+1)..(commas[j+1]-1)]];
@@ -1288,7 +1180,7 @@ if (enterTM eq false) then
     printf "-"^(75) cat "\n";
 else
 
-    // generate a record to store relevant field K info
+        // generate a record to store relevant field K info
     FieldInfo:= recformat<field,gen,ringofintegers,
 			  minpoly,zeta,fundamentalunits>;
 
@@ -1333,6 +1225,7 @@ else
     fieldKinfo`zeta:= zeta;
     fieldKinfo`fundamentalunits:= epslist;
 
+    /*
     L, tl:= SplittingField(f);
     printf "Computing the ring of integers of the splitting field...";
     t2:= Cputime();
@@ -1342,157 +1235,155 @@ else
     assert tf;
     assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
     fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
-
+    */
     // DONT NEED THIS FOR SUNITGENERATOR
-    ijkL,AutL:= ijkAutL(fieldLinfo);
-    assert ijkL[3](th) eq L!th; // this is the identity automorphism
+    /* ijkL,AutL:= ijkAutL(fieldLinfo); */
+    /* assert ijkL[3](th) eq L!th; // this is the identity automorphism */
 
+    // mulitple primelists not possible
+    assert #RemainingCases eq 1;
+    remainingCase:= RemainingCases[1];
     // generate all ideal equations
-    afplistAll:= [**];
-    for apset in RemainingCases do
-	afplist:=prep1(fieldKinfo,clist,apset);
-	afplistAll:= afplistAll cat afplist;
-    end for;
+    afplist:= prep1(fieldKinfo,clist,remainingCase);
 
-    // remove ideal equations which have exponent 0 on all prime ideals by solving
-    // corresponding Thue equations
+    // setup for Thue equations
     Zx<x_>:= PolynomialRing(Integers());
+    QUV<U,V>:=PolynomialRing(Rationals(),2);
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n eq 3;
     fclist:= [Integers()!Coefficient(f,i) : i in [3..0 by -1]];
     Integerf:=&+[fclist[i+1]*x_^(n-i) : i in [0..n]];
     assert f eq ChangeRing(Integerf,Rationals());
     Thuef:= Thue(Integerf);
-    // LEFT OFF HERE.
+    F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
+    assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
-    // TO DO: TEST PROGRAM; CHOOSE A SAMPLE FROM LIST OF FILES
-//    for set in sets do
-//N:= set[1];
-//clist:= [set[2][i] : i in [2..5]];
-//f, enterTM, TMSolutions, RemainingCases:= prep0(OutFiles,LogFile,clist,N);
-//if #RemainingCases gt 2 then
-//print set;
-//end if;
-    //end for;
-    // CAN WE AMALGAMATE ASETS? IS IT POSSIBLE THAT WE"RE GETTING THE SAME NEW A AND PRIMESET? IS THERE A WAY THAT WE CAN REMOVE REDUNDANCY?
-
+    // remove ideal equations which have exponent 0 on all prime ideals by solving
+    // corresponding Thue equations
     toRemove:= [];
     RHSlist:= [];
-    for i in [1..#afplistAll] do
-	fplist:= afplistAll[i][4];
+    for i in [1..#afplist] do
+	fplist:= afplist[i][4];
 	if IsEmpty(fplist) then
-	    a:= afplistAll[i][1]`newa
-	    adu:= afplistAll[i][1]`adu;
-	    primelist:= afplistAll[i][2];
-	    ideal_a:= afplistAll[i][3];
+	    a:= afplist[i][1]`newa;
+	    adu:= afplist[i][1]`adu;
+	    primelist:= afplist[i][2];
+	    ideal_a:= afplist[i][3];
 	    v:= #primelist;
 	    tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
 	    assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
 	    rhs:= Integers()! a*&*[primelist[i]^tt[i] : i in [1..v]];
-	    if rhs notin RHSlist then
-		Append(~RHSlist, RHS);
+	    tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
+	    if (tf) and (rhs notin RHSlist) then
+		Append(~RHSlist, rhs);
 	    end if;
-	    Append(~toRemove,i);
+	    Append(~toRemove,[i,rhs]);
 	end if;
     end for;
 
-
-    for i in [1..#afplistAll] do
-	fplist:= afplistAll[i][4];
-	if i notin toRemove then
-	    a:= afplistAll[i][1]`avalue;
-	    du:= afplistAll[i][1]`du;
-	    primelist:= afplistAll[i][2];
-	    af:= afplistAll[i][3];
-	    v:= #primelist;
-	    tt:= [Valuation(Norm(af), primelist[i]) : i in [1..v]];
-	    assert Norm(af) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
-	    RHS:= Integers()! a*&*[primelist[i]^tt[i] : i in [1..v]];
-	    if RHS in RHSlist then
-		print "RHS";
-	    end if;
-	end if;
-    end for;
-
-
-
-
-
-
-    for RHS in RHSlist do
-	sol:= Solutions(Thuef,RHS);
+    //  generate all Thue solutions
+    for rhs in RHSlist do
+	sol:= Solutions(Thuef,rhs);
 	for s in sol do
-	    if s notin TMSolutions then
-		Append(~TMSolutions,s);
+	    if IsCoprime(s[1],s[2]) then
+		for i in toRemove do
+		    if i[2] eq rhs then
+			adu:= afplist[i[1]][1]`adu;
+			primelist:= afplist[i[1]][2];
+			ideal_a:= afplist[i[1]][3];
+			assert IsEmpty(afplist[i[1]][4]);
+			v:= #primelist;
+			tt:= [Valuation(Norm(ideal_a), primelist[j]) : j in [1..v]];
+			// iterate through each set a,d,u corresponding to primelist
+			for aduset in adu do
+			    a:= aduset[1];
+			    d:= aduset[2];
+			    u:= aduset[3];
+			    // translate x,y,z to X,Y,Z
+			    X:= (d*s[1])/c0;
+			    Y:= d*s[2];
+			    Zi:= [tt[j] - Valuation(u*a,primelist[j]) : j in [1..v]];
+			    rhsNew:= a*&*[primelist[j]^Zi[j] : j in [1..v]];
+			    assert Evaluate(F,[X,Y]) eq rhsNew;
+			    assert Evaluate(Thuef,s[1],s[2]) eq u*Evaluate(F,[X,Y]);
+			    if (X in Integers()) and (Y in Integers()) then
+				X:= Integers()!X;
+				Y:= Integers()!Y;
+				if (IsCoprime(X,Y)) and (<[X,Y],rhsNew> notin TMSolutions) then
+				    Append(~TMSolutions,<[X,Y],rhsNew>);
+				end if;
+			    end if;
+			end for;
+		    end if;
+		end for;
 	    end if;
 	end for;
     end for;
 
-    afplistAllNew:= [afplistAll[i] : i in [1..#afplistAll] | i notin toRemove];
-    afplistAll:= afplistAllNew;
+    // remove cases covered by Thue solver
+    toRemoveNew:= [i[1] : i in toRemove];
+    afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
+    afplist:= afplistNew;
 
-    if IsEmpty(afplistAll) then
-//	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
-//	fprintf NoSUnitEqNeeded, "No S-unit equations to resolve for this Thue-Mahler equation\n";
-//	fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
-
-//	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+    if IsEmpty(afplist) then
+	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
+	fprintf NoSUnitEqNeeded,
+		"No S-unit equations to resolve for this Thue-Mahler equation\n";
+	fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
+	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
     else
 
 	printf "Number of ideal equations: %o\n", #afplist;
 	printf "Computing all S-unit equations...";
 	t2:= Cputime();
-	alphgamlistAll:= prep2(fieldKinfo,ClK,afplistAll);
+	alphgamlist:= prep2(fieldKinfo,ClK,afplist);
 
 	printf "Done! Duration: %o\n", Cputime(t2);
-	printf "Number of S-unit equations: %o\n", #alphgamlistAll;
-	assert #alphgamlistAll ne 0;
+	printf "Number of S-unit equations: %o\n", #alphgamlist;
+	if IsEmpty(alphgamlist) then
+	    fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
+	    fprintf NoSUnitEqNeeded,
+		    "No S-unit equations to resolve for this Thue-Mahler equation\n";
+	    fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
+	    fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+	else
+	    assert #alphgamlist ne 0;
+	    complexPrec:= 400;
 
-	ComplexPrec:= 400;
-	// compute the initial height bound: change me
-	printf "Computing initial height bounds...";
-	t1:= Cputime();
-	UpperBounds(fieldKinfo,clist,~alphgamlistAll,ComplexPrec);
-	printf "Done! Duration: %o\n", Cputime(t1);
+	    printf "Computing initial height bounds...";
+	    t1:= Cputime();
+	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
+	    printf "Done! Duration: %o\n", Cputime(t1);
 
-//	fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
-//	fprintf SUnitEq, "solutions obtained via Thue equations: \n%o\n", TMSolutions;
-//	fprintf SUnitEq, "-"^(75) cat "\n";
-	for Case in alphgamlistAll do
-	   // fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
-	   // fprintf SUnitEq, "minimal polynomial for K:= %o\n", f;
-	   // fprintf SUnitEq, "class number:= %o\n", ClK`classnumber;
-	   // fprintf SUnitEq, "fundamental units:= ";
-	    for i in [1..#fieldKinfo`fundamentalunits-1] do
-	//	fprintf SUnitEq, "%o, ", K!fieldKinfo`fundamentalunits[i];
+	    fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
+	    fprintf SUnitEq, "Solutions obtained via Thue equations: \n%o\n", TMSolutions;
+	    fprintf SUnitEq, "-"^(75) cat "\n";
+	    for idealEq in alphgamlist do
+		fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
+		fprintf SUnitEq, "minimal polynomial for K:= %o\n", fclist;
+		fprintf SUnitEq, "class number:= %o\n", ClK`classnumber;
+		fprintf SUnitEq, "fundamental units:= ";
+		for i in [1..#fieldKinfo`fundamentalunits-1] do
+		    fprintf SUnitEq, "%o, ", K!fieldKinfo`fundamentalunits[i];
+		end for;
+		fprintf SUnitEq, "%o \n",
+			K!fieldKinfo`fundamentalunits[#fieldKinfo`fundamentalunits];
+		fprintf SUnitEq, "alpha:= %o\n", K!idealEq`alpha;
+		fprintf SUnitEq, "gammas:= ";
+		for i in [1..#idealEq`gammalist-1] do
+		    fprintf SUnitEq, "%o, ", K!idealEq`gammalist[i];
+		end for;
+		fprintf SUnitEq, "%o \n", K!idealEq`gammalist[#idealEq`gammalist];
+		fprintf SUnitEq, "S-unit equation rank:= %o\n",
+			#idealEq`gammalist+#fieldKinfo`fundamentalunits;
+		fprintf SUnitEq, "initial bound:= %o\n", idealEq`bound;
+		fprintf SUnitEq, "-"^(75) cat "\n";
 	    end for;
-	   // fprintf SUnitEq, "%o \n",
-		    K!fieldKinfo`fundamentalunits[#fieldKinfo`fundamentalunits];
-	   // fprintf SUnitEq, "alpha:= %o\n", K!Case`alpha;
-	   // fprintf SUnitEq, "gammas:= ";
-	    for i in [1..#Case`gammalist-1] do
-	//	fprintf SUnitEq, "%o, ", K!Case`gammalist[i];
-	    end for;
-	   // fprintf SUnitEq, "%o \n", K!Case`gammalist[#Case`gammalist];
-	   // fprintf SUnitEq, "S-unit equation rank:= %o\n",
-		    #Case`gammalist+#fieldKinfo`fundamentalunits;
-	   // fprintf SUnitEq, "initial bound:= %o\n", Case`bound;
-	   // fprintf SUnitEq, "-"^(75) cat "\n";
-	end for;
+	end if;
     end if;
 end if;
 
-
-// LEFT OFF HERE
-// Now availble to run, but with errors
-// need to be able to record errors
-// need to increase precision on ComplexPrec (done, but not update on r7-bennett3 yet
-// cases which don't align with BeGhRe - might just be that they align with BeGhRe, but the partial local obstructions don't, and so the equation really has a local obstruction
-
-// **********************set AllSUnitEq, LogFile, Error File, tempname for SUnit output
-
-
-
-
-// some cases are very slow: set:=[1430,[2,0,1,2]] running for 37 minutes now to generate S unit eqns
-// was caused by using too many primes on the RHS for the PrimesUpTo(67) test; fixed, but not updated on r7-bennett3 yet
 UnsetLogFile();
 exit;
