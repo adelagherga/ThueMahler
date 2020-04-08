@@ -1118,8 +1118,8 @@ nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parall
 
 */
 
-// convert bash input into magma integers, sets
-
+t0:= Cputime();
+// generate relevant files
 LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs/" cat set cat "Log.txt";
 NoSUnitEqPossible:=
     "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible/" cat set cat "NoSUnitEqPossible.txt";
@@ -1130,8 +1130,7 @@ SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq/" cat set cat "SUn
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];
 
-// LEFT OFF HERE; start code on new vms, kill it on r7-bennett3.
-
+// convert bash input into magma integers, sets
 N:= [];
 i:= 2;
 while set[i] ne "," do
@@ -1146,7 +1145,7 @@ commas:= []; // store indices of seperating commas in S
 i:= i+1;
 assert set[i] eq "[";
 Append(~brackets,i);
-while set[i] ne "]" do // i should start at ","
+while set[i] ne "]" do
     if set[i] eq "," then
 	Append(~commas, i);
     end if;
@@ -1163,32 +1162,25 @@ for j in [1..#commas-1] do
     n:= [set[i] : i in [(commas[j]+1)..(commas[j+1]-1)]];
     Append(~clist,StringToInteger(&cat(n)));
 end for;
-Append(~clist,StringToInteger
-		  (&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
+Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
 
 printf "Resolving Thue-Mahler equation with... \n";
 printf "Coefficients: %o, Conductor: %o \n", clist, N;
-//printf "-"^(75) cat "\n" cat "-"^(75) cat "\n";
 
-// TEMP
-LogFile:= [];
-OutFiles:= [[],[],[]];
-// END OF TEMP
+printf "Determining local obstructions...";
+t1:= Cputime();
 f, enterTM, TMSolutions, RemainingCases:= prep0(OutFiles,LogFile,clist,N);
+printf "Done! Duration: %o\n", Cputime(t1);
 if (enterTM eq false) then
     printf "No S-unit equations to resolve for this Thue-Mahler equation\n";
     printf "-"^(75) cat "\n";
 else
-
-        // generate a record to store relevant field K info
-    FieldInfo:= recformat<field,gen,ringofintegers,
-			  minpoly,zeta,fundamentalunits>;
-
+    // generate a record to store relevant info of the field K = Q(th)
+    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
     K<th>:=NumberField(f);
     OK:=MaximalOrder(K);
     th:=OK!th;
-    fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,
-				 ringofintegers:= OK,minpoly:= f>;
+    fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
     printf "Computing the class group...";
     t2:= Cputime();
@@ -1206,45 +1198,30 @@ else
     assert (s+2*t) eq n;
     assert (r eq 1) or (r eq 2);
     printf "Computing the Unit Group...";
-    t5:= Cputime();
-    U,psi:= UnitGroup(OK);      // generates the fundamental units
-    printf "Done! Duration: %o\n", Cputime(t5);
-    // expresses the fund. units as elts in OK in terms of the integral basis
+    t3:= Cputime();
+    U,psi:= UnitGroup(OK); // generate fundamental units
+    printf "Done! Duration: %o\n", Cputime(t3);
+    // expresse the fundamental units as elts in OK in terms of the integral basis
     epslist:=[psi(U.(i+1)) : i in [1..r]];
     assert (#epslist eq 1) or (#epslist eq 2);
-    zetalist:= [psi(U.1)];      // generator for the units of finite order
+    zetalist:= [psi(U.1)]; // generator for units of finite order
     zeta:= (psi(U.1))^2;
-    while (zeta ne psi(U.1)) and (zeta notin zetalist) and
-	  (-zeta notin zetalist) do
+    while (zeta ne psi(U.1)) and (zeta notin zetalist) and (-zeta notin zetalist) do
 	Append(~zetalist, zeta);
 	zeta:= zeta*psi(U.1);
     end while;
-    // K has at least 1 real embedding, thus the torsion subgroup is {1,-1}
+    // assert torsion subgroup of K is {1,-1}, as K has at least 1 real embedding {1,-1}
     assert #zetalist eq 1;
     zeta:= zetalist[1];
     fieldKinfo`zeta:= zeta;
     fieldKinfo`fundamentalunits:= epslist;
 
-    /*
-    L, tl:= SplittingField(f);
-    printf "Computing the ring of integers of the splitting field...";
-    t2:= Cputime();
-    OL:= MaximalOrder(L);
-    printf "Done! Duration: %o\n", Cputime(t2);
-    tf,mapKL:= IsSubfield(K,L);
-    assert tf;
-    assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-    fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
-    */
-    // DONT NEED THIS FOR SUNITGENERATOR
-    /* ijkL,AutL:= ijkAutL(fieldLinfo); */
-    /* assert ijkL[3](th) eq L!th; // this is the identity automorphism */
-
-    // mulitple primelists not possible
-    assert #RemainingCases eq 1;
+    assert #RemainingCases eq 1; // mulitple primelists not possible
     remainingCase:= RemainingCases[1];
-    // generate all ideal equations
-    afplist:= prep1(fieldKinfo,clist,remainingCase);
+    printf "Computing all ideal equations...";
+    t4:= Cputime();
+    afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
+    printf "Done! Duration: %o\n", Cputime(t4);
 
     // setup for Thue equations
     Zx<x_>:= PolynomialRing(Integers());
@@ -1260,6 +1237,8 @@ else
     F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
     assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
+    printf "Removing ideal equations covered by Thue solver...";
+    t5:= Cputime();
     // remove ideal equations which have exponent 0 on all prime ideals by solving
     // corresponding Thue equations
     toRemove:= [];
@@ -1283,7 +1262,7 @@ else
 	end if;
     end for;
 
-    //  generate all Thue solutions
+    // generate all Thue solutions
     for rhs in RHSlist do
 	sol:= Solutions(Thuef,rhs);
 	for s in sol do
@@ -1326,6 +1305,7 @@ else
     toRemoveNew:= [i[1] : i in toRemove];
     afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
     afplist:= afplistNew;
+    printf "Done! Duration: %o\n", Cputime(t5);
 
     if IsEmpty(afplist) then
 	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
@@ -1334,13 +1314,11 @@ else
 	fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
 	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
     else
-
 	printf "Number of ideal equations: %o\n", #afplist;
 	printf "Computing all S-unit equations...";
-	t2:= Cputime();
+	t6:= Cputime();
 	alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-
-	printf "Done! Duration: %o\n", Cputime(t2);
+	printf "Done! Duration: %o\n", Cputime(t6);
 	printf "Number of S-unit equations: %o\n", #alphgamlist;
 	if IsEmpty(alphgamlist) then
 	    fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
@@ -1351,11 +1329,10 @@ else
 	else
 	    assert #alphgamlist ne 0;
 	    complexPrec:= 400;
-
 	    printf "Computing initial height bounds...";
-	    t1:= Cputime();
+	    t7:= Cputime();
 	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-	    printf "Done! Duration: %o\n", Cputime(t1);
+	    printf "Done! Duration: %o\n", Cputime(t7);
 
 	    fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
 	    fprintf SUnitEq, "Solutions obtained via Thue equations: \n%o\n", TMSolutions;
@@ -1385,5 +1362,6 @@ else
     end if;
 end if;
 
+printf "Total time: %o\n", Cputime(t0);
 UnsetLogFile();
 exit;
