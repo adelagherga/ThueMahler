@@ -1114,7 +1114,7 @@ end procedure;
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
      Output:
      Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
+nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -k magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
 */
 
@@ -1123,6 +1123,7 @@ t0:= Cputime();
 LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs.txt";
 NoSUnitEqPossible:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible.txt";
 NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.txt";
+SUnitEqSolutions:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqSolutions.txt";
 SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
 
 SetLogFile(LogFile);
@@ -1332,9 +1333,10 @@ else
 	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
 	    printf "Done! Duration: %o\n", Cputime(t7);
 
-	    fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
-	    fprintf SUnitEq, "Solutions obtained via Thue equations: \n%o\n", TMSolutions;
-	    fprintf SUnitEq, "-"^(75) cat "\n";
+	    fprintf SUnitEqSolutions, "Coefficients: %o, Conductor: %o \n", clist, N;
+	    fprintf SUnitEqSolutions, "Solutions obtained via Thue equations: \n%o\n",
+		    TMSolutions;
+	    fprintf SUnitEqSolutions, "-"^(75) cat "\n";
 	    for idealEq in alphgamlist do
 		fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
 		fprintf SUnitEq, "minimal polynomial for K:= %o\n", fclist;
