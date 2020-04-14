@@ -1120,12 +1120,10 @@ nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parall
 
 t0:= Cputime();
 // generate relevant files
-LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs/" cat set cat "Log.txt";
-NoSUnitEqPossible:=
-    "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible/" cat set cat "NoSUnitEqPossible.txt";
-NoSUnitEqNeeded:=
-    "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded/" cat set cat "NoSUnitEqNeeded.txt";
-SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq/" cat set cat "SUnitEq.txt";
+LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs.txt";
+NoSUnitEqPossible:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible.txt";
+NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.txt";
+SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
 
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];

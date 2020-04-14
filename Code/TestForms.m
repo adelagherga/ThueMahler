@@ -4535,11 +4535,12 @@ OutFiles:= [[],[],[]];
 Two:=[];
 Sols:=[];
 
-for i in [2205..#sets] do
-    set:= sets[i];
+for set in sets do
+//    set:= sets[i];
 //    set in sets do
     N:= set[1];
     clist:= [set[2][i] : i in [2..5]];
+    DiscF:= 4*set[2][1];
     f, enterTM, TMSolutions, RemainingCases:= prep0(OutFiles,LogFile,clist,N);
     print "set";
     print set;
@@ -4609,6 +4610,7 @@ for i in [2205..#sets] do
 	assert f eq ChangeRing(Integerf,Rationals());
 	Thuef:= Thue(Integerf);
 	F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
+	assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
 	toRemove:= [];
 	RHSlist:= [];
@@ -4700,9 +4702,11 @@ for i in [2205..#sets] do
 		printf "Done! Duration: %o\n", Cputime(t2);
 		printf "Number of S-unit equations: %o\n", #alphgamlist;
 		assert #alphgamlist ne 0;
-
+		complexPrec:= 400;
+		UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
 		print TMSolutions;
 	    end if;
+
 	end if;
     end if;
 end for;
