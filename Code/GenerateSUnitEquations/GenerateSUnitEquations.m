@@ -252,16 +252,14 @@ prep0:= function(OutFiles,LogFile,clist,N)
 	// local obstructions present; do not enter TM solver
 	enterTM:= false;
 	fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-	fprintf NoSUnitEqPossible, "Local obstruction at primes:= %o \n",
-		localObstruction;
+	fprintf NoSUnitEqPossible, "Local obstruction at p:= %o \n", localObstruction[1];
 	fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
     if (IsEmpty(partialObstruction) eq false) then
 	// partial local obstructions present; remove p from primelist
 	printf "Partial local obstructions present \n";
-	printf 	"No solutions with positive exponent of %o are possible \n",
-		partialObstruction;
+	printf "No solutions with positive exponent of %o are possible \n", partialObstruction;
     end if;
 
     // generate a record to store relevant prime bounds
