@@ -174,7 +174,7 @@ localtest:= function(N,F,DiscF)
     return partialObstruction, localObstruction;
 end function;
 
-prep0:= function(OutFiles,LogFile,clist,N)
+prep0:= function(hash,OutFiles,LogFile,clist,N)
 
     /*
      Description: Verify conditions of Theorem 1 of BeReGh for clist,N
@@ -251,15 +251,15 @@ prep0:= function(OutFiles,LogFile,clist,N)
     if (IsEmpty(localObstruction) eq false) then
 	// local obstructions present; do not enter TM solver
 	enterTM:= false;
-	fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-	fprintf NoSUnitEqPossible, "Local obstruction at p:= %o \n", localObstruction[1];
-	fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+	fprintf NoSUnitEqPossible, hash cat " Local obstruction at p:= %o \n",
+		localObstruction[1];
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
     if (IsEmpty(partialObstruction) eq false) then
 	// partial local obstructions present; remove p from primelist
-	printf "Partial local obstructions present \n";
-	printf "No solutions with positive exponent of %o are possible \n", partialObstruction;
+	printf hash cat " Partial local obstructions present \n";
+	printf hash cat " No solutions with positive exponent of %o are possible \n",
+	       partialObstruction;
     end if;
 
     // generate a record to store relevant prime bounds
@@ -390,11 +390,8 @@ prep0:= function(OutFiles,LogFile,clist,N)
 		assert x`prime eq p;
 		if (assigned x`unbounded) and (x`alpha1 ge 1) then
 		    enterTM:= false;
-		    fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-		    fprintf
-			NoSUnitEqPossible,
-			"Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-		    fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+		    fprintf NoSUnitEqPossible, hash cat
+					       " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
 		    return f, enterTM, TMSolutions, RemainingCasesAllAs;
 		elif (assigned x`unbounded) and (x`alpha1 eq 0) then
 		    delete x`unbounded; // update bound at p
@@ -408,10 +405,8 @@ prep0:= function(OutFiles,LogFile,clist,N)
 
 	if IsEmpty(psetNew) then
 	    enterTM:= false;
-	    fprintf NoSUnitEqPossible, "Coefficients: %o, Conductor: %o \n", clist, N;
-	    fprintf NoSUnitEqPossible,
-		    "Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-	    fprintf NoSUnitEqPossible, "-"^(75) cat "\n";
+	    fprintf NoSUnitEqPossible, hash cat
+				       " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
 	    return f, enterTM, TMSolutions, RemainingCasesAllAs;
 	end if;
 	// verify pset now only includes the exponent 0 case at p
@@ -507,14 +502,11 @@ prep0:= function(OutFiles,LogFile,clist,N)
     // if all cases are resolved via Thue equations
     if IsEmpty(RemainingCases) then
 	enterTM:=false;
-	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
-	fprintf NoSUnitEqNeeded,
-		"Thue-Mahler equation has reduced to several Thue equations \n";
-	fprintf NoSUnitEqNeeded,
-		"All solutions thus computed via Magma built-in Thue solver \n";
-	fprintf NoSUnitEqNeeded,
-		"All solutions: \n%o\n", TMSolutions;
-	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+	fprintf NoSUnitEqNeeded, hash cat
+		" Thue-Mahler equation has reduced to several Thue equations \n";
+	if IsEmpty(TMSolutions) eq false then
+	    fprintf NoSUnitEqNeeded, hash cat " All solutions: \n%o\n", TMSolutions;
+	end if;
 	return f, enterTM, TMSolutions, RemainingCasesAllAs;
     end if;
 
@@ -1112,7 +1104,7 @@ end procedure;
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
      Output:
      Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -k magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
+nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -k --group magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
 */
 
@@ -1161,16 +1153,17 @@ for j in [1..#commas-1] do
 end for;
 Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
 
-printf "Resolving Thue-Mahler equation with... \n";
-printf "Coefficients: %o, Conductor: %o \n", clist, N;
+hash:= set;
 
-printf "Determining local obstructions...";
+printf hash cat " Resolving Thue-Mahler equation with...\n";
+printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
+
+printf hash cat " Determining local obstructions...\n";
 t1:= Cputime();
-f, enterTM, TMSolutions, RemainingCases:= prep0(OutFiles,LogFile,clist,N);
-printf "Done! Duration: %o\n", Cputime(t1);
+f, enterTM, TMSolutions, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N);
+printf hash cat " Done! Duration: %o\n", Cputime(t1);
 if (enterTM eq false) then
-    printf "No S-unit equations to resolve for this Thue-Mahler equation\n";
-    printf "-"^(75) cat "\n";
+    printf hash cat " No S-unit equations to resolve for this Thue-Mahler equation\n";
 else
     // generate a record to store relevant info of the field K = Q(th)
     FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
@@ -1179,13 +1172,13 @@ else
     th:=OK!th;
     fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-    printf "Computing the class group...";
+    printf hash cat " Computing the class group...\n";
     t2:= Cputime();
     // generate a record to store relevant class group info
     ClassGroupInfo:= recformat<classgroup,classnumber,map>;
     ClK:= rec< ClassGroupInfo | >;
     ClK`classgroup, ClK`map:= ClassGroup(K);
-    printf "Done! Duration: %o\n", Cputime(t2);
+    printf hash cat " Done! Duration: %o\n", Cputime(t2);
     ClK`classnumber:= ClassNumber(K);
 
     n:= Degree(f);
@@ -1194,10 +1187,10 @@ else
     r:= s+t-1;
     assert (s+2*t) eq n;
     assert (r eq 1) or (r eq 2);
-    printf "Computing the Unit Group...";
+    printf hash cat " Computing the Unit Group...\n";
     t3:= Cputime();
     U,psi:= UnitGroup(OK); // generate fundamental units
-    printf "Done! Duration: %o\n", Cputime(t3);
+    printf hash cat " Done! Duration: %o\n", Cputime(t3);
     // expresse the fundamental units as elts in OK in terms of the integral basis
     epslist:=[psi(U.(i+1)) : i in [1..r]];
     assert (#epslist eq 1) or (#epslist eq 2);
@@ -1305,61 +1298,58 @@ else
     printf "Done! Duration: %o\n", Cputime(t5);
 
     if IsEmpty(afplist) then
-	fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
-	fprintf NoSUnitEqNeeded,
-		"No S-unit equations to resolve for this Thue-Mahler equation\n";
-	fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
-	fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+	fprintf NoSUnitEqNeeded, hash cat
+		" No S-unit equations to resolve for this Thue-Mahler equation\n";
+	if IsEmpty(TMSolutions) eq false then
+	    fprintf NoSUnitEqNeeded, hash cat " All solutions: \n%o\n", TMSolutions;
+	end if;
     else
-	printf "Number of ideal equations: %o\n", #afplist;
-	printf "Computing all S-unit equations...";
+	printf hash cat " Number of ideal equations: %o\n", #afplist;
+	printf hash cat " Computing all S-unit equations...\n";
 	t6:= Cputime();
 	alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-	printf "Done! Duration: %o\n", Cputime(t6);
-	printf "Number of S-unit equations: %o\n", #alphgamlist;
+	printf hash cat " Done! Duration: %o\n", Cputime(t6);
+	printf hash cat " Number of S-unit equations: %o\n", #alphgamlist;
 	if IsEmpty(alphgamlist) then
-	    fprintf NoSUnitEqNeeded, "Coefficients: %o, Conductor: %o \n", clist, N;
 	    fprintf NoSUnitEqNeeded,
-		    "No S-unit equations to resolve for this Thue-Mahler equation\n";
-	    fprintf NoSUnitEqNeeded, "All solutions: \n%o\n", TMSolutions;
-	    fprintf NoSUnitEqNeeded, "-"^(75) cat "\n";
+		    hash cat " No S-unit equations to resolve for this Thue-Mahler equation\n";
+	    fprintf NoSUnitEqNeeded, hash cat " All solutions: \n%o\n", TMSolutions;
 	else
 	    assert #alphgamlist ne 0;
 	    complexPrec:= 400;
-	    printf "Computing initial height bounds...";
+	    printf hash cat " Computing initial height bounds...\n";
 	    t7:= Cputime();
 	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-	    printf "Done! Duration: %o\n", Cputime(t7);
+	    printf hash cat " Done! Duration: %o\n", Cputime(t7);
 
-	    fprintf SUnitEqSolutions, "Coefficients: %o, Conductor: %o \n", clist, N;
-	    fprintf SUnitEqSolutions, "Solutions obtained via Thue equations: \n%o\n",
+	    fprintf SUnitEqSolutions, hash cat " Solutions obtained via Thue equations: \n%o\n",
 		    TMSolutions;
-	    fprintf SUnitEqSolutions, "-"^(75) cat "\n";
-	    for idealEq in alphgamlist do
-		fprintf SUnitEq, "Coefficients: %o, Conductor: %o \n", clist, N;
-		fprintf SUnitEq, "minimal polynomial for K:= %o\n", fclist;
-		fprintf SUnitEq, "class number:= %o\n", ClK`classnumber;
-		fprintf SUnitEq, "fundamental units:= ";
+
+	    for j in [1..#alphgamlist] do
+		idealEq:= alphgamlist[j];
+		hash:= hash cat "Case" cat IntegerToString(j);
+		fprintf SUnitEq, hash cat " minimal polynomial for K:= %o\n", fclist;
+		fprintf SUnitEq, hash cat " class number:= %o\n", ClK`classnumber;
+		fprintf SUnitEq, hash cat " fundamental units:= ";
 		for i in [1..#fieldKinfo`fundamentalunits-1] do
-		    fprintf SUnitEq, "%o, ", K!fieldKinfo`fundamentalunits[i];
+		    fprintf SUnitEq, hash cat " %o, ", K!fieldKinfo`fundamentalunits[i];
 		end for;
-		fprintf SUnitEq, "%o \n",
+		fprintf SUnitEq, hash cat " %o \n",
 			K!fieldKinfo`fundamentalunits[#fieldKinfo`fundamentalunits];
-		fprintf SUnitEq, "alpha:= %o\n", K!idealEq`alpha;
-		fprintf SUnitEq, "gammas:= ";
+		fprintf SUnitEq, hash cat " alpha:= %o\n", K!idealEq`alpha;
+		fprintf SUnitEq, hash cat " gammas:= ";
 		for i in [1..#idealEq`gammalist-1] do
-		    fprintf SUnitEq, "%o, ", K!idealEq`gammalist[i];
+		    fprintf SUnitEq, hash cat " %o, ", K!idealEq`gammalist[i];
 		end for;
-		fprintf SUnitEq, "%o \n", K!idealEq`gammalist[#idealEq`gammalist];
-		fprintf SUnitEq, "S-unit equation rank:= %o\n",
+		fprintf SUnitEq, hash cat " %o \n", K!idealEq`gammalist[#idealEq`gammalist];
+		fprintf SUnitEq, hash cat " S-unit equation rank:= %o\n",
 			#idealEq`gammalist+#fieldKinfo`fundamentalunits;
-		fprintf SUnitEq, "initial bound:= %o\n", idealEq`bound;
-		fprintf SUnitEq, "-"^(75) cat "\n";
+		fprintf SUnitEq, hash cat " initial bound:= %o\n", idealEq`bound;
 	    end for;
 	end if;
     end if;
 end if;
 
-printf "Total time: %o\n", Cputime(t0);
+printf hash cat " Total time: %o\n", Cputime(t0);
 UnsetLogFile();
 exit;
