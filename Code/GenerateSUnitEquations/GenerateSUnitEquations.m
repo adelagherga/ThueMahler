@@ -1106,7 +1106,7 @@ end procedure;
      Output:
      Example: run with
 nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -k --group magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
-[11,[-11,1,2,2,2]]
+magma set:=[11,[-11,1,2,2,2]] /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m
 
 */
 
@@ -1342,7 +1342,7 @@ else
 		fprintf SUnitEq, jhash cat " Minimal polynomial for K: %o \n", fclist;
 		fprintf SUnitEq, jhash cat " Class number: %o \n", ClK`classnumber;
 		if #fieldKinfo`fundamentalunits eq 1 then
-		    fprintf SUnitEq, jhash cat " Fundamental units: " cat
+		    fprintf SUnitEq, jhash cat " Fundamental unit: " cat
 				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "\n";
 		elif #fieldKinfo`fundamentalunits eq 2 then
 		    fprintf SUnitEq, jhash cat " Fundamental units: " cat
@@ -1352,7 +1352,7 @@ else
 		fprintf SUnitEq, jhash cat " Zeta: %o \n", K!fieldKinfo`zeta;
 		fprintf SUnitEq, jhash cat " Alpha: %o \n", K!idealEq`alpha;
 		if #idealEq`gammalist eq 1 then
-		    fprintf SUnitEq, jhash cat " Gammas: " cat Sprint(K!idealEq`gammalist[1])
+		    fprintf SUnitEq, jhash cat " Gamma: " cat Sprint(K!idealEq`gammalist[1])
 				     cat "\n";
 		else
 		    fprintf SUnitEq,
@@ -1360,9 +1360,9 @@ else
 			    &cat[Sprintf( "%o, ", K!idealEq`gammalist[i], K!idealEq`gammalist[i]): i in [1..#idealEq`gammalist-1]]
 			    cat Sprint(K!idealEq`gammalist[#idealEq`gammalist]) cat "\n";
 		end if;
-		fprintf SUnitEq, jhash cat " S-unit equation rank:= %o \n",
+		fprintf SUnitEq, jhash cat " S-unit equation rank: %o \n",
 			#idealEq`gammalist+#fieldKinfo`fundamentalunits;
-		fprintf SUnitEq, jhash cat " Initial bound:= %o \n", idealEq`bound;
+		fprintf SUnitEq, jhash cat " Initial bound: %o \n", idealEq`bound;
 	    end for;
 	end if;
     end if;
