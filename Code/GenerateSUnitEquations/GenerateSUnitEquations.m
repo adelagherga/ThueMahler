@@ -504,6 +504,9 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 		hash cat " Thue-Mahler equation has reduced to several Thue equations \n";
 	if IsEmpty(TMSolutions) then
 	    fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
+	elif #TMSolutions eq 1 then
+	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
+				     cat "\n";
 	else
 	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
 				     &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
@@ -1121,7 +1124,7 @@ SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];
 SetAutoColumns(false);
-SetColumns(200);
+SetColumns(235);
 
 // convert bash input into magma integers, sets
 N:= [];
@@ -1303,6 +1306,9 @@ else
 		hash cat " No S-unit equations to resolve for this Thue-Mahler equation \n";
 	if IsEmpty(TMSolutions) then
 	    fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
+	elif #TMSolutions eq 1 then
+	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
+				     cat "\n";
 	else
 	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
 				     &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
@@ -1319,6 +1325,9 @@ else
 		    hash cat " No S-unit equations to resolve for this Thue-Mahler equation\n";
 	    if IsEmpty(TMSolutions) then
 		fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
+	    elif #TMSolutions eq 1 then
+		fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
+					 cat "\n";
 	    else
 		fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
 					 &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
@@ -1332,6 +1341,10 @@ else
 
 	    if IsEmpty(TMSolutions) then
 		fprintf PartialSUnitEqSol, hash cat " No solutions from Thue equations \n";
+	    elif #TMSolutions eq 1 then
+		fprintf PartialSUnitEqSol,
+			hash cat " All solutions obtained from Thue equations: " cat
+			Sprint(TMSolutions[1]) cat "\n";
 	    else
 		fprintf PartialSUnitEqSol,
 			hash cat " All solutions obtained from Thue equations: " cat
