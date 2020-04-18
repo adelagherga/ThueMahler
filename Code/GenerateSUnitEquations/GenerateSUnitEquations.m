@@ -1120,6 +1120,8 @@ SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
 
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];
+SetAutoColumns(false);
+SetColumns(200);
 
 // convert bash input into magma integers, sets
 N:= [];
