@@ -1110,7 +1110,7 @@ end procedure;
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
      Output:
      Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -k --group magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
+nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 magma set:=[11,[-11,1,2,2,2]] /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m
 
 */
@@ -1363,7 +1363,7 @@ else
 				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "\n";
 		elif #fieldKinfo`fundamentalunits eq 2 then
 		    fprintf SUnitEq, jhash cat " Fundamental units: " cat
-				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "," cat
+				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat ", " cat
 				     Sprint(K!fieldKinfo`fundamentalunits[2]) cat "\n";
 		end if;
 		fprintf SUnitEq, jhash cat " Zeta: %o \n", K!fieldKinfo`zeta;
