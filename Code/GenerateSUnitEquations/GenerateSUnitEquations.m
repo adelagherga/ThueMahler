@@ -178,11 +178,13 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 
     /*
      Description: Verify conditions of Theorem 1 of BeReGh for clist,N
-     Input: OutFiles:= store all possible outcomes for [N,clist] in one of
-     	    	       "[N,clist]NoSUnitEqPossible.txt"
-		       "[N,clist]NoSUnitEqNeeded.txt", or
-     	    	       "[N,clist]SUnitEq.txt"
-            LogFile:= store running times and additional information as "[N,clist]Log.txt"
+     Input: hash:= string set appended to the start of every output line;
+                   used to ensure output corresponds to correct Thue Mahler form
+     	    OutFiles:= store all possible outcomes for [N,clist] in one of
+     	    	       "NoSUnitEqPossible.txt"
+		       "NoSUnitEqNeeded.txt", or
+     	    	       "SUnitEq.txt"
+            LogFile:= store running times and additional information as "SUnitEqLogs.txt"
             clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
             N:= conductor of corresponding elliptic curves in question
      Output: f:= monic polynomial defining the number field K = Q(th)
@@ -1361,7 +1363,7 @@ else
 				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "\n";
 		elif #fieldKinfo`fundamentalunits eq 2 then
 		    fprintf SUnitEq, jhash cat " Fundamental units: " cat
-				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat
+				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "," cat
 				     Sprint(K!fieldKinfo`fundamentalunits[2]) cat "\n";
 		end if;
 		fprintf SUnitEq, jhash cat " Zeta: %o \n", K!fieldKinfo`zeta;
