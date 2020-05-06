@@ -1187,14 +1187,17 @@ Ellipsoid:= function(fieldKinfo,fieldLinfo,Case,i0jjkk,AutL,mapsLL,HeightBounds,
     CField<i>:= ComplexField(RealPrec);
     LintoC:= hom< L -> CField | Conjugates(L.1)[1] >;
 
+    AllepsLogs:= [[],[]];
     // compute i1, i2: L- > C to generate matrix R
     for i1 in [1..#AutL] do
         for i2 in [i1 + 1..#AutL] do
             a:= (AutL[i1])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
             a:= RField!(Log(Abs(LintoC(a))));
+	    Append(~AllepsLogs[1],a);
 
             b:= (AutL[i1])(epslistL[2][jj[1]][jj[2]]/epslistL[2][i0[1]][i0[2]]);
             b:= Log(Abs(LintoC(b)));
+	    Append(~AllepsLogs[2],b);
 
             c:= (AutL[i2])(epslistL[1][jj[1]][jj[2]]/epslistL[1][i0[1]][i0[2]]);
             c:= Log(Abs(LintoC(c)));
@@ -1253,12 +1256,12 @@ Ellipsoid:= function(fieldKinfo,fieldLinfo,Case,i0jjkk,AutL,mapsLL,HeightBounds,
     Beps:= [];
     for l in [1..r] do
         Beps[l]:= ((1/Degree(K,Rationals()))*&+[HeightBoundonGammalist[k]*wgamlklist[l][k] : k in [1..nu]]);
-        Beps[l]:= (Beps[l] + (1/Degree(L,Rationals()))*&+[HeightBoundonEpslist[k]*wepslklist[l][k] : k in [1..#AutL]])^2;
+        Beps[l]:= (Beps[l] + (1/Degree(L,Rationals()))*Max([HeightBoundonEpslist[k]*wepslklist[l][k] : k in [1..#AutL]]))^2;
     end for;
 
     matD:= DiagonalMatrix(Integers(), [ Floor(Log(p)^2/Log(2)^2) : p in CasePrimes]);
     matM:= IdentityMatrix(Integers(),nu+r);
-    InsertBlock(~matM, (&*[Ceiling(Beps[l]) : l in [1..r]])*(Transpose(matA)*matD*matA), 1, 1);
+    InsertBlock(~matM, Integers()!(&*[Ceiling(Beps[l]) : l in [1..r]])*(Transpose(ChangeRing(matA,Integers()))*matD*ChangeRing(matA,Integers())), 1, 1);
     for l in [1..r] do
         matM[nu+l,nu+l]:= Bgam*(&*[Ceiling(Beps[k]) : k in [1..r] | k ne l]);
     end for;
@@ -1326,7 +1329,7 @@ pLatticePrep:=procedure(fieldKinfo,fieldLinfo,Case,~localpinfo,ijkL,AutL,HeightB
     Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
     check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
     // verify that thetap[i][j] are roots of f
-    assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
+//    assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
     // verify the precision has not been changed by the above test
     assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
     // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
@@ -1830,44 +1833,46 @@ a:= 1;
     for Case in alphgamlist do
 //Case:= alphgamlist[1];
 
-        CasePrimes:= [Norm(fp) : fp in Case`ideallist];
-        nu:= #Case`gammalist;
-        assert #CasePrimes eq nu;
-        assert &and[p in primelist : p in CasePrimes];
-        printf "-"^(80) cat "\n";
-        printf "Case: %o\n", CaseNo;
-        printf "Initial height bound: %o\n", Case`bound;
+	// generate case primes? ie take the norm of each ideal in ideallist
+
+	primelist:= idealEq`primelist;
+	nu:= #idealEq`gammalist;
+	unboundedprimes:= [PrimeDivisors(Norm(fp)) : fp in idealEq`ideallist];
+	assert &and[#p eq 1 : p in unboundedprimes];
+	unboundedprimes:= [p[1] : p in unboundedprimes];
+	assert #unboundedprimes eq nu;
+        assert &and[p in primelist : p in unboundedprimes];
 
         HeightBoundInfo:= recformat<heightgammalist,heightepslist>;
-        HeightBounds:= rec<HeightBoundInfo | heightgammalist:= [Case`bound : i in [1..nu]],heightepslist:= [Case`bound : i in [1..#AutL]]>;
+        HeightBounds:= rec<HeightBoundInfo | heightgammalist:= [idealEq`bound : i in [1..nu]],heightepslist:= [idealEq`bound : i in [1..#AutL]]>;
 
-         //pprecs:= padicprecision(primelist, L);      // estimated required precision
+        //pprecs:= padicprecision(primelist, L);      // estimated required precision
         // generate a record to store relevant local info
 
-// padic:
-    pCaseInfo:= recformat<prime,Lp,mapLLp,smallbound,delta1inQp,delta2inQp,ihat,logihat,betalist,ellipsoid,bgam,bepslist>;
-    //printf "Computing all roots of f in Cp...";
+	// padic:
+	pCaseInfo:= recformat<prime,Lp,mapLLp,smallbound,delta1inQp,delta2inQp,ihat,logihat,betalist,ellipsoid,bgam,bepslist>;
+	//printf "Computing all roots of f in Cp...";
         t3:= Cputime();
-    localpinfoList:= [];
+	localpinfoList:= [];
 
 
-UseSmallBound:= false;  // still to include
-pAdicPrec:= 400;
-RealPrec:= 100;
+	UseSmallBound:= false;  // still to include
+	pAdicPrec:= 400;
+	RealPrec:= 100;
 
-// run through all possible combos of embeddings
+	// run through all possible combos of embeddings
 
-Prec:= [pAdicPrec,RealPrec];
-    for i in [1..nu] do
-        p:= CasePrimes[i];
-        idealinL:= (Factorisation(p*OL))[1][1];
-        Lp, mapLLp:= Completion(L, idealinL : Precision:=pAdicPrec);
+	Prec:= [pAdicPrec,RealPrec];
+	for i in [1..nu] do
+            p:= unboundedprimes[i];
+            idealinL:= (Factorisation(p*OL))[1][1];
+            Lp, mapLLp:= Completion(L, idealinL : Precision:=pAdicPrec);
 
-        localpinfoList[i]:=rec< pCaseInfo | prime:= p, Lp:= Lp, mapLLp:= mapLLp>;
+            localpinfoList[i]:=rec< pCaseInfo | prime:= p, Lp:= Lp, mapLLp:= mapLLp>;
 
 
         // compute thetas, relevant maps for each prime in the TM equation
-        pLatticePrep(fieldKinfo,fieldLinfo,Case,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound);
+        pLatticePrep(fieldKinfo,fieldLinfo,idealEq,~localpinfoList[i],ijkL,AutL,HeightBounds,Prec : UseSmallBound);
 
         if (assigned localpinfoList[i]`smallbound) and (UseSmallBound eq true) then
             // reduce equation to move alpha into other cases
