@@ -469,9 +469,9 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     RHSlist:= RHSlistNew;
 
     // store Thue equations to be solved in "ThueEqToSolve.txt"
-    if IsEmpty(RHSlist) then
-	fprintf ThueEqToSolve, hash cat " No Thue equations to be solved \n";
-    elif #RHSlist eq 1 then
+//    if IsEmpty(RHSlist) then
+//	fprintf ThueEqToSolve, hash cat " No Thue equations to be solved \n";
+    if #RHSlist eq 1 then
 	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1])
 				 cat "\n";
@@ -1241,9 +1241,9 @@ else
 	   Cputime(t5);
 
     // store Thue equations to be solved in "ThueEqToSolve.txt"
-    if IsEmpty(RHSlist) then
-	fprintf ThueEqToSolve, hash cat " No Thue equations to be solved \n";
-    elif #RHSlist eq 1 then
+//    if IsEmpty(RHSlist) then
+//	fprintf ThueEqToSolve, hash cat " No Thue equations to be solved \n";
+    if #RHSlist eq 1 then
 	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", fclist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1])
 				 cat "\n";
