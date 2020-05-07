@@ -1137,7 +1137,7 @@ hash:= set;
 // reverse order of clist terms if cn has fewer divisors than c0
 c0:=Integers()!clist[1];
 cn:=Integers()!clist[4];
-if #Divisors(cn) lt #Divisors(c0) then
+if #Divisors(Abs(cn)) lt #Divisors(Abs(c0)) then
     Reverse(~clist);
 end if;
 
