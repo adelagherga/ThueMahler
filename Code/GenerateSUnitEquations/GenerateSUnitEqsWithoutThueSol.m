@@ -473,6 +473,7 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1]) cat "\n";
     elif #RHSlist gt 1 then
+	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat
 				 &cat[Sprintf( "%o, ", RHSlist[i], RHSlist[i]): i in [1..#RHSlist-1]] cat Sprint(RHSlist[#RHSlist]) cat "\n";
     end if;
@@ -1243,6 +1244,7 @@ else
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1])
 				 cat "\n";
     elif #RHSlist gt 1 then
+	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", fclist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat
 				 &cat[Sprintf( "%o, ", RHSlist[i], RHSlist[i]): i in [1..#RHSlist-1]] cat Sprint(RHSlist[#RHSlist]) cat "\n";
     end if;
