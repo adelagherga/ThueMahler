@@ -18,7 +18,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             run with
-	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel	magma -j32--joblog tmplog set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
+	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEqsWithoutThueSol.m 2>&1 &
 
 To do list: 1. test this version - DONE
             2. move current files on remote - DONE
