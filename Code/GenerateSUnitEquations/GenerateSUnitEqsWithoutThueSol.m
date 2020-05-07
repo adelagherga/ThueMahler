@@ -18,7 +18,8 @@ Description: This program generates all S-unit equations corresponding to the Th
 
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
 
-To do list: 1. test this version
+To do list: 0. add possibility to switch order of terms under SL2Z action
+      	    1. test this version
             2. move current files on remote
 	    3. run with parallel joblog (limit jobs #s) + check for errors
 	    4. edit intro to GenerateSUnit+solve Thue;s
@@ -1139,8 +1140,16 @@ Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]))
 
 hash:= set;
 
+// reverse order of clist terms if cn has fewer divisors than c0
+c0:=Integers()!clist[1];
+cn:=Integers()!clist[4];
+if #Divisors(cn) lt #Divisors(c0) then
+    Reverse(~clist);
+end if;
+
 printf hash cat " Resolving Thue-Mahler equation with...\n";
 printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
+
 
 t1:= Cputime();
 f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N);
