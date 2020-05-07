@@ -17,13 +17,15 @@ Description: This program generates all S-unit equations corresponding to the Th
 	     to be solved.
 
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+            run with
+	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel	magma -j32--joblog tmplog set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
-To do list: 0. add possibility to switch order of terms under SL2Z action
-      	    1. test this version
-            2. move current files on remote
+To do list: 1. test this version - DONE
+            2. move current files on remote - DONE
 	    3. run with parallel joblog (limit jobs #s) + check for errors
 	    4. edit intro to GenerateSUnit+solve Thue;s
 	    5. Reference list for: BeReGh, Gh, Si
+            6. compress files with gzip -k filename.txt ? and add original files to gitignore ?
 
 Example:
 
@@ -1079,16 +1081,8 @@ end procedure;
 /*
      Description: generate all S-unit equations corresponding to N, clist
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
-     Output:
-     Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma --joblog set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
-
-compress files with gzip -k filename.txt
-add original files to gitignore
-
-
-magma set:=[11,[-11,1,2,2,2]] /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m
-
+     Output: N/A
+     Example:
 */
 
 t0:= Cputime();
