@@ -1,49 +1,36 @@
 /*
-SUnitEquations.m
+
+GenerateSUnitEquations.m
 
 Author: Adela Gherga <adelagherga@gmail.com>
 Copyright © 2020, Adela Gherga, all rights reserved.
 Created: 23 January 2020
 
-Description: This program generates all S-unit equations corresponding to the Thue-Mahler forms of absolute discriminant <= 10^{10}
+Description: This program generates all S-unit equations corresponding to the Thue-Mahler
+	     forms of absolute discriminant <= 10^{10}. Output is printed among
+	     "SUnitEqLogs.txt", "NoSUnitEqPossible.txt", "NoSUnitEqNeeded.txt",
+	     "PartialSUnitEqSol.txt", and "AllSUnitEq.txt". The corresponding S-unit equations
+	     are printed on "AllSUnitEq.txt," while "NoSUnitEqPossible.txt" lists the
+	     Thue-Mahler equations which cannot yield solutions. The file
+	     "NoSUnitEqNeeded.txt" lists Thue-Mahler forms which either reduce to Thue
+	     equations or which do not yield any S-unit equations. The file
+	     "PartialSUnitEqSol.txt" lists all Thue equations solutions arising from
+	     Thue-Mahler equations with S-unit equations remaining to be solved. Finally,
+	     "SUnitEqLogs.txt" tracks all relevant data. Each such file uses a hash in order
+	     to distinquish forms printed to the file in parallel.
 
-Commentary:
+Commentary: In this algorithm, Thue-Mahler equations are solved, but Thue equations are.
+            run with
+	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
-To do list:  0. Create the appropriate folders (determine rank possibilities)
-      	     1. Write the code
-      	     2. Generate appropriate output files
-	     3. Port output files onto github or dropbox folder
+To do list: 1. test this version - DONE
+            2. move current files on remote - DONE
+	    3. run with parallel joblog (limit jobs #s) + check for errors - DONE
+	    4. edit intro to GenerateSUnit+solve Thue;s
+	    5. Reference list for: BeReGh, Gh, Si
+            6. compress files with gzip -k filename.txt ? and add original files to gitignore ?
 
-             1. Output results from LocalObstruction, RemainingCases = []
-             2. Reference list for: BeReGh, Gh, Si
 Example:
-
-*/
-
-/*
-Organizational ideas:
-
-1. use bash code to read each line, and use the input to run (this) magma code. This code handles only 1 TM equaiton at a time, and ports the ouput to an apporpriate text file (based on rank, ie number of primes and infinite places);
-   Advantages: can parallelize
-   Disadvantages: writing bash code is damn hard and I'm not that good at it
-   		  won't be able to sort the S-unit equations among each file,
-		  will only be able to append them at the end of the files
-		  (by rank)
-
-
-2. Alternatively, this code reads the forms file, and for each on (one at a time), goes through and generates teh S-unit equation and ouptuts it appropriately;
-
-   Advantages: significantly easier to code
-	       will be able to further sort the S-unit equations among each
-	       file (by more than just rank)
-   Disadvantages: parallelization won't be possible here
-   		  slow code that might take too long to run
-
-
-It seems the clear winner is to write bash code that does this. Folder format should be as follows
-
-No. real/complex embeddings (R=0,1,2): 1 folder each
-    No of finite places (so total rank should be obvious): 1 folder for each
 
 */
 
@@ -1108,16 +1095,8 @@ end procedure;
 /*
      Description: generate all S-unit equations corresponding to N, clist
      Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
-     Output:
-     Example: run with
-nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel magma --joblog set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
-
-compress files with gzip -k filename.txt
-add original files to gitignore
-
-
-magma set:=[11,[-11,1,2,2,2]] /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m
-
+     Output: N/A
+     Example:
 */
 
 t0:= Cputime();

@@ -14,7 +14,8 @@ Description: This program generates all S-unit equations corresponding to the Th
 	     equations which cannot yield solutions. The file "NoSUnitEqNeeded.txt" lists
 	     Thue-Mahler forms which either reduce to Thue equations or which do not yield any
 	     S-unit equations. The file "ThueEqToSolve.txt" lists all Thue equations remaining
-	     to be solved.
+	     to be solved. Finally, "SUnitEqLogs.txt" tracks all relevant data. Each such file
+	     uses a hash in order to distinquish forms printed to the file in parallel.
 
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             run with
@@ -22,10 +23,13 @@ Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved
 
 To do list: 1. test this version - DONE
             2. move current files on remote - DONE
-	    3. run with parallel joblog (limit jobs #s) + check for errors
-	    4. edit intro to GenerateSUnit+solve Thue;s
-	    5. Reference list for: BeReGh, Gh, Si
-            6. compress files with gzip -k filename.txt ? and add original files to gitignore ?
+	    3. run with parallel joblog (limit jobs #s) + check for errors - DONE
+	    4. edit intro to GenerateSUnit+solve Thue - DONE
+            5. check and compare changes with FormsForBenjamin.txt
+	    6. Reference list for: BeReGh, Gh, Si
+            7. compress files with gzip -k filename.txt ? and add original files to gitignore ?
+
+seems like changing the order may not be the best option always...
 
 Example:
 
@@ -158,7 +162,7 @@ localtest:= function(N,F,DiscF)
     return partialObstruction, localObstruction;
 end function;
 
-prep0:= function(hash,OutFiles,LogFile,clist,N)
+prep0:= function(hash,OutFiles,LogFile,clist,N : printOutput:=true)
 
     /*
      Description: Verify conditions of Theorem 1 of BeReGh for clist,N
@@ -172,6 +176,8 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
             LogFile:= store running times and additional information as "SUnitEqLogs.txt"
             clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
             N:= conductor of corresponding elliptic curves in question
+            printOutput:= boolean value determining whether to print to LogFile
+                          default value is set to true
      Output: f:= monic polynomial defining the number field K = Q(th)
              enterTM:= boolean value determining whether to enter the TM solver
              RemainingCasesAllAs:= list of primelist and all corresponding a values
@@ -240,7 +246,7 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 		localObstruction[1];
 	return f, enterTM, RemainingCasesAllAs;
     end if;
-    if (IsEmpty(partialObstruction) eq false) then
+    if (IsEmpty(partialObstruction) eq false) and (printOutput eq true) then
 	// partial local obstructions present; remove p from primelist
 	printf hash cat " Partial local obstructions present \n";
 	printf hash cat " No solutions with positive exponent of %o are possible \n",
@@ -472,10 +478,10 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     RHSlist:= RHSlistNew;
 
     // store Thue equations to be solved in "ThueEqToSolve.txt"
-    if #RHSlist eq 1 then
+    if (#RHSlist eq 1) and (printOutput eq true) then
 	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1]) cat "\n";
-    elif #RHSlist gt 1 then
+    elif (#RHSlist gt 1) and (printOutput eq true) then
 	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
 	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat
 				 &cat[Sprintf( "%o, ", RHSlist[i], RHSlist[i]): i in [1..#RHSlist-1]] cat Sprint(RHSlist[#RHSlist]) cat "\n";
@@ -1133,17 +1139,8 @@ end for;
 Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
 
 hash:= set;
-
-// reverse order of clist terms if cn has fewer divisors than c0
-c0:=Integers()!clist[1];
-cn:=Integers()!clist[4];
-if #Divisors(Abs(cn)) lt #Divisors(Abs(c0)) then
-    Reverse(~clist);
-end if;
-
 printf hash cat " Resolving Thue-Mahler equation with...\n";
 printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
-
 
 t1:= Cputime();
 f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N);
@@ -1154,6 +1151,39 @@ if (enterTM eq false) then
 else
     // generate a record to store relevant info of the field K = Q(th)
     FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
+
+    // verify whether action of SL2(Z) group leads to fewer S-unit equations
+    // comparison with SL2(Z) matrix given by Matrix(Integers(),2,2,[0,1,1,0])
+    clistOptions:= [clist, Reverse(clist)];
+    clistCases:= [0 : i in [1..#clistOptions]];
+    for i in [1..#clistOptions] do
+	tempclist:= clistOptions[i];
+	f, enterTM, RemainingCases:=
+	    prep0(hash,OutFiles,LogFile,tempclist,N:printOutput:=false);
+	assert enterTM;
+	K<th>:=NumberField(f);
+	OK:=MaximalOrder(K);
+	th:=OK!th;
+	fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
+	assert #RemainingCases eq 1; // mulitple primelists not possible
+	remainingCase:= RemainingCases[1];
+
+	avalues:= remainingCase`avalues;
+	primelist:= remainingCase`primelist;
+	// for each a in avalues, generate all new values of a after applying monic
+	// linear transformation
+	alist:= monic(fieldKinfo,tempclist,primelist,avalues);
+	// verify number of ideals of norm a
+	for aset in alist do
+	    a:= Integers()!aset`newa;
+	    invs:=normInv(a,OK); // generate all ideals of norm a
+	    clistCases[i]:= clistCases[i] + #invs;
+	end for;
+    end for;
+    min,ind:= Min(clistCases); // determine which action of SL2(Z) yields less ideals of norm a
+    clist:= clistOptions[ind];
+
+    f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N:printOutput:= false);
     K<th>:=NumberField(f);
     OK:=MaximalOrder(K);
     th:=OK!th;
