@@ -598,7 +598,8 @@ GL2Zactions:= function(clist)
 	    if hasGL2Zaction then
 		assert (a*d - b*c eq 1);
 		GL2ZF:= Evaluate(F,[a*U+b*V,c*U+d*V]);
-		newclist:= [Integers()!c : c in Coefficients(GL2ZF)];
+		newclist:= [MonomialCoefficient(GL2ZF,U^(n-i)*V^i) : i in [0..n]];
+		assert newclist eq Reverse(Coefficients(Evaluate(GL2ZF,[x,1])));
 		assert newclist[1] eq i;
 		Append(~GL2Zclists,newclist);
 	    end if;
