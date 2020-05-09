@@ -25,9 +25,12 @@ To do list: 1. test this version - DONE
             2. move current files on remote - DONE
 	    3. run with parallel joblog (limit jobs #s) + check for errors - DONE
 	    4. edit intro to GenerateSUnit+solve Thue - DONE
-            5. check and compare changes with FormsForBenjamin.txt
-	    6. Reference list for: BeReGh, Gh, Si
-            7. compress files with gzip -k filename.txt ? and add original files to gitignore ?
+            5. add SL2Z actions; find a way to choose a,b,c,d - DONE
+            6. print SL2Z tests in logfile
+            7. test + comment
+            8. check and compare changes with FormsForBenjamin.txt
+	    9. Reference list for: BeReGh, Gh, Si
+            10. compress files with gzip -k filename.txt ? and add original files to gitignore ?
 
 seems like changing the order may not be the best option always...
 
@@ -54,12 +57,13 @@ ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
 
     if (qDividesRHS eq true) then
 	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) mod q when q | RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q eq 0) then
-		hasSolutions:= true;
-		break u;
+	for u,v in [0..q-1] do
+	    if [u,v] ne [0,0] then
+		F_q:= Integers()! (Evaluate(F,[u,v]));
+		if (F_q mod q eq 0) then
+		    hasSolutions:= true;
+		    break u;
+		end if;
 	    end if;
 	end for;
     else
@@ -79,12 +83,13 @@ ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
 	end for;
 	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) moq q
 	// when q does not divide RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q in rhs) then
-		hasSolutions:= true;
-		break u;
+	for u,v in [0..q-1] do
+	    if [u,v] ne [0,0] then
+		F_q:= Integers()! (Evaluate(F,[u,v]));
+		if (F_q mod q in rhs) then
+		    hasSolutions:= true;
+		    break u;
+		end if;
 	    end if;
 	end for;
     end if;
@@ -526,6 +531,82 @@ prep0:= function(hash,OutFiles,LogFile,clist,N : printOutput:=true)
     return f, enterTM, RemainingCasesAllAs;
 end function;
 
+GL2Zactions:= function(clist)
+
+     /*
+     Description: generate all possible GL2(Z) actions under which c0 lies in [1..20]
+     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+     Output: GL2Zclists:= all possible coefficients of F(X,Y) under GL2(Z) action under which
+                          c0 lies in the interval [1..20]
+     Example:
+    */
+
+    QUV<U,V>:=PolynomialRing(Rationals(),2);
+    Qx<x>:= PolynomialRing(Rationals());
+    Zx_<x_>:= PolynomialRing(Integers());
+
+    // general setup for Thue-Mahler solver
+    assert &and[c in Integers() : c in clist];
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n eq 3;
+
+    // generate the relevant Thue Mahler polynomial
+    F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
+    assert IsHomogeneous(F);
+    DiscF:= -27*clist[1]^2*clist[4]^2 + clist[2]^2*clist[3]^2;
+    DiscF:= DiscF + 18*clist[1]*clist[2]*clist[3]*clist[4];
+    DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
+    assert DiscF eq Discriminant(Evaluate(F,[x,1]));
+
+    fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
+    f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
+    c0:= Integers()!fclist[1]; // update c0
+    assert c0 eq 1;
+    assert IsMonic(f);
+    assert Coefficients(f) eq
+	   Coefficients(clist[1]^(n-1)*Evaluate(F,[x/clist[1],1]));
+    assert Degree(f) eq n;
+    assert IsIrreducible(f);
+    assert &and[c in Integers() : c in Coefficients(f)];
+
+    // generate possible GL2(Z) actions under which c0 lies in the interval [1..20]
+    // solve corresponding Thue equation F(a,c) = c0 for new potential c0
+    ThueF:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
+    GL2Zclists:= [];
+    for i in [1..20] do
+	if IsEmpty(Solutions(ThueF,i)) eq false then
+	    hasGL2Zaction:= false;
+	    a:= Solutions(ThueF,i)[1][1];
+	    c:= Solutions(ThueF,i)[1][2];
+	    if ((a eq 0) and (Abs(c) eq 1)) then
+		b:= -1/c;
+		d:= 0;
+		hasGL2Zaction:= true;
+	    elif ((c eq 0) and (Abs(a) eq 1)) then
+		d:= 1/a;
+		b:= 0;
+		hasGL2Zaction:= true;
+	    elif ((a ne 0) and (c ne 0) and (GCD(a,c) eq 1)) then
+		g,d,b:= XGCD(a,c);
+		b:= -b;
+		assert g eq 1;
+		hasGL2Zaction:= true;
+	    end if;
+
+	    if hasGL2Zaction then
+		assert (a*d - b*c eq 1);
+		GL2ZF:= Evaluate(F,[a*U+b*V,c*U+d*V]);
+		newclist:= [Integers()!c : c in Coefficients(GL2ZF)];
+		assert newclist[1] eq i;
+		Append(~GL2Zclists,newclist);
+	    end if;
+	end if;
+    end for;
+    return GL2Zclists;
+end function;
+
 monic:= function(fieldKinfo,clist,primelist,avalues)
 
     /*
@@ -655,6 +736,33 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
     assert IsEmpty(alistIndex);
 
     return alistNew;
+end function;
+
+normInv:= function(R,OK)
+
+    /*
+     Description: generate all ideals of OK having norm R
+     Input: R:= a positive integer
+            OK:= corresponding ring of integers of the field K
+     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Example:
+   */
+
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+    if R eq 1 then
+	return { 1*OK };
+    end if;
+    p:=Max(PrimeDivisors(R));
+    fpr:=[fp[1] : fp in Factorisation(p*OK)];
+    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
+    if #fpr eq 0 then
+	return {};
+    else
+	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+    end if;
 end function;
 
 algs1and2:=function(fieldKinfo,p)
@@ -792,33 +900,6 @@ algs1and2:=function(fieldKinfo,p)
     Lp:= LpNew;
 
     return Lp,Mp,fprs;
-end function;
-
-normInv:= function(R,OK)
-
-    /*
-     Description: generate all ideals of OK having norm R
-     Input: R:= a positive integer
-            OK:= corresponding ring of integers of the field K
-     Output: all ideals of OK having norm R, displayed in an enumerated set
-     Example:
-   */
-
-    assert R in Integers();
-    assert R ge 1;
-    R:=Integers()!R;
-    assert R ge 1;
-    if R eq 1 then
-	return { 1*OK };
-    end if;
-    p:=Max(PrimeDivisors(R));
-    fpr:=[fp[1] : fp in Factorisation(p*OK)];
-    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
-    if #fpr eq 0 then
-	return {};
-    else
-	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
-    end if;
 end function;
 
 prep1:= function(fieldKinfo,clist,apset)
@@ -1143,7 +1224,7 @@ printf hash cat " Resolving Thue-Mahler equation with...\n";
 printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
 
 t1:= Cputime();
-f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N);
+f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N:printOutput:=false);
 printf hash cat " Total time to determine local obstructions: %o \n", Cputime(t1);
 
 if (enterTM eq false) then
@@ -1152,12 +1233,18 @@ else
     // generate a record to store relevant info of the field K = Q(th)
     FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
 
-    // verify whether action of SL2(Z) group leads to fewer S-unit equations
-    // comparison with SL2(Z) matrix given by Matrix(Integers(),2,2,[0,1,1,0])
-    clistOptions:= [clist, Reverse(clist)];
-    clistCases:= [0 : i in [1..#clistOptions]];
-    for i in [1..#clistOptions] do
-	tempclist:= clistOptions[i];
+    t2:= Cputime();
+    // verify whether action of GL2(Z) group leads to fewer S-unit equations
+    // this comparison is based on the number of divisors of c0 and subsequent ideals of norm a
+    // as all resulting fields K are isomorphic (and thus ideal splitting remains unchanged)
+    GL2Zclists:= GL2Zactions(clist);
+    if clist notin GL2Zclists then
+	Append(~GL2Zclists,clist);
+    end if;
+
+    GL2Zcases:= [0 : i in [1..#GL2Zclists]];
+    for i in [1..#GL2Zclists] do
+	tempclist:= GL2Zclists[i];
 	f, enterTM, RemainingCases:=
 	    prep0(hash,OutFiles,LogFile,tempclist,N:printOutput:=false);
 	assert enterTM;
@@ -1177,24 +1264,28 @@ else
 	for aset in alist do
 	    a:= Integers()!aset`newa;
 	    invs:=normInv(a,OK); // generate all ideals of norm a
-	    clistCases[i]:= clistCases[i] + #invs;
+	    GL2Zcases[i]:= GL2Zcases[i] + #invs;
 	end for;
     end for;
-    min,ind:= Min(clistCases); // determine which action of SL2(Z) yields less ideals of norm a
-    clist:= clistOptions[ind];
+    // determine which action of GL2(Z) yields least number of ideals of norm a
+    min,ind:= Min(GL2Zcases);
+    clist:= GL2Zclists[ind]; // redefine clist
+    printf hash cat " Total time to determine optimal GL2(Z) action: %o \n", Cputime(t2);
+    printf hash cat " New Thue-Mahler equation coefficients: %o \n", clist;
 
-    f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N:printOutput:= false);
+    f, enterTM, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N:printOutput:=true);
+    assert enterTM;
     K<th>:=NumberField(f);
     OK:=MaximalOrder(K);
     th:=OK!th;
     fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-    t2:= Cputime();
+    t3:= Cputime();
     // generate a record to store relevant class group info
     ClassGroupInfo:= recformat<classgroup,classnumber,map>;
     ClK:= rec< ClassGroupInfo | >;
     ClK`classgroup, ClK`map:= ClassGroup(K);
-    printf hash cat " Total time to compute the class group: %o \n", Cputime(t2);
+    printf hash cat " Total time to compute the class group: %o \n", Cputime(t3);
     ClK`classnumber:= ClassNumber(K);
 
     n:= Degree(f);
@@ -1203,9 +1294,9 @@ else
     r:= s+t-1;
     assert (s+2*t) eq n;
     assert (r eq 1) or (r eq 2);
-    t3:= Cputime();
+    t4:= Cputime();
     U,psi:= UnitGroup(OK); // generate fundamental units
-    printf hash cat " Total time to compute the unit group: %o \n", Cputime(t3);
+    printf hash cat " Total time to compute the unit group: %o \n", Cputime(t4);
     // expresse the fundamental units as elts in OK in terms of the integral basis
     epslist:=[psi(U.(i+1)) : i in [1..r]];
     assert (#epslist eq 1) or (#epslist eq 2);
@@ -1223,9 +1314,9 @@ else
 
     assert #RemainingCases eq 1; // mulitple primelists not possible
     remainingCase:= RemainingCases[1];
-    t4:= Cputime();
+    t5:= Cputime();
     afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
-    printf hash cat " Total time to compute all ideal equations: %o \n", Cputime(t4);
+    printf hash cat " Total time to compute all ideal equations: %o \n", Cputime(t5);
 
     // general setup and assertions
     Zx<x_>:= PolynomialRing(Integers());
@@ -1240,7 +1331,7 @@ else
     F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
     assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
-    t5:= Cputime();
+    t6:= Cputime();
     // remove ideal equations which have exponent 0 on all prime ideals by generating
     // corresponding Thue equations to be solved
     toRemove:= [];
@@ -1269,7 +1360,7 @@ else
     afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
     afplist:= afplistNew;
     printf hash cat " Total time to remove ideal equations covered by Thue solver: %o \n",
-	   Cputime(t5);
+	   Cputime(t6);
 
     // store Thue equations to be solved in "ThueEqToSolve.txt"
     if #RHSlist eq 1 then
@@ -1287,9 +1378,9 @@ else
 		hash cat " No S-unit equations to resolve for this Thue-Mahler equation \n";
     else
 	printf hash cat " Number of ideal equations: %o \n", #afplist;
-	t6:= Cputime();
+	t7:= Cputime();
 	alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-	printf hash cat " Total time to compute all S-unit equations: %o \n", Cputime(t6);
+	printf hash cat " Total time to compute all S-unit equations: %o \n", Cputime(t7);
 	printf hash cat " Number of S-unit equations: %o \n", #alphgamlist;
 
 	if IsEmpty(alphgamlist) then
@@ -1298,13 +1389,15 @@ else
 	else
 	    assert #alphgamlist ne 0;
 	    complexPrec:= 400;
-	    t7:= Cputime();
+	    t8:= Cputime();
 	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-	    printf hash cat " Total time to compute initial height bounds: %o \n", Cputime(t7);
+	    printf hash cat " Total time to compute initial height bounds: %o \n", Cputime(t8);
 
 	    for j in [1..#alphgamlist] do
 		idealEq:= alphgamlist[j];
 		jhash:= hash cat "Case" cat IntegerToString(j);
+		fprintf SUnitEq,
+			jhash cat " Optimal Thue-Mahler equation coefficients: %o \n", clist;
 		fprintf SUnitEq, jhash cat " Minimal polynomial for K: %o \n", fclist;
 		fprintf SUnitEq, jhash cat " Class number: %o \n", ClK`classnumber;
 		if #fieldKinfo`fundamentalunits eq 1 then
@@ -1337,4 +1430,4 @@ end if;
 
 printf hash cat " Total time: %o\n", Cputime(t0);
 UnsetLogFile();
-exit;
+//exit;
