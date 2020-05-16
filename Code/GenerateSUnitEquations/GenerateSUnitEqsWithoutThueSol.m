@@ -21,16 +21,8 @@ Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved
             run with
 	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEqsWithoutThueSol.m 2>&1 &
 
-To do list: 1. test this version - DONE
-            2. move current files on remote - DONE
-	    3. run with parallel joblog (limit jobs #s) + check for errors - DONE
-	    4. edit intro to GenerateSUnit+solve Thue - DONE
-            5. add SL2Z actions; find a way to choose a,b,c,d - DONE
-            6. print SL2Z tests in logfile
-            7. test + comment
-            8. check and compare changes with FormsForBenjamin.txt
-	    9. Reference list for: BeReGh, Gh, Si
-            10. compress files with gzip -k filename.txt ? and add original files to gitignore ?
+To do list: 1. Reference list for: BeReGh, Gh, Si
+            2. compress files with gzip -k filename.txt ? and add original files to gitignore ?
 
 seems like changing the order may not be the best option always...
 
