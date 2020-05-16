@@ -30,12 +30,13 @@ import re
 optimal_forms = {}
 for line in open("/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt"):
     if "Optimal Thue-Mahler equation coefficients:" in line:
-        form = (re.search('coefficients: \[(.*)\]',line)).group(1)
+        form = fargle((re.search('coefficients: \[(.*)\]',line)).group(1))
         N = int((re.search('\[(.*),\[', line)).group(1))
         if N in optimal_forms:
-            optimal_forms[N] = optimal_forms[N] + fargle(form)
+            if form[0] not in optimal_forms[N]:
+                optimal_forms[N] = optimal_forms[N] + form
         else:
-            optimal_forms[N] = fargle(form)
+            optimal_forms[N] = form
 
 for key in sorted(optimal_forms):
     for form in optimal_forms[key]:
