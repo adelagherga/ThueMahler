@@ -1248,9 +1248,10 @@ else
     // this comparison is based on the number of divisors of c0 and subsequent ideals of norm a
     // as all resulting fields K are isomorphic (and thus ideal splitting remains unchanged)
     GL2Zclists:= GL2Zactions(clist);
-    if clist notin GL2Zclists then
-	Append(~GL2Zclists,clist);
+    if clist in GL2Zclists then
+	Exclude(~GL2Zclists, clist);
     end if;
+    Insert(GL2Zclists, 1, clist);
 
     GL2Zcases:= [0 : i in [1..#GL2Zclists]];
     for i in [1..#GL2Zclists] do
