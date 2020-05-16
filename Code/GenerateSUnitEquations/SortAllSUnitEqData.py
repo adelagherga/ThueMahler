@@ -23,14 +23,16 @@ def fargle(X):
     Y = []
     for char in X.split():
         Y.append(int(char.replace(",","")))
-    return [Y]
+    return Y
 
 import re
 
 optimal_forms = {}
 for line in open("/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt"):
     if "Optimal Thue-Mahler equation coefficients:" in line:
-        form = fargle((re.search('coefficients: \[(.*)\]',line)).group(1))
+        form = (re.search('coefficients: \[(.*)\]',line)).group(1)
+        discF = (re.search(',\[(.*)\]]Case', line)).group(1).split(',')[0]
+        form = fargle(discF + "," + form)
         N = int((re.search('\[(.*),\[', line)).group(1))
         if N in optimal_forms:
             if form[0] not in optimal_forms[N]:
