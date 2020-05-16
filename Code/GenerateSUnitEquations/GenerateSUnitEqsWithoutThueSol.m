@@ -1251,7 +1251,7 @@ else
     if clist in GL2Zclists then
 	Exclude(~GL2Zclists, clist);
     end if;
-    Insert(GL2Zclists, 1, clist);
+    Insert(~GL2Zclists, 1, clist);
 
     GL2Zcases:= [0 : i in [1..#GL2Zclists]];
     for i in [1..#GL2Zclists] do
