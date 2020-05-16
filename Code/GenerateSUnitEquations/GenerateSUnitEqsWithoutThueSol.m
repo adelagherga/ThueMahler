@@ -575,7 +575,8 @@ GL2Zactions:= function(clist)
     // solve corresponding Thue equation F(a,c) = c0 for new potential c0
     ThueF:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
     GL2Zclists:= [];
-    for i in [1..20] do
+    testset:= PrimesInInterval(1,200) cat [i: i in [1..20] | i notin PrimesInInterval(1,200)];
+    for i in testset do
 	if IsEmpty(Solutions(ThueF,i)) eq false then
 	    hasGL2Zaction:= false;
 	    a:= Solutions(ThueF,i)[1][1];
@@ -1181,6 +1182,14 @@ NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.txt";
 ThueEqToSolve:= "/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve.txt";
 SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
 
+/*
+LogFile:= "tmplog";
+NoSUnitEqPossible:= "tmpno";
+NoSUnitEqNeeded:= "tmpno";
+ThueEqToSolve:= "tmpthue";
+SUnitEq:= "tmpall";
+*/
+
 SetLogFile(LogFile);
 OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,ThueEqToSolve,SUnitEq];
 SetAutoColumns(false);
@@ -1255,20 +1264,39 @@ else
 	fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 	assert #RemainingCases eq 1; // mulitple primelists not possible
 	remainingCase:= RemainingCases[1];
+	afplist:= prep1(fieldKinfo,tempclist,remainingCase); // generate all ideal equations
 
-	avalues:= remainingCase`avalues;
-	primelist:= remainingCase`primelist;
-	// for each a in avalues, generate all new values of a after applying monic
-	// linear transformation
-	alist:= monic(fieldKinfo,tempclist,primelist,avalues);
-	// verify number of ideals of norm a
-	for aset in alist do
-	    a:= Integers()!aset`newa;
-	    invs:=normInv(a,OK); // generate all ideals of norm a
-	    GL2Zcases[i]:= GL2Zcases[i] + #invs;
+	// remove ideal equations which have exponent 0 on all prime ideals by generating
+	// corresponding Thue equations to be solved
+	toRemove:= [];
+	RHSlist:= [];
+	for i in [1..#afplist] do
+	    fplist:= afplist[i][4];
+	    if IsEmpty(fplist) then
+		a:= afplist[i][1]`newa;
+		adu:= afplist[i][1]`adu;
+		primelist:= afplist[i][2];
+		ideal_a:= afplist[i][3];
+		v:= #primelist;
+		tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+		assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
+		rhs:= Integers()! a*&*[primelist[i]^tt[i] : i in [1..v]];
+		tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
+		if (tf) and (rhs notin RHSlist) then
+		    Append(~RHSlist, rhs);
+		end if;
+		Append(~toRemove,[i,rhs]);
+	    end if;
 	end for;
+
+	// remove cases covered by Thue solver
+	toRemoveNew:= [i[1] : i in toRemove];
+	afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
+	afplist:= afplistNew;
+	GL2Zcases[i]:= #afplist;
     end for;
-    // determine which action of GL2(Z) yields least number of ideals of norm a
+
+    // determine which action of GL2(Z) yields least number of ideal equations
     min,ind:= Min(GL2Zcases);
     clist:= GL2Zclists[ind]; // redefine clist
     printf hash cat " Total time to determine optimal GL2(Z) action: %o \n", Cputime(t2);
@@ -1431,4 +1459,4 @@ end if;
 
 printf hash cat " Total time: %o\n", Cputime(t0);
 UnsetLogFile();
-//exit;
+exit;

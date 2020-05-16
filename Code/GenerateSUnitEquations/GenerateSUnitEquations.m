@@ -19,7 +19,10 @@ Description: This program generates all S-unit equations corresponding to the Th
 	     "SUnitEqLogs.txt" tracks all relevant data. Each such file uses a hash in order
 	     to distinquish forms printed to the file in parallel.
 
-Commentary: In this algorithm, Thue-Mahler equations are solved, but Thue equations are.
+Commentary: This algorithm is now obsolete and has been superceded by
+            GenerateSUnitEqsWithoutThueSol.m
+
+            In this algorithm, Thue-Mahler equations are solved, but Thue equations are.
             run with
 	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
