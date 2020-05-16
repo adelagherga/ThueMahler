@@ -23,7 +23,7 @@ def fargle(X):
     Y = []
     for char in X.split():
         Y.append(int(char.replace(",","")))
-    return Y
+    return [Y]
 
 import re
 
