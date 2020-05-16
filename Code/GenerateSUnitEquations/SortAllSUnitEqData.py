@@ -10,8 +10,7 @@
 #
 # Commentary: This program only needs to be applied once.
 #             Run with
-#             python3 /home/adela/ThueMahler/Code/GenerateSUnitEquations/SortAllSUnitEqData.py >
-#             /home/adela/ThueMahler/Data/SUnitEqData/OptimalRequiredSUnitEqs.txt
+#             python3 /home/adela/ThueMahler/Code/GenerateSUnitEquations/SortAllSUnitEqData.py > /home/adela/ThueMahler/Data/SUnitEqData/OptimalRequiredSUnitEqs.txt
 #
 # To do list: 0. write code for optimal forms
 #             1. graph data on ranks, time to generate S-unit eqs, size of terms? Possibly in
@@ -29,9 +28,7 @@ def fargle(X):
 import re
 
 optimal_forms = {}
-#for line in open("/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt"):
-
-for line in open("pytest.txt"):
+for line in open("/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt"):
     if "Optimal Thue-Mahler equation coefficients:" in line:
         form = (re.search('coefficients: \[(.*)\]',line)).group(1)
         N = int((re.search('\[(.*),\[', line)).group(1))
