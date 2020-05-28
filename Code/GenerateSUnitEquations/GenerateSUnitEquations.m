@@ -20,7 +20,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
 	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.csv | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEqsWithoutThueSol.m 2>&1 &
+	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si
             2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
