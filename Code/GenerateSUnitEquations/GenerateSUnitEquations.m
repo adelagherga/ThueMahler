@@ -1200,8 +1200,8 @@ ThueEqToSolve:= "/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve.csv";
 
 // .csv format is
 // N,"form","optimal form","min poly","partial obstructions",class number,r,no ideal eq,
-// no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,
-// class group time,unit group time,ideal eq time,Thue eq time,S-unit time,total time
+// no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,class group time,
+// unit group time,ideal eq time,Thue eq time,S-unit time,bound time,total time
 SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv";
 
 SetLogFile(SUnitErr);
