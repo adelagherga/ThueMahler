@@ -9,8 +9,8 @@ Created:  6 May 2020
 Description: This program generates all S-unit equations corresponding to the Thue-Mahler
 	     forms of absolute discriminant <= 10^{10}. Output is printed among
 	     "SUnitErr.txt", "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv",
-	     "ThueEqToSolve.csv", and "AllSUnitEq.csv". The corresponding S-unit equations are
-	     printed on "AllSUnitEq.csv," while "NoSUnitEqPossible.csv" lists the Thue-Mahler
+	     "ThueEqToSolve.csv", and "TMFormData.csv". The corresponding S-unit equations are
+	     printed on "TMFormData.csv," while "NoSUnitEqPossible.csv" lists the Thue-Mahler
 	     equations which cannot yield solutions. The file "NoSUnitEqNeeded.csv" lists
 	     Thue-Mahler forms which either reduce to Thue equations or which do not yield any
 	     S-unit equations. The file "ThueEqToSolve.csv" lists all Thue equations remaining
@@ -19,7 +19,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
-	    "AllSUnitEq.csv" with appropriate headings before running the algorithm with
+	    "TMFormData.csv" with appropriate headings before running the algorithm with
 	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.csv | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEqsWithoutThueSol.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si
@@ -1189,20 +1189,20 @@ NoSUnitEqPossible:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible.c
 
 // .csv format is
 // N,"form","optimal form",no Thue eq,local obstruction time,GL2Z action time,
-// class group time,unit group time,ideal eq time,thue eq time,total time
+// class group time,unit group time,ideal eq time,Thue eq time,total time
 // timings may be output as time or None
 // "optimal form" may be output as form or None
 NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.csv";
 
 // .csv format is
-// N,"form","thue eq","RHSlist"
+// N,"form","Thue eq","RHSlist"
 ThueEqToSolve:= "/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve.csv";
 
 // .csv format is
 // N,"form","optimal form","min poly","partial obstructions",class number,r,no ideal eq,
 // no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,
-// class group time,unit group time,ideal eq time,thue eq time,S-unit time,total time
-SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.csv";
+// class group time,unit group time,ideal eq time,Thue eq time,S-unit time,total time
+SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv";
 
 SetLogFile(SUnitErr);
 SetAutoColumns(false);
