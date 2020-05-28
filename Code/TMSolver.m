@@ -1,14 +1,24 @@
-// To Do:
-// 1. precision for real/padic case
-// 2. timing names
+/*
+TMSolver.m
 
+Author: Adela Gherga <adelagherga@gmail.com>
+Copyright © 2020, Adela Gherga, all rights reserved.
+Created: 18 May 2020
 
+Description:
 
+Commentary:
 
+To do list: 1. Edit input files
+           precision for real/padic case
+           timing names
+           partial obstructions need to be manually entered
+           code will not check for local obstructions/partial local obstructions
+                have to check GenerateSUnitEqWithoutThueSol.m for that
+           should this version of the code verify local/partial local obstructions?
+Example:
 
-
-
-
+*/
 
 // GESolver.m
 
@@ -42,145 +52,370 @@ Bottlenecks of this current implementation:
     - computing the ring of integers of the splitting field of the TM equation
     - computing the unit group
 
-//============================================================================//
-
-INPUT:
-
-OUTPUT:
-
-EXAMPLE:
 
 */
 //============================================================================//
 //============================================================================//
 
+prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:=true)
+// need to edit in partial obstruction, change output files (don't need No....txt, ThueToSolve files
 
-ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
-
-    /*
-     Description: default to where z = 0 nad p does not divide RHS
-     Input: F:= polynomial F(X,Y) in question
-            RHSprimes:= primes appearing on RHS of TM equation in local test
-            q:= rational prime under which the local test is performed
-                that is, we search for solutions of the TM equations mod q
-            qDividesRHS:= boolean value determining whether q | RHS
-                          default value is false
-     Output: hasSolutions:= boolean value determining whether TM equation has nontrivial local
-                            solutions mod q
-     Example:
-   */
-
-    hasSolutions:= false;
-
-    if (qDividesRHS eq true) then
-	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) mod q when q | RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q eq 0) then
-		hasSolutions:= true;
-		break u;
-	    end if;
-	end for;
-    else
-	// when q does not divide RHS
-	Zmodq:=FiniteField(q,1);
-	RHSprimesModq:= [];
-	rhs:= [];
-	// determine all possibilites of p^i mod q
-	for p in RHSprimes do
-	    pModq:= Zmodq! p;
-	    Append(~RHSprimesModq, [Zmodq! (p^i) : i in [0..Order(pModq)-1]]);
-	end for;
-	RHSprod:= CartesianProduct(RHSprimesModq);
-	// determine all possibilities of RHS mod q
-	for prod in RHSprod do
-	    Append(~rhs, Integers()! &*prod);
-	end for;
-	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) moq q
-	// when q does not divide RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q in rhs) then
-		hasSolutions:= true;
-		break u;
-	    end if;
-	end for;
-    end if;
-    return hasSolutions;
-end function;
-
-localtest:= function(N,F,DiscF)
 
     /*
-     Description: determines whether the TM equation has local or partial local obstructions
-     Input: N:= conductor of corresponding elliptic curves in question
-            F:= polynomial F(X,Y) in question
-            DiscF:= discriminant of F(X,Y)
-     Output: partialObstruction:= set of primes p for which solutions can only be possible
+     Description: Verify conditions of Theorem 1 of BeReGh for clist,N
+     Input: hash:= string set appended to the start of every output line;
+                   used to ensure output corresponds to correct Thue Mahler form
+     	    OutFiles:= store all possible outcomes for [N,clist] in one of
+     	    	       "NoSUnitEqPossible.txt"
+		       "NoSUnitEqNeeded.txt", or
+     	    	       "SUnitEq.txt,"
+                       and store Thue equations to be solved in "ThueEqToSolve.txt"
+            LogFile:= store running times and additional information as "SUnitEqLogs.txt"
+            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+            N:= conductor of corresponding elliptic curves in question
+            partialObstruction:=  set of primes p for which solutions can only be possible
      	     			  with p having exponent 0 on RHS of the TM equation
-             localobstruction:= set of primes p presenting obstructions for the TM equation
-	                        that is, an obstruction exists at p as per Theorem 1 of BeGhRe
-                                or no solution of the TM equation exists mod p
+            printOutput:= boolean value determining whether to print to LogFile
+                          default value is set to true
+     Output: f:= monic polynomial defining the number field K = Q(th)
+             enterTM:= boolean value determining whether to enter the TM solver
+             RemainingCasesAllAs:= list of primelist and all corresponding a values
+                                   comprising the RHS of F(x,y)
      Example:
    */
 
-    // determine rational primes to verify; 2,3 and all prime factors of N
-    testPrimes:= PrimeFactors(N);
-    if 2 notin testPrimes then
-	Append(~testPrimes, 2);
+    QUV<U,V>:=PolynomialRing(Rationals(),2);
+    Qx<x>:= PolynomialRing(Rationals());
+
+    // FIX HERE
+    SUnitEq:= OutFiles[4];
+
+    // general setup for Thue-Mahler solver
+    assert &and[c in Integers() : c in clist];
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n eq 3;
+
+    // generate the relevant Thue Mahler polynomial
+    F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
+    assert IsHomogeneous(F);
+    DiscF:= -27*clist[1]^2*clist[4]^2 + clist[2]^2*clist[3]^2;
+    DiscF:= DiscF + 18*clist[1]*clist[2]*clist[3]*clist[4];
+    DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
+    assert DiscF eq Discriminant(Evaluate(F,[x,1]));
+
+    fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
+    f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
+    c0:= Integers()!fclist[1]; // update c0
+    assert c0 eq 1;
+    assert IsMonic(f);
+    assert Coefficients(f) eq
+	   Coefficients(clist[1]^(n-1)*Evaluate(F,[x/clist[1],1]));
+    assert Degree(f) eq n;
+    assert IsIrreducible(f);
+    assert &and[c in Integers() : c in Coefficients(f)];
+
+    // verify conditions of Theorem 1 of BeReGh
+    alpha:= Valuation(N,2);
+    beta:= Valuation(N,3);
+    alpha0:= Valuation(DiscF,2);
+    beta0:= Valuation(DiscF,3);
+    N0:= Integers()! ( N/((2^alpha)*(3^beta)));
+    N1:= Integers()! (DiscF/((2^alpha0)*(3^beta0)));
+    primelist:= PrimeDivisors(N0);
+    assert &and[IsPrime(p) : p in primelist];
+    assert (2 notin primelist) and (3 notin primelist);
+    assert alpha in [0..8];
+    assert beta in [0..5];
+    assert IsDivisibleBy(N0,N1);
+
+    // technically don't need this; should we keep it here regardless?
+    enterTM:= true;
+    RemainingCasesAllAs:= [];
+
+    if (IsEmpty(partialObstruction) eq false) and (printOutput eq true) then
+	// partial local obstructions present; remove p from primelist
+	printf hash cat " Partial local obstructions present \n";
+	printf hash cat " No solutions with positive exponent of %o are possible \n",
+	       partialObstruction;
     end if;
-    if 3 notin testPrimes then
-	Append(~testPrimes, 3);
+
+    // generate a record to store relevant prime bounds
+    // determine any bounds as per Theorem 1 of BeGhRe correspondence
+    primeInfo:= recformat<prime,alpha1,unbounded>;
+    primeBounds:= [[],[]];
+
+    // verify behaviour at p = 2
+    if (alpha eq 0) then
+	if alpha0 eq 2 then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3>);
+	end if;
+    elif (alpha eq 1) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 4, unbounded:= "yes">);
+	elif (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3, unbounded:= "yes">);
+	end if;
+    elif (alpha eq 2) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        elif (alpha0 eq 4) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
+    elif (alpha eq 3) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
+        elif (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
+        elif (alpha0 eq 4) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
+    elif (alpha eq 4) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
+	elif (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2, unbounded:= "yes">);
+        elif (alpha0 eq 4) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
+    elif (alpha eq 5) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+        elif (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
+    elif (alpha eq 6) then
+        if (alpha0 eq 2) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
+        elif (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1, unbounded:= "yes">);
+        elif (alpha0 eq 4) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
+    elif (alpha eq 7) then
+        if (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+        elif (alpha0 eq 4) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+        end if;
+    elif (alpha eq 8) then
+        if (alpha0 eq 3) then
+	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+        end if;
     end if;
 
-    localObstruction:= [];
-    partialObstruction:= [];
-    for p in testPrimes do
-	// search for solutions (u,v) of F(u,v) mod p
-	// under the assumption that the exponent on p is > 0
-	if (p le 13) or (p in [13..151] and (#testPrimes le 3)) then
-	    // the bounds 13,1513 are arbitrary, but serve to decrease search time
+    // verify behaviour at p = 3
+    if (beta eq 0) then
+        if (beta0 eq 0) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+        end if;
+    elif (beta eq 1) then
+        if (beta0 eq 0) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1, unbounded:= "yes">);
+        elif (beta0 eq 1) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	end if;
+    elif (beta eq 2) then
+        if (beta0 eq 0) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	elif (beta0 eq 1) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	elif (beta0 eq 3) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+	end if;
+    elif (beta ge 3) then
+        if (beta0 eq beta) then
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1>);
+        else
+	    // when all coefficients of the form F_1 are  divisible by 3,
+	    // since also beta1 = {0,1} and 3|LHS we must have that 3|RHS,  hence beta1 = 1
+	    // in this case, we may divide 3 from both sides
+	    // this yields the form F = F_1/3, whose discriminant has
+	    // Valuation(DiscF,3) != beta0 = beta
+	    // thus since beta1=1 is divided out, so beta1=0
+	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+        end if;
+    end if;
 
-	    posExpSol:= ModpCheck(F,testPrimes,p : qDividesRHS:= true);
-	    if (p ge 3) and (Valuation(N,p) eq 1) and (DiscF mod p ne 0) then
-		// verify local obstructions as per Theorem 1 of BeGhRe
-		// ie. if Valuation(N,p) = 1 for p >= 3, then p | DiscF*F(u,v)
-		// thus if DiscF != 0 mod p, then F(u,v) = 0 mod p for some (u,v)
-		// if u = v = 0 mod p is the only solution, gcd(u,v) != 1
-		// hence locMal obstruction at p
-		if (posExpSol eq false) then
-		    Append(~localObstruction, p);
-		    return partialObstruction, localObstruction;
-		end if;
-	    else
-		// verify local obstructions for primes possible on RHS
-		// this includes divisors of N, and 2,3
-
-		// search for solutions (u,v) of F(u,v) mod p
-		// under the assumption that the exponent on p is 0
-		zeroExpSol:= ModpCheck(F,Exclude(testPrimes,p),p :
-				       qDividesRHS:=false);
-		if (zeroExpSol eq false) and (posExpSol eq false) then
-		    // if u = v = 0 mod p is the only solution in both cases
-		    // gcd(u,v) != 1, hence local obstruction at p
-	    	    Append(~localObstruction, p);
-		    return partialObstruction, localObstruction;
-		elif (zeroExpSol eq true) and (posExpSol eq false) then
-		    // if a solution (u,v) != (0,0) mod p exists
-		    // when the exponent on p is 0
-		    // but u = v = 0 mod p is the only solution
-		    // when the exponent on p is > 0
-		    // partial obstruction at p; can remove p from primelist
-		    Append(~partialObstruction, p);
-		end if;
-	    end if;
+    // verify behaviour at primes dividing N1
+    for p in PrimeDivisors(N1) do
+	if IsDivisibleBy(N1,p^2) then
+	    assert p in PrimeDivisors(N0);
+	    primeBounds[#primeBounds+1]:= [];
+	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 0>);
+	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 1>);
 	end if;
     end for;
 
-    return partialObstruction, localObstruction;
+    // remove superflous cases where a partial obstruction at p exists
+    primeBoundsNew:= [];
+    for pset in primeBounds do
+	toRemove:= [];
+	ps:= [i`prime : i in pset];
+	// verify the pset corresponds to only 1 prime
+	assert &and[p eq ps[1] : p in ps];
+	p:= ps[1];
+	if (p in partialObstruction) then
+	    for i in [1..#pset] do
+		x:= pset[i];
+		assert x`prime eq p;
+		if (assigned x`unbounded) and (x`alpha1 ge 1) then
+		    enterTM:= false;
+		    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
+		    return f, enterTM, RemainingCasesAllAs;
+		elif (assigned x`unbounded) and (x`alpha1 eq 0) then
+		    delete x`unbounded; // update bound at p
+		elif (assigned x`unbounded eq false) and (x`alpha1 ge 1) then
+		    // remove extra cases at p which are now not possible
+		    Append(~toRemove,i);
+		end if;
+	    end for;
+	end if;
+	psetNew:= [pset[i] : i in [1..#pset] | i notin toRemove];
+
+	if IsEmpty(psetNew) then
+	    enterTM:= false;
+	    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
+	    return f, enterTM, RemainingCasesAllAs;
+	end if;
+	// verify pset now only includes the exponent 0 case at p
+	if (p in partialObstruction) then
+	    assert (#psetNew eq 1);
+	    assert (assigned psetNew[1]`unbounded eq false);
+	    assert (psetNew[1]`alpha1 eq 0);
+	end if;
+	Append(~primeBoundsNew, psetNew);
+    end for;
+    primeBounds:= primeBoundsNew;
+
+    // generate all combinations of exponent restrictions as determined above
+    Sdata:= []; // stores all combinations of prime bounds on each p
+    expCombos:= CartesianProduct([[1..#pset] : pset in primeBounds]);
+    for c in expCombos do
+	Append(~Sdata, [primeBounds[i][c[i]] : i in [1..#c]]);
+    end for;
+    aprimelist:=[]; // store corresponding a value and primelist
+    for pset in Sdata do
+	a:= 1;
+	primes:= primelist;
+	for i in pset do
+	    if (assigned i`unbounded) then
+		if (i`prime notin primes) then
+		    assert (i`prime eq 2) or (i`prime eq 3);
+		    assert i`prime notin partialObstruction;
+		    Append(~primes, i`prime);
+		end if;
+	    else
+		if (i`prime in primes) then
+		    Exclude(~primes,i`prime);
+		end if;
+		a:= a*(i`prime)^(i`alpha1);
+	    end if;
+	end for;
+	Sort(~primes);
+	if <a,primes> notin aprimelist then
+	    Append(~aprimelist, <a,primes>);
+	end if;
+    end for;
+
+    // store Thue-Mahler equations to be solved
+    // store corresponding Thue equations to be solved, if any
+    RemainingCases:=aprimelist;
+
+    RHSlist:= [];
+    for pset in aprimelist do
+	if IsEmpty(pset[2]) then // no unbounded primes
+	    rhs:= Integers()! pset[1];
+	    if rhs notin RHSlist then
+		Append(~RHSlist, rhs);
+	    end if;
+	    Exclude(~RemainingCases, pset);
+	end if;
+    end for;
+
+    // remove Thue cases covered by Thue-Mahler cases
+    RHSlistNew:= RHSlist;
+    for a in RHSlist do
+	for pset in RemainingCases do
+	    if IsEmpty(pset[2]) eq false then
+		b:= pset[1];
+		primelist:= pset[2];
+		check1:= &and[p in primelist : p in PrimeDivisors(a) |
+			      p notin PrimeDivisors(b)];
+		check2:= &and[Valuation(b,p) eq Valuation(a,p) : p in PrimeDivisors(b)];
+		if (check1) and (check2) then
+		    assert IsDivisibleBy(a,b);
+		    DivisorsCheck:= [p : p in PrimeDivisors(a) | p in PrimeDivisors(b)] cat
+				    [p : p in primelist |
+				     p in PrimeDivisors(a) and p notin PrimeDivisors(b)];
+		    assert PrimeDivisors(a) eq DivisorsCheck;
+		    Exclude(~RHSlistNew,a);
+		    break pset;
+		end if;
+	    end if;
+	end for;
+    end for;
+    RHSlist:= RHSlistNew;
+
+    // store Thue equations to be solved in "ThueEqToSolve.txt"
+    if (#RHSlist eq 1) and (printOutput eq true) then
+	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
+	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1]) cat "\n";
+    elif (#RHSlist gt 1) and (printOutput eq true) then
+	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
+	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat
+				 &cat[Sprintf( "%o, ", RHSlist[i], RHSlist[i]): i in [1..#RHSlist-1]] cat Sprint(RHSlist[#RHSlist]) cat "\n";
+    end if;
+
+    // if all cases are resolved via Thue equations
+    if IsEmpty(RemainingCases) then
+	enterTM:=false;
+	fprintf NoSUnitEqNeeded,
+		hash cat " Thue-Mahler equation has reduced to several Thue equations \n";
+	return f, enterTM, RemainingCasesAllAs;
+    end if;
+
+    // if there are Thue-Mahler equations yet to be solved, not resolvable via Thue equations
+    // generate the corresponding S-unit equations
+    // remove redundancy so that each primeset has all corresponding a values
+    CaseInfoAllAs:= recformat<avalues,primelist>;
+    RemainingCasesCopy:= RemainingCases;
+    for pset in RemainingCases do
+	if pset in RemainingCasesCopy then
+	    a:= pset[1];
+	    primelist:= pset[2];
+	    avalues:= [a];
+	    Exclude(~RemainingCasesCopy, pset);
+	    for pset2 in RemainingCasesCopy do
+		a2:= pset2[1];
+		primelist2:= pset2[2];
+		if (primelist eq primelist2) then
+		    Append(~avalues, a2);
+		    Exclude(~RemainingCasesCopy, pset2);
+		end if;
+	    end for;
+	    Sort(~avalues);
+	    apset:=rec<CaseInfoAllAs | avalues:=avalues,
+				       primelist:= primelist>;
+	    Append(~RemainingCasesAllAs, apset);
+	end if;
+    end for;
+
+    // if the code has made it this far, the following must hold
+    assert enterTM;
+    return f, enterTM, RemainingCasesAllAs;
 end function;
+
+
+
 
 prep0:= function(hash,LogFile,clist,N)
 

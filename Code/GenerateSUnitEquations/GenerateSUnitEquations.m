@@ -4,38 +4,48 @@ GenerateSUnitEquations.m
 
 Author: Adela Gherga <adelagherga@gmail.com>
 Copyright © 2020, Adela Gherga, all rights reserved.
-Created: 23 January 2020
+Created:  6 May 2020
 
 Description: This program generates all S-unit equations corresponding to the Thue-Mahler
 	     forms of absolute discriminant <= 10^{10}. Output is printed among
-	     "SUnitEqLogs.txt", "NoSUnitEqPossible.txt", "NoSUnitEqNeeded.txt",
-	     "PartialSUnitEqSol.txt", and "AllSUnitEq.txt". The corresponding S-unit equations
-	     are printed on "AllSUnitEq.txt," while "NoSUnitEqPossible.txt" lists the
-	     Thue-Mahler equations which cannot yield solutions. The file
-	     "NoSUnitEqNeeded.txt" lists Thue-Mahler forms which either reduce to Thue
-	     equations or which do not yield any S-unit equations. The file
-	     "PartialSUnitEqSol.txt" lists all Thue equations solutions arising from
-	     Thue-Mahler equations with S-unit equations remaining to be solved. Finally,
-	     "SUnitEqLogs.txt" tracks all relevant data. Each such file uses a hash in order
-	     to distinquish forms printed to the file in parallel.
+	     "SUnitErr.txt", "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv",
+	     "ThueEqToSolve.csv", and "AllSUnitEq.csv". The corresponding S-unit equations are
+	     printed on "AllSUnitEq.csv," while "NoSUnitEqPossible.csv" lists the Thue-Mahler
+	     equations which cannot yield solutions. The file "NoSUnitEqNeeded.csv" lists
+	     Thue-Mahler forms which either reduce to Thue equations or which do not yield any
+	     S-unit equations. The file "ThueEqToSolve.csv" lists all Thue equations remaining
+	     to be solved. Each such file is manually generated as a .csv file with
+	     appropriately listed headings. Finally, "SUnitErr.txt" tracks any arising errors.
 
-Commentary: This algorithm is now obsolete and has been superceded by
-            GenerateSUnitEqsWithoutThueSol.m
+Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+            Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
+	    "AllSUnitEq.csv" with appropriate headings before running the algorithm with
+	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.csv | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEqsWithoutThueSol.m 2>&1 &
 
-            In this algorithm, Thue-Mahler equations are solved, but Thue equations are.
-            run with
-	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
-
-To do list: 1. test this version - DONE
-            2. move current files on remote - DONE
-	    3. run with parallel joblog (limit jobs #s) + check for errors - DONE
-	    4. edit intro to GenerateSUnit+solve Thue;s
-	    5. Reference list for: BeReGh, Gh, Si
-            6. compress files with gzip -k filename.txt ? and add original files to gitignore ?
+To do list: 1. Reference list for: BeGhRe, Gh, Si
+            2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
 
 Example:
 
 */
+
+SeqEnumToString:= function(X)
+
+    /*
+     Description: convert a SeqEnum into a string without whitespace, enclosed by "( )" for
+     		  .csv input
+     Input: X:= [x_1, _2, \dots, x_n] where Type(X):= SeqEnum
+     Output: stX:= "\"(x_1, \dots ,x_n)\"", where Type(strX):= MonStgElt
+     Example:
+   */
+    if (#X eq 1) then
+	strX:= "\"(" cat IntegerToString(X[1]) cat ")\"";
+    else
+	strX:= "\"(" cat &cat[IntegerToString(X[i]) cat "," : i in [1..#X-1]]
+	       cat IntegerToString(X[#X]) cat ")\"";
+    end if;
+    return strX;
+end function;
 
 ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
 
@@ -56,12 +66,13 @@ ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
 
     if (qDividesRHS eq true) then
 	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) mod q when q | RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q eq 0) then
-		hasSolutions:= true;
-		break u;
+	for u,v in [0..q-1] do
+	    if [u,v] ne [0,0] then
+		F_q:= Integers()! (Evaluate(F,[u,v]));
+		if (F_q mod q eq 0) then
+		    hasSolutions:= true;
+		    break u;
+		end if;
 	    end if;
 	end for;
     else
@@ -81,12 +92,13 @@ ModpCheck:= function(F,RHSprimes,q : qDividesRHS:=false)
 	end for;
 	// set hasSolutions to true if F(X,Y) has a solution (u,v) != (0,0) moq q
 	// when q does not divide RHS
-	for u,v in [1..q-1] do
-	    assert [u,v] ne [0,0];
-	    F_q:= Integers()! (Evaluate(F,[u,v]));
-	    if (F_q mod q in rhs) then
-		hasSolutions:= true;
-		break u;
+	for u,v in [0..q-1] do
+	    if [u,v] ne [0,0] then
+		F_q:= Integers()! (Evaluate(F,[u,v]));
+		if (F_q mod q in rhs) then
+		    hasSolutions:= true;
+		    break u;
+		end if;
 	    end if;
 	end for;
     end if;
@@ -164,34 +176,28 @@ localtest:= function(N,F,DiscF)
     return partialObstruction, localObstruction;
 end function;
 
-prep0:= function(hash,OutFiles,LogFile,clist,N)
+prep0:= function(clist,N)
 
     /*
-     Description: Verify conditions of Theorem 1 of BeReGh for clist,N
-     Input: hash:= string set appended to the start of every output line;
-                   used to ensure output corresponds to correct Thue Mahler form
-     	    OutFiles:= store all possible outcomes for [N,clist] in one of
-     	    	       "NoSUnitEqPossible.txt"
-		       "NoSUnitEqNeeded.txt", or
-     	    	       "SUnitEq.txt"
-            LogFile:= store running times and additional information as "SUnitEqLogs.txt"
-            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+     Description: Verify conditions of Theorem 1 of BeGhRe for clist, N
+     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
             N:= conductor of corresponding elliptic curves in question
      Output: f:= monic polynomial defining the number field K = Q(th)
              enterTM:= boolean value determining whether to enter the TM solver
-             TMSolutions:= solutions for the TM equation arising from Thue equations
              RemainingCasesAllAs:= list of primelist and all corresponding a values
                                    comprising the RHS of F(x,y)
+             partialObstruction:= set of primes p for which solutions can only be possible
+     	     			  with p having exponent 0 on RHS of the TM equation
+             ThueToSolve:= Thue equations to be solved, stored as [< Thue coefficients, RHS >]
+             exitline:= string to be appended to hash for .csv input in exitfile; if enterTM
+	     		is true, this is the empty string
+             exitfile:= string indicating appropriate .csv file for exitline; if enterTM is
+	     		true, this is the empty string
      Example:
    */
 
     QUV<U,V>:=PolynomialRing(Rationals(),2);
     Qx<x>:= PolynomialRing(Rationals());
-    Zx<x_>:= PolynomialRing(Integers());
-
-    NoSUnitEqPossible:= OutFiles[1];
-    NoSUnitEqNeeded:= OutFiles[2];
-    SUnitEq:= OutFiles[3];
 
     // general setup for Thue-Mahler solver
     assert &and[c in Integers() : c in clist];
@@ -219,7 +225,7 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     assert IsIrreducible(f);
     assert &and[c in Integers() : c in Coefficients(f)];
 
-    // verify conditions of Theorem 1 of BeReGh
+    // verify conditions of Theorem 1 of BeGhRe
     alpha:= Valuation(N,2);
     beta:= Valuation(N,3);
     alpha0:= Valuation(DiscF,2);
@@ -234,8 +240,10 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     assert IsDivisibleBy(N0,N1);
 
     enterTM:= true;
-    TMSolutions:= []; // store all Thue-Mahler solutions
     RemainingCasesAllAs:= [];
+    ThueToSolve:= [];
+    exitline:= "";
+    exitfile:= "";
 
     // verify local and partial local obstructions
     partialObstruction, localObstruction:= localtest(N,F,DiscF);
@@ -243,15 +251,9 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     if (IsEmpty(localObstruction) eq false) then
 	// local obstructions present; do not enter TM solver
 	enterTM:= false;
-	fprintf NoSUnitEqPossible, hash cat " Local obstruction at p:= %o \n",
-		localObstruction[1];
-	return f, enterTM, TMSolutions, RemainingCasesAllAs;
-    end if;
-    if (IsEmpty(partialObstruction) eq false) then
-	// partial local obstructions present; remove p from primelist
-	printf hash cat " Partial local obstructions present \n";
-	printf hash cat " No solutions with positive exponent of %o are possible \n",
-	       partialObstruction;
+	exitline:= "," cat Sprint(localObstruction[1]) cat ",None";
+	exitfile:= "NoSUnitEqPossible";
+	return f,enterTM,RemainingCasesAllAs,partialObstruction,ThueToSolve,exitline,exitfile;
     end if;
 
     // generate a record to store relevant prime bounds
@@ -382,8 +384,10 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 		assert x`prime eq p;
 		if (assigned x`unbounded) and (x`alpha1 ge 1) then
 		    enterTM:= false;
-		    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-		    return f, enterTM, TMSolutions, RemainingCasesAllAs;
+		    exitline:= ",None," cat IntegerToString(p);
+		    exitfile:= "NoSUnitEqPossible";
+		    return f,enterTM,RemainingCasesAllAs,partialObstruction,
+			   ThueToSolve,exitline,exitfile;
 		elif (assigned x`unbounded) and (x`alpha1 eq 0) then
 		    delete x`unbounded; // update bound at p
 		elif (assigned x`unbounded eq false) and (x`alpha1 ge 1) then
@@ -396,8 +400,10 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 
 	if IsEmpty(psetNew) then
 	    enterTM:= false;
-	    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-	    return f, enterTM, TMSolutions, RemainingCasesAllAs;
+	    exitline:= ",None," cat IntegerToString(p);
+	    exitfile:= "NoSUnitEqPossible";
+	    return f,enterTM,RemainingCasesAllAs,partialObstruction,ThueToSolve,
+		   exitline,exitfile;
 	end if;
 	// verify pset now only includes the exponent 0 case at p
 	if (p in partialObstruction) then
@@ -440,9 +446,8 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     end for;
 
     // store Thue-Mahler equations to be solved
-    // solve corresponding Thue equations, if any
+    // store corresponding Thue equations to be solved, if any
     RemainingCases:=aprimelist;
-    ThueF:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
 
     RHSlist:= [];
     for pset in aprimelist do
@@ -479,31 +484,17 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
     end for;
     RHSlist:= RHSlistNew;
 
-    // generate all Thue solutions
-    for rhs in RHSlist do
-	sol:= Solutions(ThueF,rhs);
-	for s in sol do
-	    if (<s,rhs> notin TMSolutions) and (IsCoprime(s[1],s[2])) then
-		Append(~TMSolutions,<s,rhs>);
-	    end if;
-	end for;
-    end for;
+    // store Thue equations to be solved in array as < Thue equation, RHS >, if any
+    if (RHSlist ne []) then
+	Append(~ThueToSolve,<clist,RHSlist>);
+    end if;
 
     // if all cases are resolved via Thue equations
     if IsEmpty(RemainingCases) then
 	enterTM:=false;
-	fprintf NoSUnitEqNeeded,
-		hash cat " Thue-Mahler equation has reduced to several Thue equations \n";
-	if IsEmpty(TMSolutions) then
-	    fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
-	elif #TMSolutions eq 1 then
-	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
-				     cat "\n";
-	else
-	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
-				     &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
-	end if;
-	return f, enterTM, TMSolutions, RemainingCasesAllAs;
+	exitline:= ",None," cat IntegerToString(#RHSlist);
+	exitfile:= "NoSUnitEqNeeded";
+	return f,enterTM,RemainingCasesAllAs,partialObstruction,ThueToSolve,exitline,exitfile;
     end if;
 
     // if there are Thue-Mahler equations yet to be solved, not resolvable via Thue equations
@@ -526,15 +517,93 @@ prep0:= function(hash,OutFiles,LogFile,clist,N)
 		end if;
 	    end for;
 	    Sort(~avalues);
-	    apset:=rec<CaseInfoAllAs | avalues:=avalues,
-				       primelist:= primelist>;
+	    apset:=rec<CaseInfoAllAs | avalues:=avalues, primelist:= primelist>;
 	    Append(~RemainingCasesAllAs, apset);
 	end if;
     end for;
 
     // if the code has made it this far, the following must hold
-    assert enterTM and IsEmpty(TMSolutions);
-    return f, enterTM, TMSolutions, RemainingCasesAllAs;
+    assert enterTM and (exitline eq "") and (exitfile eq "");
+    return f,enterTM,RemainingCasesAllAs,partialObstruction,ThueToSolve,exitline,exitfile;
+
+end function;
+
+GL2Zactions:= function(clist)
+
+    /*
+     Description: generate all possible GL2(Z) actions under which c0 lies in [1..20]
+     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+     Output: GL2Zclists:= all possible coefficients of F(X,Y) under GL2(Z) action under which
+                          c0 lies in the interval [1..20]
+     Example:
+   */
+
+    QUV<U,V>:=PolynomialRing(Rationals(),2);
+    Qx<x>:= PolynomialRing(Rationals());
+    Zx_<x_>:= PolynomialRing(Integers());
+
+    // general setup for Thue-Mahler solver
+    assert &and[c in Integers() : c in clist];
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n eq 3;
+
+    // generate the relevant Thue Mahler polynomial
+    F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
+    assert IsHomogeneous(F);
+    DiscF:= -27*clist[1]^2*clist[4]^2 + clist[2]^2*clist[3]^2;
+    DiscF:= DiscF + 18*clist[1]*clist[2]*clist[3]*clist[4];
+    DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
+    assert DiscF eq Discriminant(Evaluate(F,[x,1]));
+
+    fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
+    f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
+    c0:= Integers()!fclist[1]; // update c0
+    assert c0 eq 1;
+    assert IsMonic(f);
+    assert Coefficients(f) eq
+	   Coefficients(clist[1]^(n-1)*Evaluate(F,[x/clist[1],1]));
+    assert Degree(f) eq n;
+    assert IsIrreducible(f);
+    assert &and[c in Integers() : c in Coefficients(f)];
+
+    // generate possible GL2(Z) actions under which c0 lies in the interval [1..20]
+    // solve corresponding Thue equation F(a,c) = c0 for new potential c0
+    ThueF:= Thue(Evaluate(F,[x_,1])); // generate Thue equation
+    GL2Zclists:= [];
+    testset:= PrimesInInterval(1,200) cat [i: i in [1..20] | i notin PrimesInInterval(1,200)];
+    for i in testset do
+	if IsEmpty(Solutions(ThueF,i)) eq false then
+	    hasGL2Zaction:= false;
+	    a:= Solutions(ThueF,i)[1][1];
+	    c:= Solutions(ThueF,i)[1][2];
+	    if ((a eq 0) and (Abs(c) eq 1)) then
+		b:= -1/c;
+		d:= 0;
+		hasGL2Zaction:= true;
+	    elif ((c eq 0) and (Abs(a) eq 1)) then
+		d:= 1/a;
+		b:= 0;
+		hasGL2Zaction:= true;
+	    elif ((a ne 0) and (c ne 0) and (GCD(a,c) eq 1)) then
+		g,d,b:= XGCD(a,c);
+		b:= -b;
+		assert g eq 1;
+		hasGL2Zaction:= true;
+	    end if;
+
+	    if hasGL2Zaction then
+		assert (a*d - b*c eq 1);
+		GL2ZF:= Evaluate(F,[a*U+b*V,c*U+d*V]);
+		newclist:= [Integers()! MonomialCoefficient(GL2ZF,U^(n-i)*V^i) : i in [0..n]];
+		assert newclist eq Reverse(Coefficients(Evaluate(GL2ZF,[x,1])));
+		assert newclist[1] eq i;
+		Append(~GL2Zclists,newclist);
+	    end if;
+	end if;
+    end for;
+    return GL2Zclists;
 end function;
 
 monic:= function(fieldKinfo,clist,primelist,avalues)
@@ -666,6 +735,33 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
     assert IsEmpty(alistIndex);
 
     return alistNew;
+end function;
+
+normInv:= function(R,OK)
+
+    /*
+     Description: generate all ideals of OK having norm R
+     Input: R:= a positive integer
+            OK:= corresponding ring of integers of the field K
+     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Example:
+   */
+
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+    if R eq 1 then
+	return { 1*OK };
+    end if;
+    p:=Max(PrimeDivisors(R));
+    fpr:=[fp[1] : fp in Factorisation(p*OK)];
+    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
+    if #fpr eq 0 then
+	return {};
+    else
+	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+    end if;
 end function;
 
 algs1and2:=function(fieldKinfo,p)
@@ -805,33 +901,6 @@ algs1and2:=function(fieldKinfo,p)
     return Lp,Mp,fprs;
 end function;
 
-normInv:= function(R,OK)
-
-    /*
-     Description: generate all ideals of OK having norm R
-     Input: R:= a positive integer
-            OK:= corresponding ring of integers of the field K
-     Output: all ideals of OK having norm R, displayed in an enumerated set
-     Example:
-   */
-
-    assert R in Integers();
-    assert R ge 1;
-    R:=Integers()!R;
-    assert R ge 1;
-    if R eq 1 then
-	return { 1*OK };
-    end if;
-    p:=Max(PrimeDivisors(R));
-    fpr:=[fp[1] : fp in Factorisation(p*OK)];
-    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
-    if #fpr eq 0 then
-	return {};
-    else
-	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
-    end if;
-end function;
-
 prep1:= function(fieldKinfo,clist,apset)
 
     /*
@@ -914,7 +983,7 @@ prep1:= function(fieldKinfo,clist,apset)
 	return afplist;
 end function;
 
-principalize:=function(fieldKinfo,ClK,ideal_a,fplist)
+principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
 
     /*
      Description: convert ideal equation (3.8), given by ideal_a, fplist, into S-unit		 equations (3.9) via procedure of Section 3.4.2 of Gh
@@ -1102,16 +1171,40 @@ end procedure;
      Example:
 */
 
+// initialize timings array to store CPU runtime of relevant checkpoints
+// store as < CPUtime, checkpoint >
 t0:= Cputime();
-// generate relevant files
-LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitEqLogs.txt";
-NoSUnitEqPossible:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible.txt";
-NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.txt";
-PartialSUnitEqSol:= "/home/adela/ThueMahler/Data/SUnitEqData/PartialSUnitEqSol.txt";
-SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.txt";
+timings:= [];
 
-SetLogFile(LogFile);
-OutFiles:= [NoSUnitEqPossible,NoSUnitEqNeeded,SUnitEq];
+// generate relevant files; these files should already exist on the appropriate server folder
+// setup for manual .csv input
+
+// logfile tracking any errors
+SUnitErr:= "/home/adela/ThueMahler/Data/SUnitEqData/SUnitErr.txt";
+
+// .csv format is
+// N,"form",local obstruction,partial vs BeGhRe,local obstructions time,total time
+// local obstruction, partial vs BeGhRe may be output as p or None
+NoSUnitEqPossible:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqPossible.csv";
+
+// .csv format is
+// N,"form","optimal form",no Thue eq,local obstruction time,GL2Z action time,
+// class group time,unit group time,ideal eq time,thue eq time,total time
+// timings may be output as time or None
+// "optimal form" may be output as form or None
+NoSUnitEqNeeded:= "/home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.csv";
+
+// .csv format is
+// N,"form","thue eq","RHSlist"
+ThueEqToSolve:= "/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve.csv";
+
+// .csv format is
+// N,"form","optimal form","min poly","partial obstructions",class number,r,no ideal eq,
+// no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,
+// class group time,unit group time,ideal eq time,thue eq time,S-unit time,total time
+SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData/AllSUnitEq.csv";
+
+SetLogFile(SUnitErr);
 SetAutoColumns(false);
 SetColumns(235);
 
@@ -1122,11 +1215,12 @@ while set[i] ne "," do
     Append(~N, set[i]);
     i:= i+1;
 end while;
+hash:= (&cat(N)) cat ","; // set hash as first element of .csv row, N
 N:= StringToInteger(&cat(N)); // convert bash input N into an integer
 
 // determine indices of ",", "[", "]" from bash input
 brackets:= []; // store indices of seperating brackets of clist
-commas:= []; // store indices of seperating commas in S
+commas:= []; // store indices of seperating commas of clist
 i:= i+1;
 assert set[i] eq "[";
 Append(~brackets,i);
@@ -1148,33 +1242,93 @@ for j in [1..#commas-1] do
     Append(~clist,StringToInteger(&cat(n)));
 end for;
 Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
-
-hash:= set;
-
-printf hash cat " Resolving Thue-Mahler equation with...\n";
-printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
+// add clist to hash in .csv format
+hash:= hash cat "\"(" cat &cat[set[i] : i in [commas[1]+1..brackets[2]-1]] cat ")\"";
 
 t1:= Cputime();
-f, enterTM, TMSolutions, RemainingCases:= prep0(hash,OutFiles,LogFile,clist,N);
-printf hash cat " Total time to determine local obstructions: %o \n", Cputime(t1);
+f,enterTM,RemainingCases,partialObstruction,ThueToSolve,exitline,exitfile:= prep0(clist,N);
+Append(~timings,<Cputime(t1),"local obstructions">);
 
-if (enterTM eq false) then
-    printf hash cat " No S-unit equations to resolve for this Thue-Mahler equation \n";
-else
+if (enterTM ne false) then
+
     // generate a record to store relevant info of the field K = Q(th)
     FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
+    t2:= Cputime();
+
+    // verify whether action of GL2(Z) group leads to fewer S-unit equations
+    // this comparison is based on the number of divisors of c0 and subsequent ideals of norm a
+    // as all resulting fields K are isomorphic (and thus ideal splitting remains unchanged)
+    GL2Zclists:= GL2Zactions(clist);
+    if clist in GL2Zclists then
+	Exclude(~GL2Zclists, clist);
+    end if;
+    Insert(~GL2Zclists, 1, clist);
+
+    GL2Zcases:= [0 : i in [1..#GL2Zclists]];
+    for i in [1..#GL2Zclists] do
+	tempclist:= GL2Zclists[i];
+	f,enterTM,RemainingCases,partialObstruction,ThueToSolve,exitline,exitfile:=
+	    prep0(tempclist,N);
+	assert enterTM;
+	K<th>:=NumberField(f);
+	OK:=MaximalOrder(K);
+	th:=OK!th;
+	fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
+	assert #RemainingCases eq 1; // mulitple primelists not possible
+	remainingCase:= RemainingCases[1];
+	afplist:= prep1(fieldKinfo,tempclist,remainingCase); // generate all ideal equations
+
+	// remove ideal equations which have exponent 0 on all prime ideals by generating
+	// corresponding Thue equations to be solved
+	toRemove:= [];
+	RHSlist:= [];
+	for i in [1..#afplist] do
+	    fplist:= afplist[i][4];
+	    if IsEmpty(fplist) then
+		a:= afplist[i][1]`newa;
+		adu:= afplist[i][1]`adu;
+		primelist:= afplist[i][2];
+		ideal_a:= afplist[i][3];
+		v:= #primelist;
+		tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+		assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
+		rhs:= Integers()! a*&*[primelist[i]^tt[i] : i in [1..v]];
+		tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
+		if (tf) and (rhs notin RHSlist) then
+		    Append(~RHSlist, rhs);
+		end if;
+		Append(~toRemove,[i,rhs]);
+	    end if;
+	end for;
+
+	// remove cases covered by Thue solver
+	toRemoveNew:= [i[1] : i in toRemove];
+	afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
+	afplist:= afplistNew;
+	GL2Zcases[i]:= #afplist;
+    end for;
+
+    // determine which action of GL2(Z) yields least number of ideal equations
+    min,ind:= Min(GL2Zcases);
+    clist:= GL2Zclists[ind]; // redefine clist
+    Append(~timings,<Cputime(t2),"GL2Z action">);
+
+    t3:= Cputime();
+    f,enterTM,RemainingCases,partialObstruction,ThueToSolve,exitline,exitfile:= prep0(clist,N);
+
+    assert enterTM;
     K<th>:=NumberField(f);
     OK:=MaximalOrder(K);
     th:=OK!th;
     fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-    t2:= Cputime();
+    t4:= Cputime();
     // generate a record to store relevant class group info
     ClassGroupInfo:= recformat<classgroup,classnumber,map>;
     ClK:= rec< ClassGroupInfo | >;
     ClK`classgroup, ClK`map:= ClassGroup(K);
-    printf hash cat " Total time to compute the class group: %o \n", Cputime(t2);
-    ClK`classnumber:= ClassNumber(K);
+    Append(~timings,<Cputime(t4),"class group">);
+    ClK`classnumber:= Integers()! ClassNumber(K);
 
     n:= Degree(f);
     assert (n eq #clist-1);
@@ -1182,9 +1336,11 @@ else
     r:= s+t-1;
     assert (s+2*t) eq n;
     assert (r eq 1) or (r eq 2);
-    t3:= Cputime();
+
+    t5:= Cputime();
     U,psi:= UnitGroup(OK); // generate fundamental units
-    printf hash cat " Total time to compute the unit group: %o \n", Cputime(t3);
+    Append(~timings,<Cputime(t5),"unit group">);
+
     // expresse the fundamental units as elts in OK in terms of the integral basis
     epslist:=[psi(U.(i+1)) : i in [1..r]];
     assert (#epslist eq 1) or (#epslist eq 2);
@@ -1202,11 +1358,11 @@ else
 
     assert #RemainingCases eq 1; // mulitple primelists not possible
     remainingCase:= RemainingCases[1];
-    t4:= Cputime();
+    t6:= Cputime();
     afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
-    printf hash cat " Total time to compute all ideal equations: %o \n", Cputime(t4);
+    Append(~timings,<Cputime(t6),"ideal equations">);
 
-    // setup for Thue equations
+    // general setup and assertions
     Zx<x_>:= PolynomialRing(Integers());
     QUV<U,V>:=PolynomialRing(Rationals(),2);
     c0:=Integers()!clist[1];
@@ -1216,13 +1372,12 @@ else
     fclist:= [Integers()!Coefficient(f,i) : i in [3..0 by -1]];
     Integerf:=&+[fclist[i+1]*x_^(n-i) : i in [0..n]];
     assert f eq ChangeRing(Integerf,Rationals());
-    Thuef:= Thue(Integerf);
     F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
     assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
-    t5:= Cputime();
-    // remove ideal equations which have exponent 0 on all prime ideals by solving
-    // corresponding Thue equations
+    t7:= Cputime();
+    // remove ideal equations which have exponent 0 on all prime ideals by generating
+    // corresponding Thue equations to be solved
     toRemove:= [];
     RHSlist:= [];
     for i in [1..#afplist] do
@@ -1244,134 +1399,141 @@ else
 	end if;
     end for;
 
-    // generate all Thue solutions
-    for rhs in RHSlist do
-	sol:= Solutions(Thuef,rhs);
-	for s in sol do
-	    if IsCoprime(s[1],s[2]) then
-		for i in toRemove do
-		    if i[2] eq rhs then
-			adu:= afplist[i[1]][1]`adu;
-			primelist:= afplist[i[1]][2];
-			ideal_a:= afplist[i[1]][3];
-			assert IsEmpty(afplist[i[1]][4]);
-			v:= #primelist;
-			tt:= [Valuation(Norm(ideal_a), primelist[j]) : j in [1..v]];
-			// iterate through each set a,d,u corresponding to primelist
-			for aduset in adu do
-			    a:= aduset[1];
-			    d:= aduset[2];
-			    u:= aduset[3];
-			    // translate x,y,z to X,Y,Z
-			    X:= (d*s[1])/c0;
-			    Y:= d*s[2];
-			    Zi:= [tt[j] - Valuation(u*a,primelist[j]) : j in [1..v]];
-			    rhsNew:= a*&*[primelist[j]^Zi[j] : j in [1..v]];
-			    assert Evaluate(F,[X,Y]) eq rhsNew;
-			    assert Evaluate(Thuef,s[1],s[2]) eq u*Evaluate(F,[X,Y]);
-			    if (X in Integers()) and (Y in Integers()) then
-				X:= Integers()!X;
-				Y:= Integers()!Y;
-				if (IsCoprime(X,Y)) and (<[X,Y],rhsNew> notin TMSolutions) then
-				    Append(~TMSolutions,<[X,Y],rhsNew>);
-				end if;
-			    end if;
-			end for;
-		    end if;
-		end for;
-	    end if;
-	end for;
-    end for;
-
     // remove cases covered by Thue solver
     toRemoveNew:= [i[1] : i in toRemove];
     afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
     afplist:= afplistNew;
-    printf hash cat " Total time to remove ideal equations covered by Thue solver: %o \n",
-	   Cputime(t5);
+
+    // store Thue equations to be solved in array as < Thue equation, RHS >, if any
+    // if fclist eq Thue equation, amalgamate RHS
+    if (IsEmpty(RHSlist) eq false) then
+	if (ThueToSolve ne []) then
+	    assert (#ThueToSolve eq 1);
+	    ThueEq:= ThueToSolve[1][1];
+	    ThueRHS:= ThueToSolve[1][2];
+	    if (ThueEq eq fclist) then
+		for rhs in RHSlist do
+		    if (rhs notin ThueRHS) then
+			Append(~ThueRHS,rhs);
+		    end if;
+		end for;
+		ThueToSolve:= [<ThueEq,ThueRHS>];
+	    end if;
+	else
+	    Append(~ThueToSolve,<fclist,RHSlist>);
+	end if;
+    end if;
+    assert (#ThueToSolve le 2);
+    Append(~timings,<Cputime(t7),"thue equations">);
 
     if IsEmpty(afplist) then
-	fprintf NoSUnitEqNeeded,
-		hash cat " No S-unit equations to resolve for this Thue-Mahler equation \n";
-	if IsEmpty(TMSolutions) then
-	    fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
-	elif #TMSolutions eq 1 then
-	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
-				     cat "\n";
+	if (#ThueToSolve eq 0) then
+	    exitline:= "," cat SeqEnumToString(clist) cat "," cat IntegerToString(0);
 	else
-	    fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
-				     &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
+	    exitline:= "," cat SeqEnumToString(clist) cat "," cat
+		       IntegerToString(&+[#i[2] : i in ThueToSolve]);
 	end if;
+	exitfile:= "NoSUnitEqNeeded";
     else
-	printf hash cat " Number of ideal equations: %o \n", #afplist;
-	t6:= Cputime();
+	t8:= Cputime();
 	alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-	printf hash cat " Total time to compute all S-unit equations: %o \n", Cputime(t6);
-	printf hash cat " Number of S-unit equations: %o \n", #alphgamlist;
+	Append(~timings,<Cputime(t8),"S-unit equations">);
 
 	if IsEmpty(alphgamlist) then
-	    fprintf NoSUnitEqNeeded,
-		    hash cat " No S-unit equations to resolve for this Thue-Mahler equation\n";
-	    if IsEmpty(TMSolutions) then
-		fprintf NoSUnitEqNeeded, hash cat " No solutions \n";
-	    elif #TMSolutions eq 1 then
-		fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat Sprint(TMSolutions[1])
-					 cat "\n";
+	    if (#ThueToSolve eq 0) then
+		exitline:= "," cat SeqEnumToString(clist) cat "," cat IntegerToString(0);
 	    else
-		fprintf NoSUnitEqNeeded, hash cat " All solutions: " cat
-					 &cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
+		exitline:= "," cat SeqEnumToString(clist) cat "," cat
+			   IntegerToString(&+[#i[2] : i in ThueToSolve]);
 	    end if;
+	    exitfile:= "NoSUnitEqNeeded";
 	else
 	    assert #alphgamlist ne 0;
 	    complexPrec:= 400;
-	    t7:= Cputime();
+	    t9:= Cputime();
 	    UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-	    printf hash cat " Total time to compute initial height bounds: %o \n", Cputime(t7);
+	    Append(~timings,<Cputime(t9),"initial bound">);
 
-	    if IsEmpty(TMSolutions) then
-		fprintf PartialSUnitEqSol, hash cat " No solutions from Thue equations \n";
-	    elif #TMSolutions eq 1 then
-		fprintf PartialSUnitEqSol,
-			hash cat " All solutions obtained from Thue equations: " cat
-			Sprint(TMSolutions[1]) cat "\n";
-	    else
-		fprintf PartialSUnitEqSol,
-			hash cat " All solutions obtained from Thue equations: " cat
-			&cat[Sprintf( "%o, ", TMSolutions[i], TMSolutions[i]): i in [1..#TMSolutions-1]] cat Sprint(TMSolutions[#TMSolutions]) cat "\n";
-	    end if;
-
+	    ranks:= [];
 	    for j in [1..#alphgamlist] do
 		idealEq:= alphgamlist[j];
-		jhash:= hash cat "Case" cat IntegerToString(j);
-		fprintf SUnitEq, jhash cat " Minimal polynomial for K: %o \n", fclist;
-		fprintf SUnitEq, jhash cat " Class number: %o \n", ClK`classnumber;
-		if #fieldKinfo`fundamentalunits eq 1 then
-		    fprintf SUnitEq, jhash cat " Fundamental unit: " cat
-				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat "\n";
-		elif #fieldKinfo`fundamentalunits eq 2 then
-		    fprintf SUnitEq, jhash cat " Fundamental units: " cat
-				     Sprint(K!fieldKinfo`fundamentalunits[1]) cat ", " cat
-				     Sprint(K!fieldKinfo`fundamentalunits[2]) cat "\n";
-		end if;
-		fprintf SUnitEq, jhash cat " Zeta: %o \n", K!fieldKinfo`zeta;
-		fprintf SUnitEq, jhash cat " Alpha: %o \n", K!idealEq`alpha;
-		if #idealEq`gammalist eq 1 then
-		    fprintf SUnitEq, jhash cat " Gamma: " cat Sprint(K!idealEq`gammalist[1])
-				     cat "\n";
-		else
-		    fprintf SUnitEq,
-			    jhash cat " Gammas: " cat
-			    &cat[Sprintf( "%o, ", K!idealEq`gammalist[i], K!idealEq`gammalist[i]): i in [1..#idealEq`gammalist-1]]
-			    cat Sprint(K!idealEq`gammalist[#idealEq`gammalist]) cat "\n";
-		end if;
-		fprintf SUnitEq, jhash cat " S-unit equation rank: %o \n",
-			#idealEq`gammalist+#fieldKinfo`fundamentalunits;
-		fprintf SUnitEq, jhash cat " Initial bound: %o \n", idealEq`bound;
+		Append(~ranks,#idealEq`gammalist+#fieldKinfo`fundamentalunits);
 	    end for;
+	    strClist:= SeqEnumToString(clist);
+	    strFclist:= SeqEnumToString(fclist);
+	    if IsEmpty(partialObstruction) then
+		strPartialObs:= "None";
+	    else
+		strPartialObs:= SeqEnumToString(partialObstruction);
+	    end if;
+	    strRanks:= SeqEnumToString(ranks);
+	    exitline:= "," cat strClist cat "," cat strFclist cat "," cat strPartialObs cat ","
+		       cat IntegerToString(ClK`classnumber) cat "," cat IntegerToString(r) cat
+		       "," cat IntegerToString(#afplist) cat ",";
+	    if (#ThueToSolve eq 0) then
+		exitline:= exitline cat IntegerToString(0) cat "," cat strRanks;
+	    else
+		exitline:= exitline cat IntegerToString(&+[#i[2] : i in ThueToSolve]) cat ","
+			   cat strRanks;
+	    end if;
+	    exitfile:= "SUnitEq";
 	end if;
     end if;
 end if;
+assert (exitfile ne "");
+Append(~timings,<Cputime(t0),"total time">);
 
-printf hash cat " Total time: %o\n", Cputime(t0);
+if exitfile eq "NoSUnitEqPossible" then
+    assert (exitline[1] eq ",") and ("\n" notin exitline);
+    assert (#timings eq 2) and (timings[1][2] eq "local obstructions");
+    strTimings:= Sprint([t[1] : t in timings]);
+    toRemove:= [];
+    for i in [1..#strTimings] do
+	j:= strTimings[i];
+	if (j eq "[") or (j eq " ") or (j eq "]") then
+	    Append(~toRemove, i);
+	end if;
+    end for;
+    strTimings:= "," cat &cat[strTimings[i] : i in [1..#strTimings] | i notin toRemove];
+    fprintf NoSUnitEqPossible, hash cat exitline cat strTimings cat "\n";
+elif exitfile eq "NoSUnitEqNeeded" then
+    assert (exitline[1] eq ",") and ("\n" notin exitline);
+    assert (#timings le 8);
+    strTimings:= Sprint([timings[i][1] : i in [1..#timings - 1]]); // exclude "total time"
+    toRemove:= [];
+    for i in [1..#strTimings] do
+	j:= strTimings[i];
+	if (j eq "[") or (j eq " ") or (j eq "]") then
+	    Append(~toRemove, i);
+	end if;
+    end for;
+    strTimings:= "," cat &cat[strTimings[i] : i in [1..#strTimings] | i notin toRemove];
+    for i in [1..(8-#timings)] do
+	strTimings:= strTimings cat ",None";
+    end for;
+    strTimings:= strTimings cat "," cat Sprint(timings[#timings][1]);
+    fprintf NoSUnitEqNeeded, hash cat exitline cat strTimings cat "\n";
+elif exitfile eq "SUnitEq" then
+    assert (exitline[1] eq ",") and ("\n" notin exitline);
+    assert (#timings eq 9);
+    strTimings:= Sprint([timings[i][1] : i in [1..#timings]]);
+    toRemove:= [];
+    for i in [1..#strTimings] do
+	j:= strTimings[i];
+	if (j eq "[") or (j eq " ") or (j eq "]") then
+	    Append(~toRemove, i);
+	end if;
+    end for;
+    strTimings:= "," cat &cat[strTimings[i] : i in [1..#strTimings] | i notin toRemove];
+    fprintf SUnitEq, hash cat exitline cat strTimings cat "\n";
+end if;
+
+if (ThueToSolve ne []) then
+    for thueSet in ThueToSolve do
+	strThueEq:= SeqEnumToString(thueSet[1]);
+	strRHS:= SeqEnumToString(thueSet[2]);
+	fprintf ThueEqToSolve, hash cat "," cat strThueEq cat ","cat strRHS cat "\n";
+    end for;
+end if;
+
 UnsetLogFile();
-exit;
