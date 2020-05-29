@@ -1,0 +1,82 @@
+no changes added to commit (use "git add" and/or "git commit -a")
+adela@lehner:~/ThueMahler/Data$ cd SUnitEqData/
+adela@lehner:~/ThueMahler/Data/SUnitEqData$ ls
+NoSUnitEqNeeded.csv  NoSUnitEqPossible.csv  SUnitErr.txt  ThueEqToSolve.csv  TMFormData.csv  tmplog
+adela@lehner:~/ThueMahler/Data/SUnitEqData$ wc -l TMFormData.csv 
+12335 TMFormData.csv
+adela@lehner:~/ThueMahler/Data/SUnitEqData$ cd ..
+adela@lehner:~/ThueMahler/Data$ find . -printf '%s %p\n'|sort -nr|head
+4942499141 ./OldSUnitEqData/AllSUnitEq.txt
+960971741 ./.git/objects/pack/pack-e6b7b4417bb4105fb222e287a25d8780305070cc.pack
+880640480 ./.git/objects/pack/pack-7ff0fa46201b67c4f0af336606e6703a403cd622.pack
+711180300 ./.git/objects/pack/tmp_pack_cafJGo
+633340544 ./OldSUnitEqData/SUnitEqLogs.txt
+164372672 ./FormsCond10To6/FormsCond10To6.txt
+100506728 ./.git/objects/pack/pack-af18c55147819d11ace8390e5c2c385bfcc5540b.pack
+86659331 ./.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3
+81343736 ./.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24
+37446001 ./OldSUnitEqData/ThueEqToSolve.txt
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/pack/pack-e6b7b4417bb4105fb222e287a25d8780305070cc.pack
+rm: remove write-protected regular file './.git/objects/pack/pack-e6b7b4417bb4105fb222e287a25d8780305070cc.pack'? y
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/pack/pack-7ff0fa46201b67c4f0af336606e6703a403cd622.pack
+rm: remove write-protected regular file './.git/objects/pack/pack-7ff0fa46201b67c4f0af336606e6703a403cd622.pack'? y
+adela@lehner:~/ThueMahler/Data$ find . -printf '%s %p\n'|sort -nr|head
+4942499141 ./OldSUnitEqData/AllSUnitEq.txt
+711180300 ./.git/objects/pack/tmp_pack_cafJGo
+633340544 ./OldSUnitEqData/SUnitEqLogs.txt
+164372672 ./FormsCond10To6/FormsCond10To6.txt
+100506728 ./.git/objects/pack/pack-af18c55147819d11ace8390e5c2c385bfcc5540b.pack
+86659331 ./.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3
+81343736 ./.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24
+37446001 ./OldSUnitEqData/ThueEqToSolve.txt
+24084492 ./.git/objects/pack/tmp_pack_4qd7aO
+13172871 ./FormsCond10To6/Raw/irreduc_neg.txt
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/pack/tmp_pack_cafJGo
+rm: remove write-protected regular file './.git/objects/pack/tmp_pack_cafJGo'? y
+adela@lehner:~/ThueMahler/Data$ find . -printf '%s %p\n'|sort -nr|head
+4942499141 ./OldSUnitEqData/AllSUnitEq.txt
+633340544 ./OldSUnitEqData/SUnitEqLogs.txt
+164372672 ./FormsCond10To6/FormsCond10To6.txt
+100506728 ./.git/objects/pack/pack-af18c55147819d11ace8390e5c2c385bfcc5540b.pack
+86659331 ./.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3
+81343736 ./.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24
+37446001 ./OldSUnitEqData/ThueEqToSolve.txt
+24084492 ./.git/objects/pack/tmp_pack_4qd7aO
+13172871 ./FormsCond10To6/Raw/irreduc_neg.txt
+8971356 ./.git/objects/30/9221dc721ce26553d4b202e75ad167150d8876
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/pack/pack-af18c55147819d11ace8390e5c2c385bfcc5540b.pack
+rm: remove write-protected regular file './.git/objects/pack/pack-af18c55147819d11ace8390e5c2c385bfcc5540b.pack'? y
+adela@lehner:~/ThueMahler/Data$ find . -printf '%s %p\n'|sort -nr|head
+4942499141 ./OldSUnitEqData/AllSUnitEq.txt
+633340544 ./OldSUnitEqData/SUnitEqLogs.txt
+164372672 ./FormsCond10To6/FormsCond10To6.txt
+86659331 ./.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3
+81343736 ./.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24
+37446001 ./OldSUnitEqData/ThueEqToSolve.txt
+24084492 ./.git/objects/pack/tmp_pack_4qd7aO
+13172871 ./FormsCond10To6/Raw/irreduc_neg.txt
+8971356 ./.git/objects/30/9221dc721ce26553d4b202e75ad167150d8876
+8939469 ./.git/objects/bb/30a516ad1dc8f0d4252f026557781691845781
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3
+rm: remove write-protected regular file './.git/objects/91/e5ec4d2150d1e4764869d234d431d2e9d286a3'? y
+adela@lehner:~/ThueMahler/Data$ rm ./.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24
+rm: remove write-protected regular file './.git/objects/70/57bf28c6d35679c279da1e0e6812beca26cf24'? y
+adela@lehner:~/ThueMahler/Data$ find . -printf '%s %p\n'|sort -nr|head
+4942499141 ./OldSUnitEqData/AllSUnitEq.txt
+633340544 ./OldSUnitEqData/SUnitEqLogs.txt
+164372672 ./FormsCond10To6/FormsCond10To6.txt
+37446001 ./OldSUnitEqData/ThueEqToSolve.txt
+24084492 ./.git/objects/pack/tmp_pack_4qd7aO
+13172871 ./FormsCond10To6/Raw/irreduc_neg.txt
+8971356 ./.git/objects/30/9221dc721ce26553d4b202e75ad167150d8876
+8939469 ./.git/objects/bb/30a516ad1dc8f0d4252f026557781691845781
+7278554 ./.git/objects/c5/56d15f05ad7593f8992e34a9de740b513c2f89
+6409472 ./OldSUnitEqData/NoSUnitEqPossible.txt
+adela@lehner:~/ThueMahler/Data$ git status
+On branch master
+error: Could not read 847e4a0263840f98a4ba9bfc3d6db43b075133e5
+error: Could not read 847e4a0263840f98a4ba9bfc3d6db43b075133e5
+fatal: Failed to traverse parents of commit 92150c9d752fb4a6ce79318d4d4411cdb57817c1
+adela@lehner:~/ThueMahler/Data$ git fsck --full
+Checking object directories: 100% (256/256), done.
+error: HEAD: invalid reflog entry 1f02fbbc9e260cd9b5a2945cbf9547e56962cbfb

@@ -1498,7 +1498,7 @@ if exitfile eq "NoSUnitEqPossible" then
     fprintf NoSUnitEqPossible, hash cat exitline cat strTimings cat "\n";
 elif exitfile eq "NoSUnitEqNeeded" then
     assert (exitline[1] eq ",") and ("\n" notin exitline);
-    assert (#timings le 7);
+    assert (#timings le 8);
     strTimings:= Sprint([timings[i][1] : i in [1..#timings - 1]]); // exclude "total time"
     toRemove:= [];
     for i in [1..#strTimings] do
@@ -1508,7 +1508,7 @@ elif exitfile eq "NoSUnitEqNeeded" then
 	end if;
     end for;
     strTimings:= "," cat &cat[strTimings[i] : i in [1..#strTimings] | i notin toRemove];
-    for i in [1..(7-#timings)] do
+    for i in [1..(8-#timings)] do
 	strTimings:= strTimings cat ",None";
     end for;
     strTimings:= strTimings cat "," cat Sprint(timings[#timings][1]);
