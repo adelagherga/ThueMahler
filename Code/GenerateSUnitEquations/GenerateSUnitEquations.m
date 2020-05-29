@@ -1246,7 +1246,7 @@ Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]))
 hash:= hash cat "\"(" cat &cat[set[i] : i in [commas[1]+1..brackets[2]-1]] cat ")\"";
 
 // print out hash in LogFile in the event of errors
-printf hash;
+printf hash cat "\n";
 
 t1:= Cputime();
 f,enterTM,RemainingCases,partialObstruction,ThueToSolve,exitline,exitfile:= prep0(clist,N);
