@@ -1467,9 +1467,9 @@ if (enterTM ne false) then
 	    if IsEmpty(partialObstruction) then
 		strPartialObs:= "None";
 	    else
-		strPartialObs:= SeqEnumToString(partialObstruction);
+		strPartialObs:= "\"" cat Sprint(partialObstruction) cat "\"";
 	    end if;
-	    strRanks:= SeqEnumToString(ranks);
+	    strRanks:= "\"" cat Sprint(ranks) cat "\"";
 	    exitline:= "," cat strClist cat "," cat strFclist cat "," cat strPartialObs cat ","
 		       cat IntegerToString(ClK`classnumber) cat "," cat IntegerToString(r) cat
 		       "," cat IntegerToString(#afplist) cat ",";
