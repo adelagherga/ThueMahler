@@ -135,7 +135,7 @@ localtest:= function(N,F,DiscF)
 	// search for solutions (u,v) of F(u,v) mod p
 	// under the assumption that the exponent on p is > 0
 	if (p le 13) or (p in [13..151] and (#testPrimes le 3)) then
-	    // the bounds 13,1513 are arbitrary, but serve to decrease search time
+	    // the bounds 13,151 are arbitrary, but serve to decrease search time
 
 	    posExpSol:= ModpCheck(F,testPrimes,p : qDividesRHS:= true);
 	    if (p ge 3) and (Valuation(N,p) eq 1) and (DiscF mod p ne 0) then
@@ -143,7 +143,7 @@ localtest:= function(N,F,DiscF)
 		// ie. if Valuation(N,p) = 1 for p >= 3, then p | DiscF*F(u,v)
 		// thus if DiscF != 0 mod p, then F(u,v) = 0 mod p for some (u,v)
 		// if u = v = 0 mod p is the only solution, gcd(u,v) != 1
-		// hence locMal obstruction at p
+		// hence local obstruction at p
 		if (posExpSol eq false) then
 		    Append(~localObstruction, p);
 		    return partialObstruction, localObstruction;
