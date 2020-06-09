@@ -16,11 +16,19 @@ To do list: 1. Edit input files
            code will not check for local obstructions/partial local obstructions
                 have to check GenerateSUnitEqWithoutThueSol.m for that
            should this version of the code verify local/partial local obstructions?
+
+
+           1. timings
+           2. output file (don't need 4 now)
+           3. hash
+           4. go through and compare again with GenerateSunitEq.m to make sure that we ruled out what can't happen there
+                     - so far, just for prep0, final code
+           5. write code to make sure that all forms have gone through GenerateSUnitEquations.m (there was a segfault; don't know which forms were prematurely terminated)
 Example:
 
 */
 
-// GESolver.m
+// TMSolver.m
 
 //============================================================================//
 //============================================================================//
@@ -57,38 +65,29 @@ Bottlenecks of this current implementation:
 //============================================================================//
 //============================================================================//
 
-prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:=true)
-// need to edit in partial obstruction, change output files (don't need No....txt, ThueToSolve files
 
+prep0:= function(N,clist,fclist,partialObstruction)
 
     /*
-     Description: Verify conditions of Theorem 1 of BeReGh for clist,N
-     Input: hash:= string set appended to the start of every output line;
-                   used to ensure output corresponds to correct Thue Mahler form
-     	    OutFiles:= store all possible outcomes for [N,clist] in one of
-     	    	       "NoSUnitEqPossible.txt"
-		       "NoSUnitEqNeeded.txt", or
-     	    	       "SUnitEq.txt,"
-                       and store Thue equations to be solved in "ThueEqToSolve.txt"
-            LogFile:= store running times and additional information as "SUnitEqLogs.txt"
-            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+     Description: Verify conditions of Theorem 1 of BeGhRe for clist, N
+     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
             N:= conductor of corresponding elliptic curves in question
-            partialObstruction:=  set of primes p for which solutions can only be possible
-     	     			  with p having exponent 0 on RHS of the TM equation
-            printOutput:= boolean value determining whether to print to LogFile
-                          default value is set to true
      Output: f:= monic polynomial defining the number field K = Q(th)
              enterTM:= boolean value determining whether to enter the TM solver
              RemainingCasesAllAs:= list of primelist and all corresponding a values
                                    comprising the RHS of F(x,y)
+             partialObstruction:= set of primes p for which solutions can only be possible
+     	     			  with p having exponent 0 on RHS of the TM equation
+             ThueToSolve:= Thue equations to be solved, stored as [< Thue coefficients, RHS >]
+             exitline:= string to be appended to hash for .csv input in exitfile; if enterTM
+	     		is true, this is the empty string
+             exitfile:= string indicating appropriate .csv file for exitline; if enterTM is
+	     		true, this is the empty string
      Example:
    */
 
     QUV<U,V>:=PolynomialRing(Rationals(),2);
     Qx<x>:= PolynomialRing(Rationals());
-
-    // FIX HERE
-    SUnitEq:= OutFiles[4];
 
     // general setup for Thue-Mahler solver
     assert &and[c in Integers() : c in clist];
@@ -105,7 +104,7 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
     DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
     assert DiscF eq Discriminant(Evaluate(F,[x,1]));
 
-    fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
+    assert fclist eq ([1] cat [clist[i+1]*c0^(i-1) : i in [1..n]]);
     f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
     c0:= Integers()!fclist[1]; // update c0
     assert c0 eq 1;
@@ -116,7 +115,7 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
     assert IsIrreducible(f);
     assert &and[c in Integers() : c in Coefficients(f)];
 
-    // verify conditions of Theorem 1 of BeReGh
+    // verify conditions of Theorem 1 of BeGhRe
     alpha:= Valuation(N,2);
     beta:= Valuation(N,3);
     alpha0:= Valuation(DiscF,2);
@@ -130,16 +129,8 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
     assert beta in [0..5];
     assert IsDivisibleBy(N0,N1);
 
-    // technically don't need this; should we keep it here regardless?
-    enterTM:= true;
     RemainingCasesAllAs:= [];
-
-    if (IsEmpty(partialObstruction) eq false) and (printOutput eq true) then
-	// partial local obstructions present; remove p from primelist
-	printf hash cat " Partial local obstructions present \n";
-	printf hash cat " No solutions with positive exponent of %o are possible \n",
-	       partialObstruction;
-    end if;
+    ThueToSolve:= [];
 
     // generate a record to store relevant prime bounds
     // determine any bounds as per Theorem 1 of BeGhRe correspondence
@@ -267,11 +258,10 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
 	    for i in [1..#pset] do
 		x:= pset[i];
 		assert x`prime eq p;
-		if (assigned x`unbounded) and (x`alpha1 ge 1) then
-		    enterTM:= false;
-		    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-		    return f, enterTM, RemainingCasesAllAs;
-		elif (assigned x`unbounded) and (x`alpha1 eq 0) then
+		// ensure there is no conflict between Theorem 1 of BeGhRe
+		// and partial obstructions
+		assert (((assigned x`unbounded) and (x`alpha1 ge 1)) eq false);
+		if (assigned x`unbounded) and (x`alpha1 eq 0) then
 		    delete x`unbounded; // update bound at p
 		elif (assigned x`unbounded eq false) and (x`alpha1 ge 1) then
 		    // remove extra cases at p which are now not possible
@@ -281,11 +271,8 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
 	end if;
 	psetNew:= [pset[i] : i in [1..#pset] | i notin toRemove];
 
-	if IsEmpty(psetNew) then
-	    enterTM:= false;
-	    fprintf NoSUnitEqPossible, hash cat " Theorem 1 of BeReGh does not align with partial obstruction at p:= %o \n", p;
-	    return f, enterTM, RemainingCasesAllAs;
-	end if;
+	// ensure there is no conflict between Theorem 1 of BeGhRe and partial obstructions
+	assert (IsEmpty(psetNew) eq false);
 	// verify pset now only includes the exponent 0 case at p
 	if (p in partialObstruction) then
 	    assert (#psetNew eq 1);
@@ -365,328 +352,15 @@ prep0:= function(hash,OutFiles,LogFile,clist,N,partialObstruction : printOutput:
     end for;
     RHSlist:= RHSlistNew;
 
-    // store Thue equations to be solved in "ThueEqToSolve.txt"
-    if (#RHSlist eq 1) and (printOutput eq true) then
-	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
-	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat Sprint(RHSlist[1]) cat "\n";
-    elif (#RHSlist gt 1) and (printOutput eq true) then
-	fprintf ThueEqToSolve, hash cat " Thue equation to be solved: %o \n", clist;
-	fprintf ThueEqToSolve, hash cat " Right-hand side: " cat
-				 &cat[Sprintf( "%o, ", RHSlist[i], RHSlist[i]): i in [1..#RHSlist-1]] cat Sprint(RHSlist[#RHSlist]) cat "\n";
+    // store Thue equations to be solved in array as < Thue equation, RHS >, if any
+    if (RHSlist ne []) then
+	Append(~ThueToSolve,<clist,RHSlist>);
     end if;
 
-    // if all cases are resolved via Thue equations
-    if IsEmpty(RemainingCases) then
-	enterTM:=false;
-	fprintf NoSUnitEqNeeded,
-		hash cat " Thue-Mahler equation has reduced to several Thue equations \n";
-	return f, enterTM, RemainingCasesAllAs;
-    end if;
-
-    // if there are Thue-Mahler equations yet to be solved, not resolvable via Thue equations
-    // generate the corresponding S-unit equations
-    // remove redundancy so that each primeset has all corresponding a values
-    CaseInfoAllAs:= recformat<avalues,primelist>;
-    RemainingCasesCopy:= RemainingCases;
-    for pset in RemainingCases do
-	if pset in RemainingCasesCopy then
-	    a:= pset[1];
-	    primelist:= pset[2];
-	    avalues:= [a];
-	    Exclude(~RemainingCasesCopy, pset);
-	    for pset2 in RemainingCasesCopy do
-		a2:= pset2[1];
-		primelist2:= pset2[2];
-		if (primelist eq primelist2) then
-		    Append(~avalues, a2);
-		    Exclude(~RemainingCasesCopy, pset2);
-		end if;
-	    end for;
-	    Sort(~avalues);
-	    apset:=rec<CaseInfoAllAs | avalues:=avalues,
-				       primelist:= primelist>;
-	    Append(~RemainingCasesAllAs, apset);
-	end if;
-    end for;
-
-    // if the code has made it this far, the following must hold
-    assert enterTM;
-    return f, enterTM, RemainingCasesAllAs;
-end function;
-
-
-
-
-prep0:= function(hash,LogFile,clist,N)
-
-    /*
-     Description: Verify conditions of Theorem 1 of BeReGh for clist,N
-     Input: hash:= string set appended to the start of every output line;
-                   used to ensure output corresponds to correct Thue Mahler form
-     	    LogFile:= store running times and additional information as "SUnitEqLogs.txt"
-            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
-            N:= conductor of corresponding elliptic curves in question
-     Output: f:= monic polynomial defining the number field K = Q(th)
-             enterTM:= boolean value determining whether to enter the TM solver
-             TMSolutions:= solutions for the TM equation arising from Thue equations
-             RemainingCasesAllAs:= list of primelist and all corresponding a values
-                                   comprising the RHS of F(x,y)
-     Example:
-   */
-
-    QUV<U,V>:=PolynomialRing(Rationals(),2);
-    Qx<x>:= PolynomialRing(Rationals());
-
-    // general setup for Thue-Mahler solver
-    assert &and[c in Integers() : c in clist];
-    c0:=Integers()!clist[1];
-    assert c0 ne 0;
-    n:=#clist-1;
-    assert n eq 3;
-
-    // generate the relevant Thue Mahler polynomial
-    F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
-    assert IsHomogeneous(F);
-    DiscF:= -27*clist[1]^2*clist[4]^2 + clist[2]^2*clist[3]^2;
-    DiscF:= DiscF + 18*clist[1]*clist[2]*clist[3]*clist[4];
-    DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
-    assert DiscF eq Discriminant(Evaluate(F,[x,1]));
-
-    fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
-    f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
-    c0:= Integers()!fclist[1]; // update c0
-    assert c0 eq 1;
-    assert IsMonic(f);
-    assert Coefficients(f) eq
-	   Coefficients(clist[1]^(n-1)*Evaluate(F,[x/clist[1],1]));
-    assert Degree(f) eq n;
-    assert IsIrreducible(f);
-    assert &and[c in Integers() : c in Coefficients(f)];
-
-    // verify conditions of Theorem 1 of BeReGh
-    alpha:= Valuation(N,2);
-    beta:= Valuation(N,3);
-    alpha0:= Valuation(DiscF,2);
-    beta0:= Valuation(DiscF,3);
-    N0:= Integers()! ( N/((2^alpha)*(3^beta)));
-    N1:= Integers()! (DiscF/((2^alpha0)*(3^beta0)));
-    primelist:= PrimeDivisors(N0);
-    assert &and[IsPrime(p) : p in primelist];
-    assert (2 notin primelist) and (3 notin primelist);
-    assert alpha in [0..8];
-    assert beta in [0..5];
-    assert IsDivisibleBy(N0,N1);
-
-    enterTM:= true;
-    TMSolutions:= []; // store all Thue-Mahler solutions
-    RemainingCasesAllAs:= [];
-
-    // verify local and partial local obstructions
-    partialObstruction, localObstruction:= localtest(N,F,DiscF);
-    // assert TM forms with local obstructions have been removed from !!!!!!!
-    assert IsEmpty(localObstruction);
-    if (IsEmpty(partialObstruction) eq false) then
-	// partial local obstructions present; remove p from primelist
-	printf hash cat " Partial local obstructions present \n";
-	printf hash cat " No solutions with positive exponent of %o are possible \n",
-	       partialObstruction;
-    end if;
-
-    // generate a record to store relevant prime bounds
-    // determine any bounds as per Theorem 1 of BeGhRe correspondence
-    primeInfo:= recformat<prime,alpha1,unbounded>;
-    primeBounds:= [[],[]];
-
-    // verify behaviour at p = 2
-    if (alpha eq 0) then
-	if alpha0 eq 2 then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3>);
-	end if;
-    elif (alpha eq 1) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 4, unbounded:= "yes">);
-	elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3, unbounded:= "yes">);
-	end if;
-    elif (alpha eq 2) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    elif (alpha eq 3) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
-        elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
-        elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    elif (alpha eq 4) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
-	elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2, unbounded:= "yes">);
-        elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    elif (alpha eq 5) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-        elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    elif (alpha eq 6) then
-        if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
-        elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1, unbounded:= "yes">);
-        elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    elif (alpha eq 7) then
-        if (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-        elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-        end if;
-    elif (alpha eq 8) then
-        if (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-        end if;
-    end if;
-
-    // verify behaviour at p = 3
-    if (beta eq 0) then
-        if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
-        end if;
-    elif (beta eq 1) then
-        if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1, unbounded:= "yes">);
-        elif (beta0 eq 1) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
-	end if;
-    elif (beta eq 2) then
-        if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
-	elif (beta0 eq 1) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
-	elif (beta0 eq 3) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
-	end if;
-    elif (beta ge 3) then
-        if (beta0 eq beta) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1>);
-        else
-	    // when all coefficients of the form F_1 are  divisible by 3,
-	    // since also beta1 = {0,1} and 3|LHS we must have that 3|RHS,  hence beta1 = 1
-	    // in this case, we may divide 3 from both sides
-	    // this yields the form F = F_1/3, whose discriminant has
-	    // Valuation(DiscF,3) != beta0 = beta
-	    // thus since beta1=1 is divided out, so beta1=0
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
-        end if;
-    end if;
-
-    // verify behaviour at primes dividing N1
-    for p in PrimeDivisors(N1) do
-	if IsDivisibleBy(N1,p^2) then
-	    assert p in PrimeDivisors(N0);
-	    primeBounds[#primeBounds+1]:= [];
-	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 0>);
-	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 1>);
-	end if;
-    end for;
-
-    // remove superflous cases where a partial obstruction at p exists
-    primeBoundsNew:= [];
-    for pset in primeBounds do
-	toRemove:= [];
-	ps:= [i`prime : i in pset];
-	// verify the pset corresponds to only 1 prime
-	assert &and[p eq ps[1] : p in ps];
-	p:= ps[1];
-	if (p in partialObstruction) then
-	    for i in [1..#pset] do
-		x:= pset[i];
-		assert x`prime eq p;
-		// assert TM forms where Theorem 1 of BeReGh does not align with partial!!!!
-		// obstructions have been removed
-		assert ((assigned x`unbounded) and (x`alpha1 ge 1)) eq false;
-		if (assigned x`unbounded) and (x`alpha1 eq 0) then
-		    delete x`unbounded; // update bound at p
-		elif (assigned x`unbounded eq false) and (x`alpha1 ge 1) then
-		    // remove extra cases at p which are now not possible
-		    Append(~toRemove,i);
-		end if;
-	    end for;
-	end if;
-	psetNew:= [pset[i] : i in [1..#pset] | i notin toRemove];
-
-	// assert TM forms where Theorem 1 of BeReGh does not align with partial obstructions!!!!
-	// have been removed
-	assert (IsEmpty(psetNew) eq false);
-	// verify pset now only includes the exponent 0 case at p
-	if (p in partialObstruction) then
-	    assert (#psetNew eq 1);
-	    assert (assigned psetNew[1]`unbounded eq false);
-	    assert (psetNew[1]`alpha1 eq 0);
-	end if;
-	Append(~primeBoundsNew, psetNew);
-    end for;
-    primeBounds:= primeBoundsNew;
-
-    // generate all combinations of exponent restrictions as determined above
-    Sdata:= []; // stores all combinations of prime bounds on each p
-    expCombos:= CartesianProduct([[1..#pset] : pset in primeBounds]);
-    for c in expCombos do
-	Append(~Sdata, [primeBounds[i][c[i]] : i in [1..#c]]);
-    end for;
-    aprimelist:=[]; // store corresponding a value and primelist
-    for pset in Sdata do
-	a:= 1;
-	primes:= primelist;
-	for i in pset do
-	    if (assigned i`unbounded) then
-		if (i`prime notin primes) then
-		    assert (i`prime eq 2) or (i`prime eq 3);
-		    assert i`prime notin partialObstruction;
-		    Append(~primes, i`prime);
-		end if;
-	    else
-		if (i`prime in primes) then
-		    Exclude(~primes,i`prime);
-		end if;
-		a:= a*(i`prime)^(i`alpha1);
-	    end if;
-	end for;
-	Sort(~primes);
-	if <a,primes> notin aprimelist then
-	    Append(~aprimelist, <a,primes>);
-	end if;
-    end for;
-
-    // store Thue-Mahler equations to be solved
-    // corresponding Thue cases ignored; resolved in GenerateSUnitEquations.m
-    RemainingCases:=aprimelist;
-
-    for pset in aprimelist do
-	if IsEmpty(pset[2]) then // no unbounded primes
-	    Exclude(~RemainingCases, pset);
-	end if;
-    end for;
-
-    // assert TM forms resolved via Thue equations have been removed FROM !!!!
+    // ensure there are remaining cases not resolvable via Thue equations
     assert (IsEmpty(RemainingCases) eq false);
 
+    // if there are Thue-Mahler equations yet to be solved, not resolvable via Thue equations
     // generate the corresponding S-unit equations
     // remove redundancy so that each primeset has all corresponding a values
     CaseInfoAllAs:= recformat<avalues,primelist>;
@@ -711,61 +385,12 @@ prep0:= function(hash,LogFile,clist,N)
 	end if;
     end for;
 
-    // if the code has made it this far, the following must hold
-    assert enterTM and IsEmpty(TMSolutions);
-    return f, enterTM, TMSolutions, RemainingCasesAllAs;
+    assert #RemainingCasesAllAs eq 1; // mulitple primelists not possible
+    remainingCase:= RemainingCasesAllAs[1];
+
+    return f,remainingCase,ThueToSolve;
 end function;
 
-ijkAutL:= function(fieldLinfo)
-
-    /*
-     Description: generate automorphisms of L, i0,j,k as in Section 6.1 of Gh
-     Input: fieldLinfo: record of the splitting field L of K = Q(th)
-     Output: ijk:= automorphisms i0,j,k: L -> C as in Section 6.1 of Gh
-             AutL:= all automorphisms L -> C of L
-     Example:
-   */
-
-    L:= fieldLinfo`field;
-    tl:= fieldLinfo`gen;
-    G,Aut,tau:= AutomorphismGroup(L);
-    assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
-
-    ijk:= [];
-    if Order(G.1) eq 3 then
-        assert G.1^3 eq Id(G);
-        if (tau(G.1))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.1);
-            ijk[2]:= tau(G.1^2);
-        else
-            ijk[1]:= tau(G.1^2);
-            ijk[2]:= tau(G.1);
-        end if;
-        ijk[3]:= tau(G.1^3); // identity map
-    elif Order(G.2) eq 3 then
-        assert G.2^3 eq Id(G);
-        if (tau(G.2))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.2);
-            ijk[2]:= tau(G.2^2);
-        else
-            ijk[1]:= tau(G.2^2);
-            ijk[2]:= tau(G.2);
-        end if;
-        ijk[3]:= tau(G.2^3);
-    end if;
-
-    AutL:= [];
-    for x in G do
-        Append(~AutL, tau(x));
-    end for;
-
-    // verify that i,j,k permutes the roots tl
-    assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3]) and (ijk[3](tl[1]) eq tl[1]);
-    assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1]) and (ijk[3](tl[2]) eq tl[2]);
-    assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2]) and (ijk[3](tl[3]) eq tl[3]);
-
-    return ijk, AutL;
-end function;
 
 monic:= function(fieldKinfo,clist,primelist,avalues)
 
@@ -896,6 +521,33 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
     assert IsEmpty(alistIndex);
 
     return alistNew;
+end function;
+
+normInv:= function(R,OK)
+
+    /*
+     Description: generate all ideals of OK having norm R
+     Input: R:= a positive integer
+            OK:= corresponding ring of integers of the field K
+     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Example:
+   */
+
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+    if R eq 1 then
+	return { 1*OK };
+    end if;
+    p:=Max(PrimeDivisors(R));
+    fpr:=[fp[1] : fp in Factorisation(p*OK)];
+    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
+    if #fpr eq 0 then
+	return {};
+    else
+	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+    end if;
 end function;
 
 algs1and2:=function(fieldKinfo,p)
@@ -1035,33 +687,6 @@ algs1and2:=function(fieldKinfo,p)
     return Lp,Mp,fprs;
 end function;
 
-normInv:= function(R,OK)
-
-    /*
-     Description: generate all ideals of OK having norm R
-     Input: R:= a positive integer
-            OK:= corresponding ring of integers of the field K
-     Output: all ideals of OK having norm R, displayed in an enumerated set
-     Example:
-   */
-
-    assert R in Integers();
-    assert R ge 1;
-    R:=Integers()!R;
-    assert R ge 1;
-    if R eq 1 then
-	return { 1*OK };
-    end if;
-    p:=Max(PrimeDivisors(R));
-    fpr:=[fp[1] : fp in Factorisation(p*OK)];
-    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
-    if #fpr eq 0 then
-	return {};
-    else
-	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
-    end if;
-end function;
-
 prep1:= function(fieldKinfo,clist,apset)
 
     /*
@@ -1144,7 +769,8 @@ prep1:= function(fieldKinfo,clist,apset)
 	return afplist;
 end function;
 
-principalize:=function(fieldKinfo,ClK,ideal_a,fplist)
+
+principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
 
     /*
      Description: convert ideal equation (3.8), given by ideal_a, fplist, into S-unit		 equations (3.9) via procedure of Section 3.4.2 of Gh
@@ -1266,6 +892,67 @@ prep2:=function(fieldKinfo,ClK,afplist)
     end for;
     return alphgamlist;
 end function;
+
+
+
+
+
+
+
+// all new above
+// old below this line
+
+ijkAutL:= function(fieldLinfo)
+
+    /*
+     Description: generate automorphisms of L, i0,j,k as in Section 6.1 of Gh
+     Input: fieldLinfo: record of the splitting field L of K = Q(th)
+     Output: ijk:= automorphisms i0,j,k: L -> C as in Section 6.1 of Gh
+             AutL:= all automorphisms L -> C of L
+     Example:
+   */
+
+    L:= fieldLinfo`field;
+    tl:= fieldLinfo`gen;
+    G,Aut,tau:= AutomorphismGroup(L);
+    assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
+
+    ijk:= [];
+    if Order(G.1) eq 3 then
+        assert G.1^3 eq Id(G);
+        if (tau(G.1))(tl[1]) eq tl[2] then
+            ijk[1]:= tau(G.1);
+            ijk[2]:= tau(G.1^2);
+        else
+            ijk[1]:= tau(G.1^2);
+            ijk[2]:= tau(G.1);
+        end if;
+        ijk[3]:= tau(G.1^3); // identity map
+    elif Order(G.2) eq 3 then
+        assert G.2^3 eq Id(G);
+        if (tau(G.2))(tl[1]) eq tl[2] then
+            ijk[1]:= tau(G.2);
+            ijk[2]:= tau(G.2^2);
+        else
+            ijk[1]:= tau(G.2^2);
+            ijk[2]:= tau(G.2);
+        end if;
+        ijk[3]:= tau(G.2^3);
+    end if;
+
+    AutL:= [];
+    for x in G do
+        Append(~AutL, tau(x));
+    end for;
+
+    // verify that i,j,k permutes the roots tl
+    assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3]) and (ijk[3](tl[1]) eq tl[1]);
+    assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1]) and (ijk[3](tl[2]) eq tl[2]);
+    assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2]) and (ijk[3](tl[3]) eq tl[3]);
+
+    return ijk, AutL;
+end function;
+
 
 UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,complexPrec)
 
@@ -2152,51 +1839,53 @@ SetLogFile(LogFile);
 SetAutoColumns(false);
 SetColumns(235);
 
+// STARTED NEW EDITS HERE!!!!!!!!!!!!!
+
 // convert bash input into magma integers, sets
-N:= [];
-i:= 2;
-while set[i] ne "," do
-    Append(~N, set[i]);
-    i:= i+1;
-end while;
-N:= StringToInteger(&cat(N)); // convert bash input N into an integer
+// bash input format is
+// N,"form","optimal form","min poly","partial obstructions",class number,r,no ideal eq,
+// no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,class group time,
+// unit group time,ideal eq time,Thue eq time,S-unit time,bound time,total time
 
-// determine indices of ",", "[", "]" from bash input
-brackets:= []; // store indices of seperating brackets of clist
-commas:= []; // store indices of seperating commas in S
-i:= i+1;
-assert set[i] eq "[";
-Append(~brackets,i);
-while set[i] ne "]" do
-    if set[i] eq "," then
-	Append(~commas, i);
-    end if;
-    i:= i + 1;
-end while;
-assert set[i] eq "]";
-assert #commas eq 4;
-Append(~brackets,i);
+CommaSplit:= Split(set,","); // split bash input by ","
+BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
+RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
 
-// convert bash symbols of clist into integers
-DiscF:= 4*StringToInteger(&cat[set[i] : i in [brackets[1]+1..commas[1]-1]]);
-clist:=[];
-for j in [1..#commas-1] do
-    n:= [set[i] : i in [(commas[j]+1)..(commas[j+1]-1)]];
-    Append(~clist,StringToInteger(&cat(n)));
-end for;
-Append(~clist,StringToInteger(&cat[set[i] : i in [commas[4]+1..brackets[2]-1]]));
+assert CommaSplit[2][1] eq "(" and CommaSplit[5][#CommaSplit[5]] eq ")"; // delimiter for form
+ // delimiter for optimal form
+assert CommaSplit[6][1] eq "(" and CommaSplit[9][#CommaSplit[9]] eq ")";
+// delimiter for min poly
+assert CommaSplit[10][1] eq "(" and CommaSplit[13][#CommaSplit[13]] eq ")";
+assert (#BracketSplit eq 3) or (#BracketSplit eq 5);
+assert #RBracketSplit eq 7;
+
+N:= StringToInteger(CommaSplit[1]); // convert bash input N into an integer
+// convert bash input for optimal form, min poly into a sequence of integers
+clist:= [StringToInteger(i) : i in Split(RBracketSplit[4],",")];
+fclist:= [StringToInteger(i) : i in Split(RBracketSplit[6],",")];
+
+if (#BracketSplit eq 3) then
+    assert CommaSplit[14] eq "None";
+    partialObstruction:= [];
+    classnumber:= StringToInteger(CommaSplit[15]);
+    r:= StringToInteger(CommaSplit[16]);
+    NoIdealEq:= StringToInteger(CommaSplit[17]);
+    NoThueEq:= StringToInteger(CommaSplit[18]);
+    ranks:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
+else
+    partialObstruction:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
+    classnumber:= StringToInteger(Split(BracketSplit[3],",")[1]);
+    r:= StringToInteger(Split(BracketSplit[3],",")[2]);
+    NoIdealEq:= StringToInteger(Split(BracketSplit[3],",")[3]);
+    NoThueEq:= StringToInteger(Split(BracketSplit[3],",")[4]);
+    ranks:= [StringToInteger(i) : i in Split(BracketSplit[4],",")];
+end if;
 
 hash:= set;
 
-printf hash cat " Resolving Thue-Mahler equation with...\n";
-printf hash cat " Coefficients: %o, Conductor: %o \n", clist, N;
-
 t1:= Cputime();
-f, enterTM, TMSolutions, RemainingCases:= prep0(hash,LogFile,clist,N);
-printf hash cat " Total time to determine local obstructions: %o \n", Cputime(t1);
+f,remainingCase,ThueToSolve:= prep0(N,clist,fclist,partialObstruction);
 
-// assert TM forms with no S-unit equations to resolve are removed !!!!!!!!!
-assert enterTM;
 // generate a record to store relevant info of the field K = Q(th)
 FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
 K<th>:=NumberField(f);
@@ -2204,37 +1893,26 @@ OK:=MaximalOrder(K);
 th:=OK!th;
 fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-// generate a record to store relevant info of the splitting field L of K = Q(th)
-L, tl:= SplittingField(f);
-t2:= Cputime();
-OL:= MaximalOrder(L);
-printf hash cat " Total time to compute the ring of integers of L: %o \n", Cputime(t2);
-tf,mapKL:= IsSubfield(K,L);
-assert tf;
-assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
-
-// generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
-ijkL,AutL:= ijkAutL(fieldLinfo);
-assert ijkL[3](th) eq L!th; // this is the identity automorphism
-
-t3:= Cputime();
+t4:= Cputime();
 // generate a record to store relevant class group info
 ClassGroupInfo:= recformat<classgroup,classnumber,map>;
 ClK:= rec< ClassGroupInfo | >;
 ClK`classgroup, ClK`map:= ClassGroup(K);
-printf hash cat " Total time to compute the class group: %o \n", Cputime(t3);
-ClK`classnumber:= ClassNumber(K);
+//Append(~timings,<Cputime(t4),"class group">);
+assert classnumber eq Integers()! ClassNumber(K);
+ClK`classnumber:= classnumber;
 
 n:= Degree(f);
 assert (n eq #clist-1);
 s,t:= Signature(K);
-r:= s+t-1;
+assert r eq (s+t-1);
 assert (s+2*t) eq n;
 assert (r eq 1) or (r eq 2);
-t4:= Cputime();
+
+t5:= Cputime();
 U,psi:= UnitGroup(OK); // generate fundamental units
-printf hash cat " Total time to compute the unit group: %o \n", Cputime(t4);
+//Append(~timings,<Cputime(t5),"unit group">);
+
 // expresse the fundamental units as elts in OK in terms of the integral basis
 epslist:=[psi(U.(i+1)) : i in [1..r]];
 assert (#epslist eq 1) or (#epslist eq 2);
@@ -2250,50 +1928,118 @@ zeta:= zetalist[1];
 fieldKinfo`zeta:= zeta;
 fieldKinfo`fundamentalunits:= epslist;
 
-assert #RemainingCases eq 1; // mulitple primelists not possible
-remainingCase:= RemainingCases[1];
-t5:= Cputime();
 afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
-printf hash cat " Total time to compute all ideal equations: %o \n", Cputime(t5);
 
-// assert setup
+// general setup and assertions
+Zx<x_>:= PolynomialRing(Integers());
 QUV<U,V>:=PolynomialRing(Rationals(),2);
-Z<x_>:= PolynomialRing(Integers());
 c0:=Integers()!clist[1];
 assert c0 ne 0;
 n:=#clist-1;
 assert n eq 3;
-fclist:= [Integers()!Coefficient(f,i) : i in [3..0 by -1]];
+assert fclist eq ([1] cat [clist[i+1]*c0^(i-1) : i in [1..n]]);
 Integerf:=&+[fclist[i+1]*x_^(n-i) : i in [0..n]];
 assert f eq ChangeRing(Integerf,Rationals());
 F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
-assert DiscF eq Discriminant(Evaluate(F,[x_,1]));
 
-t6:= Cputime();
-// remove ideal equations which have exponent 0 on all prime ideals by solving
-// corresponding Thue equations
+t7:= Cputime();
+// remove ideal equations which have exponent 0 on all prime ideals by generating
+// corresponding Thue equations to be solved
 toRemove:= [];
-
+RHSlist:= [];
 for i in [1..#afplist] do
     fplist:= afplist[i][4];
     if IsEmpty(fplist) then
-	Append(~toRemove,i);
+	a:= afplist[i][1]`newa;
+	adu:= afplist[i][1]`adu;
+	primelist:= afplist[i][2];
+	ideal_a:= afplist[i][3];
+	v:= #primelist;
+	tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+	assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
+	rhs:= Integers()! a*&*[primelist[i]^tt[i] : i in [1..v]];
+	tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
+	if (tf) and (rhs notin RHSlist) then
+	    Append(~RHSlist, rhs);
+	end if;
+	Append(~toRemove,[i,rhs]);
     end if;
 end for;
 
 // remove cases covered by Thue solver
-afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemove];
+toRemoveNew:= [i[1] : i in toRemove];
+afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemoveNew];
 afplist:= afplistNew;
-printf hash cat " Total time to remove ideal equations covered by Thue solver: %o \n",
-       Cputime(t6);
+assert #afplist eq NoIdealEq;
 
-// these should have been removed !!
+// store Thue equations to be solved in array as < Thue equation, RHS >, if any
+// if fclist eq Thue equation, amalgamate RHS
+if (IsEmpty(RHSlist) eq false) then
+    if (ThueToSolve ne []) then
+	assert (#ThueToSolve eq 1);
+	ThueEq:= ThueToSolve[1][1];
+	ThueRHS:= ThueToSolve[1][2];
+	if (ThueEq eq fclist) then
+	    for rhs in RHSlist do
+		if (rhs notin ThueRHS) then
+		    Append(~ThueRHS,rhs);
+		end if;
+	    end for;
+	    ThueToSolve:= [<ThueEq,ThueRHS>];
+	end if;
+    else
+	Append(~ThueToSolve,<fclist,RHSlist>);
+    end if;
+end if;
+
+assert (#ThueToSolve le 2);
+if #ThueToSolve eq 0 then
+    assert NoThueEq eq 0;
+else
+    assert &+[#i[2] : i in ThueToSolve] eq NoThueEq;
+end if;
+
+// ensure there are remaining ideal equations not resolvable via Thue equations
 assert (IsEmpty(afplist) eq false);
-printf hash cat " Number of ideal equations: %o \n", #afplist;
-t7:= Cputime();
+
 alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-printf hash cat " Total time to compute all S-unit equations: %o \n", Cputime(t7);
-printf hash cat " Number of S-unit equations: %o \n", #alphgamlist;
+// ensure the list of S-unit equations is non-trivial and aligns with
+// results of GenerateSUnitEquations.m
+assert #alphgamlist eq #ranks;
+Sort(~ranks);
+RankTest:= [];
+for j in [1..#alphgamlist] do
+    idealEq:= alphgamlist[j];
+    Append(~RankTest,#idealEq`gammalist+#fieldKinfo`fundamentalunits);
+end for;
+Sort(~RankTest);
+assert ranks eq RankTest;
+
+
+// UP TO HERE
+
+
+complexPrec:= 400;
+t9:= Cputime();
+UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
+Append(~timings,<Cputime(t9),"initial bound">);
+
+
+
+
+// generate a record to store relevant info of the splitting field L of K = Q(th)
+L, tl:= SplittingField(f);
+t2:= Cputime();
+OL:= MaximalOrder(L);
+printf hash cat " Total time to compute the ring of integers of L: %o \n", Cputime(t2);
+tf,mapKL:= IsSubfield(K,L);
+assert tf;
+assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
+fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+
+// generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
+ijkL,AutL:= ijkAutL(fieldLinfo);
+assert ijkL[3](th) eq L!th; // this is the identity automorphism
 
 // empty alphgamlist should have been remvoed !!!
 assert (IsEmpty(alphgamlist) eq false);
