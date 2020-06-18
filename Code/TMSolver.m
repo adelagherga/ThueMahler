@@ -18,6 +18,7 @@ To do list: 1. Edit input files
            should this version of the code verify local/partial local obstructions?
 
 
+references; Gh
            1. timings
            2. output file (don't need 4 now)
            3. hash
@@ -26,7 +27,17 @@ To do list: 1. Edit input files
            5. write code to make sure that all forms have gone through GenerateSUnitEquations.m (there was a segfault; don't know which forms were prematurely terminated)
 Example:
 
+Plan:
+1. Get bounds; ijkAutL
+2. For each case, loop through precision, seperately?
+3. For each case, for each prime:
+       a. Find i0,j,k to compute n_l directly; if possible, absorb n_l into alpha (and check if
+       	  the equation is a Thue equation now)
+       b. If (a) fails, try to find i0,j,k such that there is a smaller bound on n_l
+4. Reassess all cases
+
 */
+
 
 // TMSolver.m
 
@@ -36,7 +47,7 @@ Example:
 This code computes integer solutions of the Goormaghtigh Equation
                     (x^m-1)/(x-1) = (y^n-1)/(y-1)
 for y > x > 1 and m > n > 2, for fixed n. In particular, fixing x,n yields a
-Thue-Mahler equation of the form
+nThue-Mahler equation of the form
                     (x-1)y^(n-1) + ... + (x-1)y + x = x^m.
 This algorithm computes solution (y,m) of this equation, and is based on the
 Thue-Mahler algorithm of Tzanakis-de Weger, as well as its updated version by
@@ -550,7 +561,7 @@ normInv:= function(R,OK)
     end if;
 end function;
 
-algs1and2:=function(fieldKinfo,p)
+algs1and2:= function(fieldKinfo,p)
 
     /*
      Description: application of Algorithm 3.3.3 and 3.3.4 of Gh
@@ -833,7 +844,7 @@ principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
     end if;
 end function;
 
-prep2:=function(fieldKinfo,ClK,afplist)
+prep2:= function(fieldKinfo,ClK,afplist)
 
     /*
      Description: iterate through each ideal equation (3.8) to generate all S-unit equations
@@ -893,22 +904,13 @@ prep2:=function(fieldKinfo,ClK,afplist)
     return alphgamlist;
 end function;
 
-
-
-
-
-
-
-// all new above
-// old below this line
-
 ijkAutL:= function(fieldLinfo)
 
     /*
-     Description: generate automorphisms of L, i0,j,k as in Section 6.1 of Gh
-     Input: fieldLinfo: record of the splitting field L of K = Q(th)
-     Output: ijk:= automorphisms i0,j,k: L -> C as in Section 6.1 of Gh
-             AutL:= all automorphisms L -> C of L
+     Description: generate automorphisms i0,j,k of L, as in Section 6.1 of Gh
+     Input: fieldLinfo:= record of the splitting field L of K = Q(th)
+     Output: ijk:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
+             AutL:= all automorphisms of L
      Example:
    */
 
@@ -937,7 +939,7 @@ ijkAutL:= function(fieldLinfo)
             ijk[1]:= tau(G.2^2);
             ijk[2]:= tau(G.2);
         end if;
-        ijk[3]:= tau(G.2^3);
+        ijk[3]:= tau(G.2^3); // identity map
     end if;
 
     AutL:= [];
@@ -953,15 +955,13 @@ ijkAutL:= function(fieldLinfo)
     return ijk, AutL;
 end function;
 
-
-UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,complexPrec)
+UpperBounds:= procedure(fieldKinfo,clist,~alphgamlist)
 
     /*
      Description: append upper bound on all S-unit equations as per Section 6.2 of Gh
      Input: fieldKinfo:= record of the field K = Q(th)
             clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
 	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
-            complexPrec:= precision on complex field, C
      Output: alphgamlist[i]`bound:= upper bound on ith S-unit equation as per Section 6.2 of Gh
      Example:
    */
@@ -986,7 +986,7 @@ UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,complexPrec)
 
     thetaC:= Conjugates(th);
     assert n eq #thetaC;
-    CField<i>:= ComplexField(complexPrec);
+    CField<i>:= ComplexField(100);
 
     taus:=[hom< K -> CField | thetaC[i] > : i in [1..n]];
     // compute the Weil height of theta
@@ -1012,7 +1012,7 @@ UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,complexPrec)
 end procedure;
 
 
-
+// new stuff:
 // for each Case, padic:
 
 ImageInL:=function(mapsLL,elt);
@@ -1053,6 +1053,184 @@ pAdicLog:=function(elt,p);
     end while;
     return Log( elt^(r*p^k) )/(r*p^k);
 end function;
+
+
+
+pLatticePrep:=procedure(fieldKinfo,fieldLinfo,Case,~localpinfo,ijkL,AutL,HeightBounds,Prec : UseSmallBound:=true);
+    /*
+    INPUT:
+        primelist
+        L
+    OUTPUT:
+       // for each prime p[l], stores theta[l][i][j]:= theta_i^{(j)}, tje associated roots of g in the completion of Q_{p[l]}
+        // ie. for i in {1,...,m[l]}, theta[l][i] satisfies gp[l][i](theta[l][i]) = 0; ie g_i(theta_i) = 0
+        // theta[l][i][1], ..., theta[l][i][n_i]:= theta_i^{(1)}, ..., theta_i^{(n_i)} for p[l] are the conjugates of theta[l][i]
+    */
+
+    pAdicPrec:= Prec[1];
+    RealPrec:= Prec[2];
+
+    K:= fieldKinfo`field;
+    OK:= fieldKinfo`ringofintegers;
+    th:= fieldKinfo`gen;
+    f:= fieldKinfo`minpoly;
+    L:= fieldLinfo`field;
+    OL:= fieldLinfo`ringofintegers;
+    zeta:= fieldKinfo`zeta;
+    epslist:= fieldKinfo`fundamentalunits;
+    n:= Degree(K);
+
+    p:= localpinfo`prime;
+    Lp:= localpinfo`Lp;
+    mapLLp:= localpinfo`mapLLp;
+    //fprsL:= localpinfo`idealinL;
+
+    gammalist:= Case`gammalist;
+    fplist:= Case`ideallist;
+    alpha:= Case`alpha;
+    nu:= #gammalist;
+    r:= #epslist;
+
+    //Lp, mapLLp:= Completion(L, fprsL : Precision:=pAdicPrec);
+    fprs:=[f[1] : f in Factorisation(p*OK)];        // the prime ideals above p
+
+    thetaL:=[];
+    mapsLL:=[];
+    for i in [1..#fprs] do      // runs through each prime ideal above p
+        thetaL[i]:=[];
+        mapsLL[i]:=[];       // the preimage of thetap in L
+                                    // ie. for th in L, mLp(ijk(th)) is one of the thetap in Lp
+        Kp, mKp:= Completion(K,fprs[i] : Precision:=pAdicPrec);
+        gp_i:= MinimalPolynomial( mKp(th), PrimeField(Kp));
+        temp:= Roots(gp_i, Lp);   // #temp = degree of gp_i = e_i*f_i
+        for j in [1..#temp] do
+            vals, ind:= Max([Valuation(mapLLp(ijkL[k](L!th)) - temp[j][1]) : k in [1..3]]);
+            mapsLL[i][j]:= ijkL[ind];        // mLp(ijk[i][j](th)) maps to thetap[i][j]
+            thetaL[i][j]:= ijkL[ind](L!th);
+        end for;
+    end for;
+
+    assert n eq &+[#thetaL[i] : i in [1..#fprs]];       // check we have the correct number of thetas
+    Lpt:=ChangePrecision(Lp,Min([Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]]));
+    check:= [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]];
+    // verify that thetap[i][j] are roots of f
+//    assert &and[Lpt!0 eq (Lpt!0 - Evaluate(f,mapLLp(thetaL[i][j]))) : j in [1..#thetaL[i]], i in [1..#thetaL]];
+    // verify the precision has not been changed by the above test
+    assert [Precision(mapLLp(thetaL[i][j])) : j in [1..#thetaL[i]], i in [1..#thetaL]] eq check;
+    // verify the thetap[i][j] are the same roots as would be obtained by sending th in L into Lp
+        // Note: this correspondence will not generate the roots in the correct order
+        // This is due to the fact that we cannot work in the algebraic closure of Qp, but only in one Lp
+        // ideally, we would be working in each Lp above each prime ideal over p in K,
+        // but Magma does not allow this
+
+    assert (#thetaL eq 2) or (#thetaL eq 3);
+    inds:= [];  // stores the indices of the unbounded primes in fplist
+    // verifies there is a prime ideal above p in fplist
+    assert &or[fq in fplist : fq in fprs];
+    for i in [1..#fplist] do
+        fp:= fplist[i];
+        for j in [1..#fprs] do
+            fq:= fprs[j];
+            if fq eq fp then
+    // index of prime ideal above p appearing in fplist
+                Append(~inds, j);
+            end if;
+        end for;
+    end for;
+    assert #inds eq 1;  // this is i0
+    i0:=[inds[1],1];    // root of g_inds(t), first (and only) element
+    // verifies the unbounded ideal corresponds to deg(gp) = 1
+    assert #thetaL[i0[1]] eq 1;
+    assert fprs[i0[1]] in fplist;
+
+    // chooses j,k where g(t) = g_1(t)g_2(t), deg(g_1) = 1, deg(g_2) = 2
+    indjk:= [i : i in [1..#thetaL] | i ne inds[1]];
+    if #thetaL eq 2 then
+        assert #indjk eq 1;
+        assert #thetaL[indjk[1]] eq 2;
+        jj:= [indjk[1],1];
+        kk:= [indjk[1],2];
+    elif #thetaL eq 3 then
+        assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
+        assert #indjk eq 2;
+        jj:= [indjk[1],1];
+        kk:= [indjk[2],1];
+    end if;
+
+    assert thetaL[jj[1]][jj[2]] ne thetaL[kk[1]][kk[2]];
+    tau:=alpha*zeta;
+
+    // generate images under the maps ijk: L-> L, th -> theta[i][j]
+    tauL:=ImageInL(mapsLL,L!tau);
+    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
+    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
+
+    // verify that the prime ideals in L above gamma do not cancel
+    for i in [1..nu] do
+        faci0:= Factorization(ideal<OL|gammalistL[i][i0[1]][i0[2]]>);
+        facjj:= Factorization(ideal<OL|gammalistL[i][jj[1]][jj[2]]>);
+        fackk:= Factorization(ideal<OL|gammalistL[i][kk[1]][kk[2]]>);
+        assert (#faci0 eq #facjj) and (#facjj eq #fackk);
+        assert &and[faci0[j][1] ne facjj[j][1] : j in [1..#faci0]];
+        assert &and[facjj[j][1] ne fackk[j][1] : j in [1..#faci0]];
+        assert &and[faci0[j][1] ne fackk[j][1] : j in [1..#faci0]];
+    end for;
+
+    // check if we can bound Nail early (Lemma 6.5)
+    delta1L:=(thetaL[i0[1]][i0[2]] - thetaL[jj[1]][jj[2]])/(thetaL[i0[1]][i0[2]] - thetaL[kk[1]][kk[2]]);
+    delta1L:=delta1L*(tauL[kk[1]][kk[2]]/tauL[jj[1]][jj[2]]);
+    delta2L:=(thetaL[jj[1]][jj[2]] - thetaL[kk[1]][kk[2]])/(thetaL[kk[1]][kk[2]] - thetaL[i0[1]][i0[2]]);
+    delta2L:=delta2L*(tauL[i0[1]][i0[2]]/tauL[jj[1]][jj[2]]);
+
+    if (Valuation(mapLLp(delta1L)) ne 0) then
+        smallbound:= Min[Valuation(mapLLp(delta1L)),0] - Valuation(mapLLp(delta2L));
+        if smallbound ge 0 then
+            localpinfo`smallbound:= smallbound;
+        else
+            localpinfo`smallbound:= -1;     // negative bound; Case can be removed
+        end if;
+    else
+        Logdelta1:= pAdicLog(mapLLp(delta1L),p);
+        Loggammalist:=[pAdicLog(mapLLp(gammalistL[i][kk[1]][kk[2]]/gammalistL[i][jj[1]][jj[2]]), p) : i in [1..nu]];
+        Logepslist:=[pAdicLog(mapLLp(epslistL[i][kk[1]][kk[2]]/epslistL[i][jj[1]][jj[2]]), p) : i in [1..r]];
+        LogList:= Loggammalist cat Logepslist;
+        assert #LogList eq (nu+r);
+
+        minval,ihat:= Min([Valuation(LogList[i]) :i in [1..nu+r]]);
+
+        if Valuation(Logdelta1) lt minval then
+            smallbound:= Max([Floor((1/(p-1) - Valuation(mapLLp(delta2L)))),Ceiling(minval - Valuation(mapLLp(delta2L)))-1]);
+            if smallbound ge 0 then
+                localpinfo`smallbound:= smallbound;
+            else
+                localpinfo`smallbound:= -1;     // negative bound; Case can be removed
+            end if;
+    // if the program makes it this far, there are no small bounds on Nail
+    // arising from Lemma 6.5 and Lemma 6.9
+    // hence the code must enter the FP process to reduce the bounds
+    // generates the linear forms in p-adic logs elements for the Special Case
+        else
+            logihat:= LogList[ihat];  // offset the first term, Logdelta1
+            betalist:= [-LogList[i]/logihat : i in [1..nu+r]];
+            // assert that we are indeed in the special case, where neither lemma can immediately reduce the bound
+            beta1:= -Logdelta1/logihat;
+            assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
+
+            localpinfo`ihat:= ihat;
+            localpinfo`logihat:= logihat;
+            localpinfo`delta1inQp:= mapLLp(delta1L);
+            localpinfo`delta2inQp:= mapLLp(delta2L);
+            localpinfo`betalist:= [*beta1,betalist*];
+
+            matM,Bgam,BepsList:= Ellipsoid(fieldKinfo,fieldLinfo,Case,[i0,jj,kk],AutL,mapsLL,HeightBounds,RealPrec);
+            localpinfo`ellipsoid:= matM;
+            localpinfo`bgam:= Bgam;
+            localpinfo`bepslist:= BepsList;
+        end if;
+    end if;
+end procedure;
+
+
 
 
 
@@ -1893,7 +2071,17 @@ OK:=MaximalOrder(K);
 th:=OK!th;
 fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-t4:= Cputime();
+// generate a record to store relevant info of the splitting field L of K = Q(th)
+L, tl:= SplittingField(f);
+OL:= MaximalOrder(L);
+tf,mapKL:= IsSubfield(K,L);
+assert tf;
+assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
+fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+// generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
+ijkL,AutL:= ijkAutL(fieldLinfo);
+assert ijkL[3](th) eq L!th; // this is the identity automorphism
+
 // generate a record to store relevant class group info
 ClassGroupInfo:= recformat<classgroup,classnumber,map>;
 ClK:= rec< ClassGroupInfo | >;
@@ -2005,7 +2193,7 @@ assert (IsEmpty(afplist) eq false);
 alphgamlist:= prep2(fieldKinfo,ClK,afplist);
 // ensure the list of S-unit equations is non-trivial and aligns with
 // results of GenerateSUnitEquations.m
-assert #alphgamlist eq #ranks;
+assert (#alphgamlist eq #ranks) and (#alphgamlist ne 0);
 Sort(~ranks);
 RankTest:= [];
 for j in [1..#alphgamlist] do
@@ -2015,88 +2203,63 @@ end for;
 Sort(~RankTest);
 assert ranks eq RankTest;
 
+UpperBounds(fieldKinfo,clist,~alphgamlist);
 
-// UP TO HERE
-
-
-complexPrec:= 400;
-t9:= Cputime();
-UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-Append(~timings,<Cputime(t9),"initial bound">);
+// PLACEHOLDER; FIX HERE LATER
+// 0. start precision loop with multiplier a la Kyle
+pAdicPrecMultiplier:= [1 :
 
 
 
 
-// generate a record to store relevant info of the splitting field L of K = Q(th)
-L, tl:= SplittingField(f);
-t2:= Cputime();
-OL:= MaximalOrder(L);
-printf hash cat " Total time to compute the ring of integers of L: %o \n", Cputime(t2);
-tf,mapKL:= IsSubfield(K,L);
-assert tf;
-assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+// 1. generate unbounded prime list across all cases
+// 2. generate Completion(K,unbounded prime), MinPoly , thetap, as list of recformats
+// 3. determine i0,j,k for early bound
+//
 
-// generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
-ijkL,AutL:= ijkAutL(fieldLinfo);
-assert ijkL[3](th) eq L!th; // this is the identity automorphism
 
-// empty alphgamlist should have been remvoed !!!
-assert (IsEmpty(alphgamlist) eq false);
-complexPrec:= 400;
-t8:= Cputime();
-UpperBounds(fieldKinfo,clist,~alphgamlist,complexPrec);
-printf hash cat " Total time to compute initial height bounds: %o \n", Cputime(t8);
+pAdicPrec:= 100;
+// CREATE PRECISION LOOP?
+// pAdicPrecMult:= [1 : i in [1..5]];
+//
 
-// didn't run any Thue tests !!!!!!!!!!!
-assert IsEmpty(TMSolutions);
+
+
+/////////////////////////////////////////////////
+/*
+Compute completion of K at each pp[i][j] (Kpp[i][j])
+and the embedding of K into
+Kpp[i][j] (mKpp[i][j]).
+Also, for each pp[i][j], compute the corresponding factor of g(t) in \QQ_{p[i]}[t] (gp[i][j])
+gp[i][j] = g_j(t) from Section 3 with p=p_i
+*/
+////////////////////////////////////////////////
+    Kpp:=[];
+    mKpp:=[];
+    gp:=[**];
+    for i:=1 to v do
+	Kpp[i]:=[];
+	mKpp[i]:=[**];
+	gp[i]:=[];
+	for j:=1 to m[i] do //m[i]:=number of distinct prime factors of p[i]
+	    Kpp[i][j], mKpp[i][j]:=Completion(K,pp[i][j] : Precision :=padicprecision[i] );
+	    gp[i][j]:=MinimalPolynomial( mKpp[i][j](theta), PrimeField(Kpp[i][j]));
+	end for;
+    end for;
+
+
+
+
+
+
+// all new stuff:
+
+
+
 
 for j in [1..#alphgamlist] do
     idealEq:= alphgamlist[j];
     jhash:= hash cat "Case" cat IntegerToString(j);
-
-    /*fprintf SUnitEq, jhash cat " Minimal polynomial for K: %o \n", fclist;
-    fprintf SUnitEq, jhash cat " Class number: %o \n", ClK`classnumber;
-    if #fieldKinfo`fundamentalunits eq 1 then
-	fprintf SUnitEq, jhash cat " Fundamental unit: " cat
-			 Sprint(K!fieldKinfo`fundamentalunits[1]) cat "\n";
-    elif #fieldKinfo`fundamentalunits eq 2 then
-	fprintf SUnitEq, jhash cat " Fundamental units: " cat
-			 Sprint(K!fieldKinfo`fundamentalunits[1]) cat
-			 Sprint(K!fieldKinfo`fundamentalunits[2]) cat "\n";
-    end if;
-    fprintf SUnitEq, jhash cat " Zeta: %o \n", K!fieldKinfo`zeta;
-    fprintf SUnitEq, jhash cat " Alpha: %o \n", K!idealEq`alpha;
-    if #idealEq`gammalist eq 1 then
-	fprintf SUnitEq, jhash cat " Gamma: " cat Sprint(K!idealEq`gammalist[1])
-			 cat "\n";
-    else
-	fprintf SUnitEq,
-		jhash cat " Gammas: " cat
-		&cat[Sprintf( "%o, ", K!idealEq`gammalist[i], K!idealEq`gammalist[i]): i in [1..#idealEq`gammalist-1]]
-		cat Sprint(K!idealEq`gammalist[#idealEq`gammalist]) cat "\n";
-    end if;
-    fprintf SUnitEq, jhash cat " S-unit equation rank: %o \n",
-	    #idealEq`gammalist+#fieldKinfo`fundamentalunits;
-    fprintf SUnitEq, jhash cat " Initial bound: %o \n", idealEq`bound;
-   */
-
-
-
-
-
-
-end for;
-
-
-
-
-printf hash cat " Total time: %o\n", Cputime(t0);
-UnsetLogFile();
-exit;
-
-
-
 
 
 

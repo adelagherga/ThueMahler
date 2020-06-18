@@ -9,14 +9,14 @@ intrinsic TMAllCases(C::[RngIntElt],p::[RngIntElt],A::RngIntElt,LogFile::MonStgE
 LogFile is a string giving the name of the log file
 OutFile is a string giving the name of the output file
 
-FindAll is a boolean variable. If FindAll is false, 
-the function only finds the small solutions of the 
-Thue-Mahler equation. Otherwise, it finds all the 
+FindAll is a boolean variable. If FindAll is false,
+the function only finds the small solutions of the
+Thue-Mahler equation. Otherwise, it finds all the
 solutions.
 
 C is the (integer) sequence of coefficients of F(x,y).
 C[i+1] = c_i for i = 0,...,n from (3).
-Note that the coefficient c_0 of x^n is entered explicity. 
+Note that the coefficient c_0 of x^n is entered explicity.
 It is NOT assumed that c_0 = 1.
 It is assumed that c_0 neq 0.
 
@@ -28,8 +28,8 @@ It is NOT assumed that (a,p_i)=1 for i=1,..,v.
 
 If F is not irreducible, an error is raised.
 
-The function checks whether the equation has solutions mod q 
-for each prime q <= 151 in p, each prime q<=151 dividing a, and every other prime 
+The function checks whether the equation has solutions mod q
+for each prime q <= 151 in p, each prime q<=151 dividing a, and every other prime
 q <= 101.
 
 For the example equation solved in [TW2], we would use
@@ -44,7 +44,7 @@ OutFile:="out.txt";
 //Description of Output:
 ////////////////////////////////////////////////
 /*
-The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler 
+The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler
 equation with gcd(X,Y)=1 and gcd(c_0,Y) = 1.
 */
 ///////////////////////////////////////////////
@@ -105,14 +105,14 @@ LogFileOutFile:=[LogFile,OUtFile];
 LogFile is a string giving the name of the log file
 OutFile is a string giving the name of the output file
 
-FindAll is a boolean variable. If FindAll is false, 
-the function only finds the small solutions of the 
-Thue-Mahler equation. Otherwise, it finds all the 
+FindAll is a boolean variable. If FindAll is false,
+the function only finds the small solutions of the
+Thue-Mahler equation. Otherwise, it finds all the
 solutions.
 
 C is the (integer) sequence of coefficients of F(x,y).
 C[i+1] = c_i for i = 0,...,n from (3).
-Note that the coefficient c_0 of x^n is entered explicity. 
+Note that the coefficient c_0 of x^n is entered explicity.
 It is NOT assumed that c_0 = 1.
 It is assumed that c_0 neq 0.
 
@@ -124,8 +124,8 @@ It is NOT assumed that (a,p_i)=1 for i=1,..,v.
 
 If F is not irreducible, an error is raised.
 
-The function checks whether the equation has solutions mod q 
-for each prime q <= 151 in p, each prime q<=151 dividing a, and every other prime 
+The function checks whether the equation has solutions mod q
+for each prime q <= 151 in p, each prime q<=151 dividing a, and every other prime
 q <= 101.
 
 For the example equation solved in [TW2], we would use
@@ -140,7 +140,7 @@ OutFile:="out.txt";
 //Description of Output:
 ////////////////////////////////////////////////
 /*
-The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler 
+The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler
 equation with gcd(X,Y)=1 and gcd(c_0,Y) = 1 that come from cases
 i=StartCases to i=FinalCases.
 */
@@ -207,7 +207,7 @@ for sol1 in SOL1 do
 //if IsDivisibleBy(X,C[0+1]) then
 //x:=X/C[0+1];
 if IsDivisibleBy(sol1[1],C[0+1]) then
-x:=sol1[1]/C[0+1];    
+x:=sol1[1]/C[0+1];
 sol2[1]:=Integers() ! x;
 sol2[2]:=sol1[2];
 
@@ -252,9 +252,9 @@ intrinsic FIsIrreducible(c::[RngIntElt]) -> BoolElt
 //Description of Input
 ////////////////////////////////////////////////////
 /*
-c is the (integer) sequence of coefficients of F(x,y). 
-c[i]=c_i from (3). 
-The coefficient c_0 of x^n is not to be entered.  
+c is the (integer) sequence of coefficients of F(x,y).
+c[i]=c_i from (3).
+The coefficient c_0 of x^n is not to be entered.
 It is assumed that c_0=1.
 */
 ////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ Outputs false if F(x,y) is reducible.
 */
 //////////////////////////////////////
 n:=#c;
-Zxy<x,y>:=PolynomialRing(IntegerRing(), 2); 
+Zxy<x,y>:=PolynomialRing(IntegerRing(), 2);
 F:=x^n+c[n]*y^n;
 for i:=1 to n-1 do
 F:=F+c[i]*x^(n-i)*y^i;
@@ -284,10 +284,10 @@ intrinsic HasSolutionModqWhereqDividesRHS(c::[RngIntElt],q::RngIntElt) -> BoolEl
 //Description of Input
 ////////////////////////////////////////////////////
 /*
-c is the (integer) sequence of coefficients of F(x,y). 
-c[i]=c_i from (3). The 
-coefficient c_0 of x^n is not to be entered.  
-It is assumed that c_0=1.  
+c is the (integer) sequence of coefficients of F(x,y).
+c[i]=c_i from (3). The
+coefficient c_0 of x^n is not to be entered.
+It is assumed that c_0=1.
 It is also assumed that F(x,y) is irreducible.
 
 p is the sequence of rational primes. p[i]=p_i from (3).
@@ -297,7 +297,7 @@ p is the sequence of rational primes. p[i]=p_i from (3).
 a is the integer a from (3).
 
 It is assumed that (a,p_i)=1 for i=1,..,v.
-  
+
 For the example equation solved in [TW2], we would use
 c:=[-23,5,24];
 p:=[2,3,5,7];
@@ -329,9 +329,9 @@ Remove(~XY, 1);
 
 for xy in XY do
 /*
-For all integers a,b not both zero, there are integers x,y 
+For all integers a,b not both zero, there are integers x,y
 such that x = a (mod q), y = b (mod q), and gcd(x,y) = 1.
-So we only need to exclude the case x = y = 0 (mod q) to 
+So we only need to exclude the case x = y = 0 (mod q) to
 account for the condition (x,y)=1.
 */
 x:=xy[1];
@@ -341,7 +341,7 @@ for i:=1 to n-1 do
 LHS:=LHS+c[i]*x^(n-i)*y^i;
 end for;
 if IsZero(LHS) then //there is a solution mod q
-flag:=true;  
+flag:=true;
 break xy;
 end if;
 
@@ -360,10 +360,10 @@ intrinsic HasSolutionModqWhereqDoesNotDivideRHS(c::[RngIntElt],p::[RngIntElt],a:
 //Description of Input
 ////////////////////////////////////////////////////
 /*
-c is the (integer) sequence of coefficients of F(x,y). 
-c[i]=c_i from (3). The 
-coefficient c_0 of x^n is not to be entered.  
-It is assumed that c_0=1.  
+c is the (integer) sequence of coefficients of F(x,y).
+c[i]=c_i from (3). The
+coefficient c_0 of x^n is not to be entered.
+It is assumed that c_0=1.
 It is also assumed that F(x,y) is irreducible.
 
 p is the sequence of rational primes. p[i]=p_i from (3).
@@ -374,7 +374,7 @@ p is the sequence of rational primes. p[i]=p_i from (3).
 a is the integer a from (3).
 
 It is assumed that (a,p_i)=1 for i=1,..,v.
-  
+
 For the example equation solved in [TW2], we would use
 c:=[-23,5,24];
 p:=[2,3,5,7];
@@ -426,9 +426,9 @@ else
 
 for xy in XY do
 /*
-For all integers a,b not both zero, there are integers x,y 
+For all integers a,b not both zero, there are integers x,y
 such that x = a (mod q), y = b (mod q), and gcd(x,y) = 1.
-So we only need to exclude the case x = y = 0 (mod q) to 
+So we only need to exclude the case x = y = 0 (mod q) to
 account for the condition (x,y)=1.
 */
 x:=xy[1];
@@ -444,7 +444,7 @@ RHS:=RHS*pq[i]^z[i];
 end for;
 
 if IsZero(LHS-RHS) then //there is a solution mod q
-flag:=true;  
+flag:=true;
 break xy;
 end if;
 
@@ -471,10 +471,10 @@ N:=cpaN[4];
 //Description of Input
 ////////////////////////////////////////////////////
 /*
-c is the (integer) sequence of coefficients of F(x,y). 
-c[i]=c_i from (3). The 
-coefficient c_0 of x^n is not to be entered.  
-It is assumed that c_0=1.  
+c is the (integer) sequence of coefficients of F(x,y).
+c[i]=c_i from (3). The
+coefficient c_0 of x^n is not to be entered.
+It is assumed that c_0=1.
 It is also assumed that F(x,y) is irreducible.
 
 p is the sequence of rational primes. p[i]=p_i from (3)
@@ -500,26 +500,26 @@ LogFile:="log.txt";
 //Description
 ////////////////////////////////////////////////////
 /*
-1. For each p[i] <= N[1], we check if the equation has a solution mod p[i]. 
-If the equation has no solutions modulo p[i], then we set 
-LacksLocalSolutions:=true and exit. If the equation has solutions modulo 
-p[i] when the exponent z[i]=0, but has no solutions modulo p[i] when the exponent z[i]>0, then we remove p[i] from the list of primes p. We also keep track of the original indices of the removed primes in the sequence 
+1. For each p[i] <= N[1], we check if the equation has a solution mod p[i].
+If the equation has no solutions modulo p[i], then we set
+LacksLocalSolutions:=true and exit. If the equation has solutions modulo
+p[i] when the exponent z[i]=0, but has no solutions modulo p[i] when the exponent z[i]>0, then we remove p[i] from the list of primes p. We also keep track of the original indices of the removed primes in the sequence
 OriginalIndicesOfRemovedPrimes.
 
-2. We check if the equation has solutions mod q for each prime q <= N[2] 
+2. We check if the equation has solutions mod q for each prime q <= N[2]
 which divides a. If the equation has no solutions mod q, then then we set LacksLocalSolutions:=true and exit.
 
-3. We check if the equation has solutions mod q for each prime q <= N[3]. 
+3. We check if the equation has solutions mod q for each prime q <= N[3].
 If the equation has no solutions mod q, then then we set LacksLocalSolutions:=true and exit.
 
-4. If the function makes it this far, the equation has local solutions for 
+4. If the function makes it this far, the equation has local solutions for
 every prime we have tested. We set LacksLocalSolutions:=false and exit.
 
-Note: Large primes mean checking the congruences can take a long time. 
+Note: Large primes mean checking the congruences can take a long time.
 The purpose of N is to let use avoid these large primes to save time.
 */
-/////////////////////////////////////////////////// 
-for j:=0 to 0 do //this loop is a hack to let us exit when we want 
+///////////////////////////////////////////////////
+for j:=0 to 0 do //this loop is a hack to let us exit when we want
 originalv:=#p;
 v:=originalv;  //current size of p
 
@@ -530,12 +530,12 @@ if p[i] le N[1] then
 if HasSolutionModqWhereqDoesNotDivideRHS(c,Remove(p,i),a,p[i]) then
 
 if HasSolutionModqWhereqDividesRHS(c,p[i]) then
-else 
+else
 fprintf LogFile, "No solutions with positive exponent of %o\n", p[i];
 Remove(~p,i);
 i-:=1;
 v-:=1;
-Append(~OriginalIndicesOfRemovedPrimes,k); 
+Append(~OriginalIndicesOfRemovedPrimes,k);
 //k = original index of removed prime
 end if;
 
@@ -543,7 +543,7 @@ else
 
 if HasSolutionModqWhereqDividesRHS(c,p[i]) then
 else
-LacksLocalSolutions:=true; 
+LacksLocalSolutions:=true;
 printf "No solutions mod %o\n", p[i];
 break j;
 end if;
@@ -595,24 +595,24 @@ end intrinsic;
 
 intrinsic TdWCases(c::[RngIntElt],p::[RngIntElt],a::RngIntElt,LogFileOutFile::[MonStgElt],FindAll::BoolElt,StartEndCase::[RngIntElt]) -> []
 {Return the solutions of the Thue-Mahler equation}
-//SetOutputFile("intout.txt": Overwrite := true);
+    //SetOutputFile("intout.txt": Overwrite := true);
 
-////////////////////////////////////////////////////
-//Description of Input
-////////////////////////////////////////////////////
-/*
+    ////////////////////////////////////////////////////
+    //Description of Input
+    ////////////////////////////////////////////////////
+    /*
 LogFile is a string giving the name of the log file
 OutFile is a string giving the name of the output file
 
-FindAll is a boolean variable. If FindAll is false, 
-the function only finds the small solutions of the 
-Thue-Mahler equation. Otherwise, it finds all the 
+FindAll is a boolean variable. If FindAll is false,
+the function only finds the small solutions of the
+Thue-Mahler equation. Otherwise, it finds all the
 solutions.
 
-c is the (integer) sequence of coefficients of F(x,y). 
-c[i]=c_i from (3). 
-The coefficient c_0 of x^n is not to be entered.  
-It is assumed that c_0=1. 
+c is the (integer) sequence of coefficients of F(x,y).
+c[i]=c_i from (3).
+The coefficient c_0 of x^n is not to be entered.
+It is assumed that c_0=1.
 It is also assumed that F(x,y) is irreducible.
 
 p is the sequence of rational primes. p[i]=p_i from (3)
@@ -620,21 +620,21 @@ p is the sequence of rational primes. p[i]=p_i from (3)
 a is the integer a from (3).
 
 It is assumed that (a,p_i)=1 for i=1,..,v.
-  
+
 For the example equation solved in [TW2], we would use
 c:=[-23,5,24];
 p:=[2,3,5,7];
-a:=1; 
+a:=1;
 LogFile:="output/log.txt";
-*/
+   */
 
-///////////////////////////////////////////////
-//Description of Output:
-////////////////////////////////////////////////
-/*
-The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler 
+    ///////////////////////////////////////////////
+    //Description of Output:
+    ////////////////////////////////////////////////
+    /*
+The list of solutions [X,Y,z_1,...,z_v] of the Thue-Mahler
 equation with gcd(X,Y)=1.
-*/
+   */
 
 StartCase:=StartEndCase[1];
 EndCase:=StartEndCase[2];
@@ -645,7 +645,7 @@ OutFile:=LogFileOutFile[2];
 //Define the n = degree of g(t) and v = number of primes
 ///////////////////////////////////////////////////////
 n:=#c;  //degree of F(t,1)=g(t)
-v:=#p;  //number of primes 
+v:=#p;  //number of primes
 
 ////////////////////////////////////////////////////
 //List of Solutions
@@ -661,7 +661,7 @@ Solutions:=[]; //to be filled
 Zt<t>:=PolynomialRing(Integers());
 g:=t^n+c[n];
 for i:=1 to n-1 do
-g:=g+c[i]*t^(n-i);
+    g:=g+c[i]*t^(n-i);
 end for;
 
 DiscriminantOfg:=Discriminant(g);
@@ -674,17 +674,16 @@ DiscriminantOfg:=Discriminant(g);
 K<theta>:=NumberField(g);
 
 //Compute the ring of integers OK of K
-OK:=MaximalOrder(K); 
+OK:=MaximalOrder(K);
 
 //Compute an integral basis for K
 IntegralBasisK:=IntegralBasis(K);
 
-//For each element of the integral basis for K, compute its 
+//For each element of the integral basis for K, compute its
 //coefficients on the power basis of K: 1,theta,...,theta^{n-1}
 CoefficientsOfIntegralBasisElement:=[];
 for i:=1 to n do
-CoefficientsOfIntegralBasisElement[i]:=
-Eltseq(IntegralBasisK[i]);
+    CoefficientsOfIntegralBasisElement[i]:=	Eltseq(IntegralBasisK[i]);
 end for;
 
 /*
@@ -699,20 +698,20 @@ CoefficientsOfIntegralBasisElement[3][1]*theta^(1-1) + CoefficientsOfIntegralBas
 IntegralBasisK[3];
 */
 
-//s = number of real embeddings, 2t = number of complex 
+//s = number of real embeddings, 2t = number of complex
 //embeddings
 s,t:=Signature(K);
 
 //number of fundamental units
-r:=s+t-1; 
+r:=s+t-1;
 
-//Compute a set of fundamental units and 
+//Compute a set of fundamental units and
 //express them as elements in OK in terms of the integral basis
 //they are represented by their coefficients on the integral basis
 U,psi:=UnitGroup(OK);
 eps:=[];
 for i:= 1 to r do
-eps[i]:=psi(U.(i+1));
+    eps[i]:=psi(U.(i+1));
 end for;
 eps[s+t]:=psi(U.1); //generator for units of finite order
 
@@ -720,17 +719,17 @@ eps[s+t]:=psi(U.1); //generator for units of finite order
 fprintf LogFile, "eps = %o\n", eps;
 PrintFile(LogFile,"Are they units?");
 for i:=1 to s+t do
-PrintFile(LogFile,IsUnit(eps[i]));
+    PrintFile(LogFile,IsUnit(eps[i]));
 end for;
 
 for i:=1 to r do
-for j:=1 to n do
-if eps[i][j] eq 0 then
-fprintf LogFile, "Digits(eps[%o][%o]) = %o\n", i, j, 0;
-else
-fprintf LogFile, "Digits(eps[%o][%o]) = %o\n", i, j, Ceiling(Log(Abs(eps[i][j]))/Log(10));
-end if;
-end for;
+    for j:=1 to n do
+	if eps[i][j] eq 0 then
+	    fprintf LogFile, "Digits(eps[%o][%o]) = %o\n", i, j, 0;
+	else
+	    fprintf LogFile, "Digits(eps[%o][%o]) = %o\n", i, j, Ceiling(Log(Abs(eps[i][j]))/Log(10));
+	end if;
+    end for;
 end for;
 
 //Compute the divisors of the class number of K
@@ -746,12 +745,11 @@ Compute the splitting field F of g over Q (FFF), the roots of g in F (rootsofgin
 FFF,rootsofginFFF:=SplittingField(g);
 OF:=MaximalOrder(FFF);
 
-////////////////////////////////////////////////////////////////////
 /*
+////////////////////////////////////////////////////////////////////
 Set precision for real/complex and p-adic computations
 
-We want the precision for real/complex computations (realprecision) to be about three time as large as the largest value of Log(C)/Log(10) (the number of decimal digits in C)  that we expect will occur in the real reduction step (Section 19).  C will about the size of H_0^(v+r), so we want to take
-realprecision \approx 2*(v+r)*Log(H_0)/Log(10).  (We would be fine if instead of "four times as large" it was just "larger" than.  We go four times as large as a safety factor to avoid having to back up and do all the calculations again with an increased precision.)
+We want the precision for real/complex computations (realprecision) to be about three time as large as the largest value of Log(C)/Log(10) (the number of decimal digits in C)  that we expect will occur in the real reduction step (Section 19).  C will about the size of H_0^(v+r), so we want to take realprecision \approx 2*(v+r)*Log(H_0)/Log(10).  (We would be fine if instead of "four times as large" it was just "larger" than.  We go four times as large as a safety factor to avoid having to back up and do all the calculations again with an increased precision.)
 
 We want to choose the precision for p_i-adic computations (padicprecision[i]) is about three times as large as the largest value of m that we expect will occur in the p_i-adic reduction step (Section 18).  m will be of a size that makes p_i^m \approx H_0^(v+r), so we want to take
 padicprecision[i] \approx 2*(v+r)*Log(H_0)/Log(p[i]).  (We would be fine if instead of "four times as large" it was just "larger" than.  We go four times as large as a safety factor to avoid having to back up and do all the calculations again with an increased precision.)
@@ -768,44 +766,44 @@ The constant c_17 from Matveev's Theorem will be bounded by something of the siz
 
 2^(6*(1+v+r)+20) * Degree(F)^(3+v+r) * Log(Degree(F)) * 10^(1+v+r)
 
-Here we are assuming that the absolute logarithmic heights involved are <= 10.  
+Here we are assuming that the absolute logarithmic heights involved are <= 10.
 
-We set the up a loop so that, if the precisions are not high enough, 
+We set the up a loop so that, if the precisions are not high enough,
 we back up and start again with more precision.
-*/
-////////////////////////////////////////////////////////////////////////////
 
-RealPrecisionMultiplier:=1;
+
+////////////////////////////////////////////////////////////////////////////
+*/
+
+RealPrecisionMultiplier:= 1;
 PadicPrecisionMultiplier:=[];
 for i:=1 to v do
-PadicPrecisionMultiplier[i]:=1;
+    PadicPrecisionMultiplier[i]:=1;
 end for;
-
 for PrecisionLoopVariable:=1 to 5 do
 
-if PrecisionLoopVariable eq 5 then
-print("Something is wrong. 
+    if PrecisionLoopVariable eq 5 then
+	print("Something is wrong.
 The required precision for the computation seems to be very large.");
-break PrecisionLoopVariable;
-end if;
+	break PrecisionLoopVariable;
+    end if;
 
-H0estimate:=Max([
-(16*Exp(1)*Degree(FFF))^(2*(2+v+r)) * (1+v+r)^3 * Log(Degree(FFF)*(1+v+r)) * Max(p)^(Degree(FFF)) * (10)^(1+v+r),
-2^(6*(1+v+r)+20) * Degree(FFF)^(3+v+r) * Log(Degree(FFF)) * 10^(1+v+r)
-]);
+    H0estimate:=Max([(16*Exp(1)*Degree(FFF))^(2*(2+v+r)) * (1+v+r)^3 * Log(Degree(FFF)*(1+v+r))
+		     * Max(p)^(Degree(FFF)) * (10)^(1+v+r),
+		     2^(6*(1+v+r)+20) * Degree(FFF)^(3+v+r) * Log(Degree(FFF)) * 10^(1+v+r) ]);
 
-realprecision:=4*Ceiling((v+r)*Log(H0estimate)/Log(10));
-realprecision:=realprecision*RealPrecisionMultiplier;
+    realprecision:=4*Ceiling((v+r)*Log(H0estimate)/Log(10));
+    realprecision:=realprecision*RealPrecisionMultiplier;
 
-padicprecision:=[];
-for i:=1 to v do
-padicprecision[i]:=4*Ceiling((v+r)*Log(H0estimate)/Log(p[i]));
-padicprecision[i]:=padicprecision[i]*PadicPrecisionMultiplier[i];
-end for;
+    padicprecision:=[];
+    for i:=1 to v do
+	padicprecision[i]:=4*Ceiling((v+r)*Log(H0estimate)/Log(p[i]));
+	padicprecision[i]:=padicprecision[i]*PadicPrecisionMultiplier[i];
+    end for;
 
-realprecision:=realprecision;
-SetDefaultRealField(RealField(realprecision));
-PI:=Pi(RealField());
+    realprecision:=realprecision;
+    SetDefaultRealField(RealField(realprecision));
+    PI:=Pi(RealField());
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -818,65 +816,65 @@ Also store the indices j of the unramified degree one primes pp[i][j] above p[i]
 */
 ///////////////////////////////////////////////////////////////////////////////
 
-pp:=[];
-m:=[];
-e:=[];
-f:=[];
-IndicesOfUnramifiedDegreeOnePrimesAbovep:=[];
-h:=[];
-pi:=[];
-DecompositionOfp:=[];
-for i:=1 to v do
-pp[i]:=[];
-e[i]:=[];
-f[i]:=[];
-IndicesOfUnramifiedDegreeOnePrimesAbovep[i]:=[];
-h[i]:=[];
-pi[i]:=[];
-DecompositionOfp[i]:=Decomposition(OK,p[i]);
-m[i]:=#DecompositionOfp[i]; //number of distinct prime factors of p[i]
-for j:=1 to m[i] do
-pp[i][j]:=DecompositionOfp[i][j][1];
-e[i][j]:=DecompositionOfp[i][j][2];
-f[i][j]:=InertiaDegree(pp[i][j]);
-if e[i][j]*f[i][j] eq 1 then
-Append(~IndicesOfUnramifiedDegreeOnePrimesAbovep[i],j);
-for k:=1 to #DivisorsOfClassNumberOfK do
-if IsPrincipal(pp[i][j]^DivisorsOfClassNumberOfK[k]) then
-h[i][j]:=DivisorsOfClassNumberOfK[k];
-temp,pi[i][j]:=IsPrincipal(pp[i][j]^DivisorsOfClassNumberOfK[k]);
-break k;
-end if;
-end for;
-else
-h[i][j]:=0;            //initialization, never used
-pi[i][j]:=eps[s+t];   //initialization, never used
-end if;
-end for; //end j loop
-end for; //end i loop
+    pp:=[];
+    m:=[];
+    e:=[];
+    f:=[];
+    IndicesOfUnramifiedDegreeOnePrimesAbovep:=[];
+    h:=[];
+    pi:=[];
+    DecompositionOfp:=[];
+    for i:=1 to v do
+	pp[i]:=[];
+	e[i]:=[];
+	f[i]:=[];
+	IndicesOfUnramifiedDegreeOnePrimesAbovep[i]:=[];
+	h[i]:=[];
+	pi[i]:=[];
+	DecompositionOfp[i]:=Decomposition(OK,p[i]);
+	m[i]:=#DecompositionOfp[i]; //number of distinct prime factors of p[i]
+	for j:=1 to m[i] do
+	    pp[i][j]:=DecompositionOfp[i][j][1];
+	    e[i][j]:=DecompositionOfp[i][j][2];
+	    f[i][j]:=InertiaDegree(pp[i][j]);
+	    if e[i][j]*f[i][j] eq 1 then
+		Append(~IndicesOfUnramifiedDegreeOnePrimesAbovep[i],j);
+		for k:=1 to #DivisorsOfClassNumberOfK do
+		    if IsPrincipal(pp[i][j]^DivisorsOfClassNumberOfK[k]) then
+			h[i][j]:=DivisorsOfClassNumberOfK[k];
+			temp,pi[i][j]:=IsPrincipal(pp[i][j]^DivisorsOfClassNumberOfK[k]);
+			break k;
+		    end if;
+		end for;
+	    else
+		h[i][j]:=0;            //initialization, never used
+		pi[i][j]:=eps[s+t];   //initialization, never used
+	    end if;
+	end for; //end j loop
+    end for; //end i loop
 
 
 /////////////////////////////////////////////////
 /*
-Compute completion of K at each pp[i][j] (Kpp[i][j]) 
-and the embedding of K into 
-Kpp[i][j] (mKpp[i][j]).  
+Compute completion of K at each pp[i][j] (Kpp[i][j])
+and the embedding of K into
+Kpp[i][j] (mKpp[i][j]).
 Also, for each pp[i][j], compute the corresponding factor of g(t) in \QQ_{p[i]}[t] (gp[i][j])
 gp[i][j] = g_j(t) from Section 3 with p=p_i
 */
 ////////////////////////////////////////////////
-Kpp:=[];
-mKpp:=[];
-gp:=[**];
-for i:=1 to v do
-Kpp[i]:=[];
-mKpp[i]:=[**];
-gp[i]:=[];
-for j:=1 to m[i] do //m[i]:=number of distinct prime factors of p[i]
-Kpp[i][j], mKpp[i][j]:=Completion(K,pp[i][j] : Precision :=padicprecision[i] );
-gp[i][j]:=MinimalPolynomial( mKpp[i][j](theta), PrimeField(Kpp[i][j]));
-end for;
-end for;
+    Kpp:=[];
+    mKpp:=[];
+    gp:=[**];
+    for i:=1 to v do
+	Kpp[i]:=[];
+	mKpp[i]:=[**];
+	gp[i]:=[];
+	for j:=1 to m[i] do //m[i]:=number of distinct prime factors of p[i]
+	    Kpp[i][j], mKpp[i][j]:=Completion(K,pp[i][j] : Precision :=padicprecision[i] );
+	    gp[i][j]:=MinimalPolynomial( mKpp[i][j](theta), PrimeField(Kpp[i][j]));
+	end for;
+    end for;
 
 //LocalFactorization(PolynomialRing(pAdicRing(p[1] : Precision:=20)) ! g : Ideals:=true);
 
@@ -888,8 +886,8 @@ Note FFFppF contains the splitting field of g over Q_{p[i]}.
 
 MAGMA currently does not support the direct computation of the splitting field of g over Q_{p[i]}.  The function that purports to do this fails for p[i] that ramify in the K.
 
-Note that since F/Q is Galois, every prime ideal of OF above p[i] has the same 
-ramification index and residue degree 
+Note that since F/Q is Galois, every prime ideal of OF above p[i] has the same
+ramification index and residue degree
 */
 /////////////////////////////////////////////////////////////////////
 ppF:=[];  //ppF[i] is a prime of FFF above p[i] selected essentially arbitrarily
@@ -913,20 +911,20 @@ end for;  //end i loop
 
 ////////////////////////////////////////////////////////////////
 /*
-Magma's Completion() function will make FFFppF[l] as one the following types of field extensions 
+Magma's Completion() function will make FFFppF[l] as one the following types of field extensions
 1. an unramified extension over the p_l-adic field
 2. a totally ramified extension over a p_l-adic field
 3. an unramified extension over an unramified extension over a p_l-adic field
 4. a totally ramified extension over an unramified extension over a p-adic field
 
-We will later want to find the coefficients of elements of FFFppF[l] on the (canonical) power basis of FFFppF[l] over Q_{p_l}.  For this, it will be important to know what type of extension FFFppF[l] is.  The variable 
+We will later want to find the coefficients of elements of FFFppF[l] on the (canonical) power basis of FFFppF[l] over Q_{p_l}.  For this, it will be important to know what type of extension FFFppF[l] is.  The variable
 FFFppFType will indicate this.
 
 The first two types are easy to identify and they come as simple extensions, which will let us use MAGMA built-in function for finding the coefficients of elements on the power basis.
-  
+
 The third type seems to be a quirk of Magma.  The top extension always has degree 1 relative to the intermediate extension.  Moreover, the minimal polynomial of the top extension over the intermediate extension is always x.  Finding the coefficients of elements on the power basis will be only slighlty harder than in cases 1. and 2.
 
-For the fourth type, the top extension will always have relative degree greater than one.  We will have to work a bit harder to find coefficients of elements here.  
+For the fourth type, the top extension will always have relative degree greater than one.  We will have to work a bit harder to find coefficients of elements here.
 
 First we find an element generator[l] that generates FFFppF[l] over Q_{p_l}.  Then we construct a matrix A[l] containing the information necessary to find the coefficients of elements of FFppF[l] on the basis 1,generator[l],...,generator[l]^(d3 - 1), where d3 = degree of FFFpFF[l] over Q_{p_l}.  We will actually need the inverse of this matrix, so we take it now.
 
@@ -941,7 +939,7 @@ generator^{k-1} = sum_{i,j} c_{ijk} \alpha^{i-1} \beta^{j-1}
 Here i ranges from 1 to d1, j ranges from 1 to d2, k ranges from 1 to d3.
 A[l] =
 c_{1 1 1} ... c_{1 1 d3}
-.                  . 
+.                  .
 .                  .
 .                  .
 c_{1 d2 1} ... c_{1 d2 d3}
@@ -972,39 +970,39 @@ for l:=1 to v do
 FFFppFType[l]:=5;           //initialize
 generator[l]:=FFFppF[l].1;   //initialize, only used in case FFFppFType[l]=4
 Ainverse[l]:=1;                    //initialize
-d1[l]:=Degree(FFFppF[l],CoefficientField(FFFppF[l]));                   
-d2[l]:=Degree(CoefficientField(FFFppF[l]),PrimeField(FFFppF[l]));             
+d1[l]:=Degree(FFFppF[l],CoefficientField(FFFppF[l]));
+d2[l]:=Degree(CoefficientField(FFFppF[l]),PrimeField(FFFppF[l]));
 d3[l]:=Degree(FFFppF[l],PrimeField(FFFppF[l]));
-u[l]:=1;     
+u[l]:=1;
 
-if AbsoluteRamificationIndex(FFFppF[l]) eq 1 then 
+if AbsoluteRamificationIndex(FFFppF[l]) eq 1 then
 FFFppFType[l]:=1;
 u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));
 if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
 end if;
 
-if AbsoluteInertiaDegree(FFFppF[l]) eq 1 then 
-FFFppFType[l]:=2; 
+if AbsoluteInertiaDegree(FFFppF[l]) eq 1 then
+FFFppFType[l]:=2;
 /*FFFppF[l];
 DefiningPolynomial(FFFppF[l]);
 Discriminant(DefiningPolynomial(FFFppF[l]));
 Parent((1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l]))));
 (1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));*/
 u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));
-if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if; 
+if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
 end if;
 
-if AbsoluteInertiaDegree(FFFppF[l]) gt 1 and d1[l] eq 1 then 
+if AbsoluteInertiaDegree(FFFppF[l]) gt 1 and d1[l] eq 1 then
 FFFppFType[l]:=3;
 u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(CoefficientField(FFFppF[l]))));
 if Valuation(CoefficientField(FFFppF[l]).1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
 end if;
 
 if d1[l] gt 1 and d2[l] gt 1 then
- 
+
 FFFppFType[l]:=4;
 
-k:=1; 
+k:=1;
 while true do
 generator[l] := k*FFFppF[l].1 + (FFFppF[l] ! CoefficientField(FFFppF[l]).1);
 if Degree(MinimalPolynomial(generator[l],PrimeField(FFFppF[l]))) eq d3[l] then
@@ -1058,7 +1056,7 @@ Output:  The coefficients of x on the basis power basis for FFFppF[l] over Q_{p_
 */
 output:=Coefficients(x);
 if FFFppFType[l] eq 3 then output:=Coefficients(Coefficient(x,1)); end if;
-if FFFppFType[l] eq 4 then 
+if FFFppFType[l] eq 4 then
 B:=ZeroMatrix( PrimeField(FFFppF[l]), d3[l], 1);
 temp1:=Coefficients(x);
 temp2:=Coefficients(temp1[1]); //initialize
@@ -1098,7 +1096,7 @@ end for;
 ///////////////////////////////////////////////////////////////
 /*
 ImageOfIntegralBasisElementp[L][i][j][k] = image of the kth element in the integral basis for K under the embedding of K into \overline{\QQ_{p_L}} defined by the map theta --> thetap[L][i][j]=
-*/ 
+*/
 ///////////////////////////////////////////////////////////////
 ImageOfIntegralBasisElementp:=[];
 for l:=1 to v do
@@ -1114,7 +1112,7 @@ ImageOfIntegralBasisElementp[l][i][j][k]:=ImageOfIntegralBasisElementp[l][i][j][
 end for; //ii
 end for; //k
 end for; //j
-end for; //i 
+end for; //i
 end for; //l
 
 ////////////////////////////////////////////////////////////////////////
@@ -1137,7 +1135,7 @@ ImageOfpip[L][k][l][i]:=[**];
 for j:=1 to e[l][i]*f[l][i] do
 ImageOfpip[L][k][l][i][j]:=0;
 for ii:= 1 to n do
-ImageOfpip[L][k][l][i][j]:=ImageOfpip[L][k][l][i][j] 
+ImageOfpip[L][k][l][i][j]:=ImageOfpip[L][k][l][i][j]
 + pi[L][k][ii]*ImageOfIntegralBasisElementp[l][i][j][ii];
 end for; //ii
 end for; //j
@@ -1159,7 +1157,7 @@ ImageOfepsp[L][l][i]:=[**];
 for j:=1 to e[l][i]*f[l][i] do
 ImageOfepsp[L][l][i][j]:=0;
 for ii:= 1 to n do
-ImageOfepsp[L][l][i][j]:=ImageOfepsp[L][l][i][j] 
+ImageOfepsp[L][l][i][j]:=ImageOfepsp[L][l][i][j]
 + eps[L][ii]*ImageOfIntegralBasisElementp[l][i][j][ii];
 end for; //ii
 end for; //j
@@ -1194,16 +1192,16 @@ thetaC:=Conjugates(theta);
 //thetaC[1]:=Roots(PolynomialRing(ComplexField())! g)[3][1];
 
 /*
-In the thesis, the roots of g in C are ordered so that 
+In the thesis, the roots of g in C are ordered so that
 thetaC[s+i] = overline(thetaC[s+t+i]) (i=1,...,t)
-Magma (and hence this program) orders the roots so that 
+Magma (and hence this program) orders the roots so that
 thetaC[s+2i-1] = overline(thetaC[s+2i]) (i=1,...,t).
 */
 
 ///////////////////////////////////////////////////////////////
 /*
 ImageOfIntegralBasisElementC[i][k] = image of the kth element in the integral basis for K under the embedding of K into \CC defined by the map theta --> thetaC[i]
-*/ 
+*/
 ///////////////////////////////////////////////////////////////
 ImageOfIntegralBasisElementC:=[];
 for i:=1 to n do
@@ -1273,7 +1271,7 @@ ImageOfpiC[L][k]:=[**];
 for i:=1 to n do
 ImageOfpiC[L][k][i]:=0;
 for ii:= 1 to n do
-ImageOfpiC[L][k][i]:=ImageOfpiC[L][k][i] 
+ImageOfpiC[L][k][i]:=ImageOfpiC[L][k][i]
 + pi[L][k][ii]*ImageOfIntegralBasisElementC[i][ii];
 end for; //ii
 end for; //i
@@ -1302,7 +1300,7 @@ end for; //L
 /*
 Recall F = the splitting field of g over Q
 
-thetaF:= the conjugates of theta as elements in F 
+thetaF:= the conjugates of theta as elements in F
 = the roots of the minimal polynomial of theta (i.e. of g) in F
 */
 //////////////////////////////////////////////////////////////////////
@@ -1311,7 +1309,7 @@ thetaF:=rootsofginFFF;
 ///////////////////////////////////////////////////////////////
 /*
 ImageOfIntegralBasisElementF[i][k] = image of the kth element in the integral basis for K under the embedding of K into F defined by the map theta --> thetaF[i]
-*/ 
+*/
 ///////////////////////////////////////////////////////////////
 ImageOfIntegralBasisElementF:=[];
 for i:=1 to n do
@@ -1341,7 +1339,7 @@ ImageOfpiF[L][k]:=[**];
 for i:=1 to n do
 ImageOfpiF[L][k][i]:=0;
 for ii:= 1 to n do
-ImageOfpiF[L][k][i]:=ImageOfpiF[L][k][i] 
+ImageOfpiF[L][k][i]:=ImageOfpiF[L][k][i]
 + pi[L][k][ii]*ImageOfIntegralBasisElementF[i][ii];
 end for; //ii
 end for; //i
@@ -1369,7 +1367,7 @@ end for; //L
 /*
 Compute the constant constant c10 = c_{10} from Section 12
 
-Note: If kappa = {k_1,...,k_r} with 1 <= k_1 < ... < k_r <= s+t, then there is a unique index k* in {1,...,s+t}-{k_1,...,k_r} and U_kappa from Section 12 is equal to the matrix formed by starting with the r by s+t matrix 
+Note: If kappa = {k_1,...,k_r} with 1 <= k_1 < ... < k_r <= s+t, then there is a unique index k* in {1,...,s+t}-{k_1,...,k_r} and U_kappa from Section 12 is equal to the matrix formed by starting with the r by s+t matrix
 U = (log|\eps_j^{(i)}|) and removing the k*th row.
 
 We use this equivalent definition of U_kappa below.
@@ -1377,11 +1375,11 @@ We use this equivalent definition of U_kappa below.
 ////////////////////////////////////////////////////////////////////////////
 
 //Function to compute maximum absolute row sum of an r by r matrix U
-function MaximumAbsoluteRowSum(U,r) 
+function MaximumAbsoluteRowSum(U,r)
 max:=0;
 for i:=1 to r do
 sum:=0;
-for j:=1 to r do 
+for j:=1 to r do
 sum:=sum+Abs(U[i][j]);
 end for;
 if sum gt max then max:=sum; end if;
@@ -1390,9 +1388,9 @@ return max;
 end function;
 
 /*
-In the thesis, the roots of g in C are ordered so that 
+In the thesis, the roots of g in C are ordered so that
 thetaC[s+i] = overline(thetaC[s+t+i]) (i=1,...,t)
-Magma (and hence this program) orders the roots so that 
+Magma (and hence this program) orders the roots so that
 thetaC[s+2i-1] = overline(thetaC[s+2i]) (i=1,...,t).
 */
 
@@ -1429,9 +1427,9 @@ c10:=1/currentmin;
 //Apply Prime Ideal Removing Lemma (PIRL)
 ///////////////////////////////////////////////////////////////////
 /*
-The elements of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L] will be of the form [[k],aaa].  
+The elements of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L] will be of the form [[k],aaa].
 
-If k <= m[L], then k has the meaning that pp[L][k] is the unconstrained prime above p[L] (pp[L][k] must have e[L][k]=f[L][k]=1).  
+If k <= m[L], then k has the meaning that pp[L][k] is the unconstrained prime above p[L] (pp[L][k] must have e[L][k]=f[L][k]=1).
 
 If k = m[L]+1, there is no prime above p[L] with ramification index and residue degree equal to one, hence no unconstrained prime above p[L].
 
@@ -1460,7 +1458,7 @@ SeqEnum
 for l:=0 to D[i] do
 aaa[i]:=l;
 if i eq m[L] then
-//aaa[k]:=0; 
+//aaa[k]:=0;
 Include(~LIST,[[k],aaa]);
 else
 for j:=i+1 to m[L] do
@@ -1504,7 +1502,7 @@ ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L]:=[];
 
 ////////////////////////////////////////////////////////////
 /*
-CC[i][j]:= \max\cbr{e_i,e_j} \cdot 
+CC[i][j]:= \max\cbr{e_i,e_j} \cdot
 \min_{k,l} \cbr{ord_p(theta_{i}^{(k)} - theta_{j}^{(l)})}
 */
 /////////////////////////////////////////////////////////////
@@ -1583,22 +1581,22 @@ end for;
 ///////////////////////////////////////////////////////
 /*
 For each unramified degree 1 prime pp[L][k] above p[L], list all valid tuples
-assuming pp[L][k] is the unconstrained prime ideal above p[L] dividing (x-y\theta).  
+assuming pp[L][k] is the unconstrained prime ideal above p[L] dividing (x-y\theta).
 
-The assumption means that, for i=1,...,m[L],i \neq k, we assume the 
-exponent of the prime ideal pp[L][i] above p[L] in the factorization of 
-(x-y\theta) is \leq (1/2)*max(e[L][1],...,e[L][m[L]])*ord_p(D_g).  We 
-assume nothing about the exponent ord_pp[L][k](x-y\theta) of pp[L][k] 
+The assumption means that, for i=1,...,m[L],i \neq k, we assume the
+exponent of the prime ideal pp[L][i] above p[L] in the factorization of
+(x-y\theta) is \leq (1/2)*max(e[L][1],...,e[L][m[L]])*ord_p(D_g).  We
+assume nothing about the exponent ord_pp[L][k](x-y\theta) of pp[L][k]
 in the factorization of (x-y\theta).
 
-For i=1,...,m[L],i \neq k, D[i] is an upper bound on the exponent of the 
+For i=1,...,m[L],i \neq k, D[i] is an upper bound on the exponent of the
 prime ideal pp[L][i] above p[L] in the factorization of bb=\mathfrak{b}
 
-The exponent of pp[L][k] in the factorization of (x-y\theta) is 
+The exponent of pp[L][k] in the factorization of (x-y\theta) is
 ord_pp[L][k](x-y\theta) (obviously).
-Suppose A < B.  The valid tuples aaa when ord_pp[L][k](x-y\theta) = B are a 
-subset of the valid tuples aaa when ord_pp[L][k](x-y\theta) = A.  So we only 
-need to consider ord_pp[L][k](x-y\theta) <= DD+1 to find all valid tuples in 
+Suppose A < B.  The valid tuples aaa when ord_pp[L][k](x-y\theta) = B are a
+subset of the valid tuples aaa when ord_pp[L][k](x-y\theta) = A.  So we only
+need to consider ord_pp[L][k](x-y\theta) <= DD+1 to find all valid tuples in
 when ord_pp[L][k](x-y\theta) >= DD+1 and when ord_pp[L][k](x-y\theta) <= DD
 Hence the definition of D[k] below.
 */
@@ -1663,12 +1661,12 @@ IndexOfTupleToRemove:=i2;
 break i2;
 
 end for;
-if IndexOfTupleToRemove ne -1 then 
+if IndexOfTupleToRemove ne -1 then
 Remove(~ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L],IndexOfTupleToRemove);
 else
 i1:=i1+1;
 end if;
-end while; 
+end while;
 /*
 Done removing tuples (for now...)
 */
@@ -1702,8 +1700,8 @@ IndexOfTupleToRemove:=i2;
 break i2;
 
 end for;
-if IndexOfTupleToRemove ne -1 then 
-Remove(~ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L],IndexOfTupleToRemove); 
+if IndexOfTupleToRemove ne -1 then
+Remove(~ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L],IndexOfTupleToRemove);
 else
 i1:=i1+1;
 end if;
@@ -1711,7 +1709,7 @@ end while;
 
 
 /*
-Go through and set aaa[k]=0 for each [[k],aaa] in 
+Go through and set aaa[k]=0 for each [[k],aaa] in
 ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L]
 */
 for i1:=1 to #ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L] do
@@ -1731,7 +1729,7 @@ end if; //controlled by #IndicesOfUnramifiedDegreeOnePrimesAbovep[L] gt 0
 /*
 List all valid tuples in the case there are no unramified degree one primes above p[L].
 
-For i=1,...,m[L], D[i] is an upper bound on the exponent of the prime ideal pp[L][i] above p[L] in the factorization of bb=\mathfrak{b}  
+For i=1,...,m[L], D[i] is an upper bound on the exponent of the prime ideal pp[L][i] above p[L] in the factorization of bb=\mathfrak{b}
 
 Should remove p[L] from consideration in certain things below.  (Done.)
 */
@@ -1773,22 +1771,22 @@ end for; //end L loop
 //Build ModifiedListOfTuplesOfExponentsForPrimesDividingbbAbovep
 /////////////////////////////////////////////////////////
 /*
-For each p[L], if there are unramifed degree one prime ideals of OK above p[L], 
-we augment ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L] by taking a 
-given choice of unbounded prime p[L][k] and allowing for all the possible 
+For each p[L], if there are unramifed degree one prime ideals of OK above p[L],
+we augment ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L] by taking a
+given choice of unbounded prime p[L][k] and allowing for all the possible
 values of the parameter s_{Lk}=s[L][k], which are 0,...,h[L][k]-1 (cf. Section 6)
 
 More precisely, for L = 1,...,v we do the following:
-For each element [[k],aaa] of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L], 
-we form the elements [[k],aaa,[0]],...,[[k],aaa,[h[L][k]-1]] and adjoin them to a 
+For each element [[k],aaa] of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L],
+we form the elements [[k],aaa,[0]],...,[[k],aaa,[h[L][k]-1]] and adjoin them to a
 new list ModifiedListOfTuplesOfExponentsForPrimesDividingbbAbovep[L].
 
-If there are no unramifed degree one prime ideals of OK above p[L], then for each 
-element [[k],aaa] of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L], we form 
-the element [[k],aaa,0] and adjoin them to 
+If there are no unramifed degree one prime ideals of OK above p[L], then for each
+element [[k],aaa] of ListOfTuplesOfExponentsForPrimesDividingbbAbovep[L], we form
+the element [[k],aaa,0] and adjoin them to
 ModifiedListOfTuplesOfExponentsForPrimesDividingbbAbovep[L].
 
-As a minor optimization, all this could be done as part of building 
+As a minor optimization, all this could be done as part of building
 ListOfTuplesOfExponentsForPrimesDividingbbAbovep.
 */
 /////////////////////////////////////////////////////////
@@ -1812,7 +1810,7 @@ delete ListOfTuplesOfExponentsForPrimesDividingbbAbovep;
 ///////////////////////////////////////////////////////////////////////////
 /*
 Compute
-ListOfIdealsOfNorma = list containing a representation of each ideal in OK having norm a.  
+ListOfIdealsOfNorma = list containing a representation of each ideal in OK having norm a.
 
 The representation is such that the ideal corresponding to ListIdealsOfNorma[i]ideals is PowerProduct(pI,ListIdealsOfNorma[i]), where pI is the sequence of the prime ideals of OK that divide a.
 
@@ -1852,7 +1850,7 @@ epI:=[];
 NpI:=[];
 for i:=1 to #FI do
 pI[i]:=FI[i][1]; //ith prime ideal in the factorization of I
-epI[i]:=FI[i][2]; //ramification index of pI[i] 
+epI[i]:=FI[i][2]; //ramification index of pI[i]
 NpI[i]:=Norm(FI[i][1]);
 end for;
 bbb:=[];
@@ -1863,7 +1861,7 @@ end if;
 
 /////////////////////////////////////////////////
 /*
-Form the list of all units of finite order \zeta in OK (i.e, the list of all roots of unity \zeta in OK) 
+Form the list of all units of finite order \zeta in OK (i.e, the list of all roots of unity \zeta in OK)
 with the understanding that we include only one of \zeta and -\zeta.
 */
 ////////////////////////////////////////////////////
@@ -1893,22 +1891,22 @@ end for;
 a;
 */
 
-//fprintf LogFile, "ListOfUnitsOfFiniteOrder = %o\n", ListOfUnitsOfFiniteOrder; 
+//fprintf LogFile, "ListOfUnitsOfFiniteOrder = %o\n", ListOfUnitsOfFiniteOrder;
 
-///////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////
 /*
-Construct 
-ListOfCases = the list of all cases of the factorized Thue-Mahler 
+Construct
+ListOfCases = the list of all cases of the factorized Thue-Mahler
 equation (11) that we need to solve.
 
-Each element in ListOfCases will be a sequence.  Consider ListOfCases[i].  
-For L = 1 to v, ListOfCases[i][L] is of the form [[k],aaa,[s]].  
-The meaning here is that pp[L][k] is the unbounded prime above p[L], 
-PowerProduct(pp[L],aaa) is the factor of bb consisting of primes above 
-pp[L] and s is the value of the parameter s_{kl}.  
+Each element in ListOfCases will be a sequence.  Consider ListOfCases[i].
+For L = 1 to v, ListOfCases[i][L] is of the form [[k],aaa,[s]].
+The meaning here is that pp[L][k] is the unbounded prime above p[L],
+PowerProduct(pp[L],aaa) is the factor of bb consisting of primes above
+pp[L] and s is the value of the parameter s_{kl}.
 
-ListOfCases[i][v+1] has the meaning that the value of the parameter aa 
-is PowerProduct(pI,ListOfCases[i][v+1]). 
+ListOfCases[i][v+1] has the meaning that the value of the parameter aa
+is PowerProduct(pI,ListOfCases[i][v+1]).
 
 Finally, ListOfCases[i][v+2] is the value of the parameter \zeta
 */
@@ -1924,7 +1922,7 @@ for i:=1 to #LIST[L] do
 bbb[L]:=i;
 if L eq v+2 then
 temp:=[**];
-for j:=1 to v+2 do 
+for j:=1 to v+2 do
 temp[j]:=LIST[j][bbb[j]];
 end for;
 Append(~ListOfCases,temp);
@@ -1952,8 +1950,8 @@ delete ModifiedListOfTuplesOfExponentsForPrimesDividingbbAbovep;
 Before we start the loop through the cases, we discard those cases where the ideal
 \mathfrak{a} \mathfrak{b} \mathfrak{p}_{1}^{s_1} \ldots \mathfrak{p}_{v}^{s_v}
 from Section 6 is not principal.
-If the case of (11) we are considering has a solution, this ideal must be principal.  
-So if it is not principal, we know there are no solutions to the case of (11) under 
+If the case of (11) we are considering has a solution, this ideal must be principal.
+So if it is not principal, we know there are no solutions to the case of (11) under
 consideration and can ignore the case.
 */
 fprintf LogFile, "Number of cases: %o\n", #ListOfCases;
@@ -1965,39 +1963,39 @@ nListOfCases:=#ListOfCases;
 
 for iiii := nListOfCases to 1 by -1 do
 
-for L:=1 to v do
+    for L:=1 to v do
 
-kk[L]:=ListOfCases[iiii][L][1][1]; //index of the unconstrained prime above p[L]
+	kk[L]:=ListOfCases[iiii][L][1][1]; //index of the unconstrained prime above p[L]
 
-if kk[L] ne m[L] + 1 then
-ppp[L]:=pp[L][kk[L]]; //the unconstrained prime above p[L]
-else //kk[L] eq m[L] + 1 
-//there are no unramified degree one primes above p[L]
-ppp[L]:=ideal<OK | 1>;
-end if;
+	if kk[L] ne m[L] + 1 then
+	    ppp[L]:=pp[L][kk[L]]; //the unconstrained prime above p[L]
+	else //kk[L] eq m[L] + 1
+	    //there are no unramified degree one primes above p[L]
+	    ppp[L]:=ideal<OK | 1>;
+	end if;
 
-ss[L]:=ListOfCases[iiii][L][3][1]; // the parameter s_L
+	ss[L]:=ListOfCases[iiii][L][3][1]; // the parameter s_L
 
-end for; //end L loop
+    end for; //end L loop
 
-aa:=PowerProduct(pI,ListOfCases[iiii][v+1]);
+    aa:=PowerProduct(pI,ListOfCases[iiii][v+1]);
 
-aatimesbb:=aa;
-for L:=1 to v do
-aaa:=ListOfCases[iiii][L][2];
-aatimesbb:=aatimesbb*PowerProduct(pp[L],aaa);
-end for;
+    aatimesbb:=aa;
+    for L:=1 to v do
+	aaa:=ListOfCases[iiii][L][2];
+	aatimesbb:=aatimesbb*PowerProduct(pp[L],aaa);
+    end for;
 
-TheIdeal:=aatimesbb;
-for L:=1 to v do
-TheIdeal:=TheIdeal*(ppp[L]^ss[L]);
-end for;
+    TheIdeal:=aatimesbb;
+    for L:=1 to v do
+	TheIdeal:=TheIdeal*(ppp[L]^ss[L]);
+    end for;
 
-IsTheIdealPrinciple,alpha:=IsPrincipal(TheIdeal);
+    IsTheIdealPrinciple,alpha:=IsPrincipal(TheIdeal);
 
-if IsTheIdealPrinciple eq false then 
-Remove(~ListOfCases,iiii);
-end if;
+    if IsTheIdealPrinciple eq false then
+	Remove(~ListOfCases,iiii);
+    end if;
 
 end for; // end iiii loop
 
@@ -2007,7 +2005,7 @@ end for; // end iiii loop
 /////////////////////////////////////////////////////////////
 //////////////////////////////////////////////
 /*
-Now we are ready to start the loop through the cases.  
+Now we are ready to start the loop through the cases.
 We first declare the procedures that we will need in the loop (they have all been made intrinsics).
 We also initialize some variables that we will use in the loop.  We initialize them now to avoid having to add additional inputs for the procedures.
 */
@@ -2065,7 +2063,7 @@ if kk[L] ne m[L] + 1 then
 ppp[L]:=pp[L][kk[L]]; //the unconstrained prime above p[L]
 hh[L]:=h[L][kk[L]]; //smallest positive integer such that ppp[L]^hh[L] is principal
 ppi[L]:=pi[L][kk[L]]; //generator of ppp[L]^hh[L]
-else //kk[L] eq m[L] + 1 
+else //kk[L] eq m[L] + 1
 //there are no unramified degree one primes above p[L]
 ppp[L]:=ideal<OK | 1>;
 hh[L]:=1;
@@ -2083,10 +2081,10 @@ end for; //end L loop
 The last thing to do is compute a generator alpha for the ideal
 \mathfrak{a} \mathfrak{b} \mathfrak{p}_{1}^{s_1} \ldots \mathfrak{p}_{v}^{s_v}
 from Section 6, provided it is principal.
-If the case of (11) we are considering has a solution, this ideal must be principal.  
-So if it is not principal, we know there are no solutions to case of (11) under 
+If the case of (11) we are considering has a solution, this ideal must be principal.
+So if it is not principal, we know there are no solutions to case of (11) under
 consideration and skip directly to the next case (by using the continue command)
-We removed all the cases where the ideal is not principle before we began. So 
+We removed all the cases where the ideal is not principle before we began. So
 */
 
 aa:=PowerProduct(pI,ListOfCases[iiii][v+1]);
@@ -2123,11 +2121,11 @@ fprintf LogFile, "ideal<OK | alpha> eq TheIdeal = %o\n", ideal<OK | alpha> eq Th
 fprintf LogFile, "aatimesbb eq TheIdeal = %o\n", aatimesbb eq TheIdeal;
 
 
-if IsTheIdealPrinciple eq false then 
-/*This should never happen because we have 
+if IsTheIdealPrinciple eq false then
+/*This should never happen because we have
 removed all such cases before we began the loop*/
 fprintf LogFile, "Ideal not principal. No solutions possible in case iiii = %o\n", iiii;
-continue iiii; 
+continue iiii;
 end if;
 
 delete aa;
@@ -2153,7 +2151,7 @@ ImageOfzetap[l][i]:=[**];
 for j:=1 to e[l][i]*f[l][i] do
 ImageOfzetap[l][i][j]:=0;
 for ii:= 1 to n do
-ImageOfzetap[l][i][j]:=ImageOfzetap[l][i][j] 
+ImageOfzetap[l][i][j]:=ImageOfzetap[l][i][j]
 + zeta[ii]*ImageOfIntegralBasisElementp[l][i][j][ii];
 end for; //ii
 end for; //j
@@ -2168,7 +2166,7 @@ ImageOfalphap[l][i]:=[**];
 for j:=1 to e[l][i]*f[l][i] do
 ImageOfalphap[l][i][j]:=0;
 for ii:= 1 to n do
-ImageOfalphap[l][i][j]:=ImageOfalphap[l][i][j] 
+ImageOfalphap[l][i][j]:=ImageOfalphap[l][i][j]
 + alpha[ii]*ImageOfIntegralBasisElementp[l][i][j][ii];
 end for; //ii
 end for; //j
@@ -2185,20 +2183,20 @@ ImageOfalphaC[i] := the image of alpha under the embedding of K into \CC defined
 
 
 
-ImageOfzetaC:=[ComplexField() | ]; 
+ImageOfzetaC:=[ComplexField() | ];
 for i:=1 to n do
 ImageOfzetaC[i]:=0;
 for ii:= 1 to n do
-ImageOfzetaC[i]:=ImageOfzetaC[i] 
+ImageOfzetaC[i]:=ImageOfzetaC[i]
 + zeta[ii]*ImageOfIntegralBasisElementC[i][ii];
 end for; //ii
 end for; //i
 
-ImageOfalphaC:=[ComplexField() | ]; 
+ImageOfalphaC:=[ComplexField() | ];
 for i:=1 to n do
 ImageOfalphaC[i]:=0;
 for ii:= 1 to n do
-ImageOfalphaC[i]:=ImageOfalphaC[i] 
+ImageOfalphaC[i]:=ImageOfalphaC[i]
 + alpha[ii]*ImageOfIntegralBasisElementC[i][ii];
 end for; //ii
 end for; //i
@@ -2215,12 +2213,12 @@ alpha[1]*ImageOfIntegralBasisElementC[1][1];
 /*
 For each p[l]:
 
-If we are NOT in the case where there are no unramified degree one primes above p[l], we fix the index i0 as in Section 7.  We will represent i0 by the unique pair of integers (i,j) such that 
-theta^{(i_0)} = theta_i^{(j)}.  
+If we are NOT in the case where there are no unramified degree one primes above p[l], we fix the index i0 as in Section 7.  We will represent i0 by the unique pair of integers (i,j) such that
+theta^{(i_0)} = theta_i^{(j)}.
 i0[l] will be a sequence of two integers such that
 theta^{(i_0)} is represented by thetap[l][i0[l][1]][i0[l][2]]
 
-If there are no unramified degree one primes above p[l], i0[l] will still be a sequence of two integers, but it will have no real meaning. 
+If there are no unramified degree one primes above p[l], i0[l] will still be a sequence of two integers, but it will have no real meaning.
 */
 ////////////////////////////////////////////////////////////////////////////
 i0:=[];
@@ -2233,40 +2231,40 @@ end for;
 /*
 For each p[l]:
 
-If we are NOT in the case where there are no unramified degree one primes 
-above p[l], we choose the indices j,k according to the guidelines in 
-Section 9.  As with i0 we represent j by a sequence of two integers jjj[l] 
-in such a way that theta^{(j)} is represented by 
-thetap[l][jjj[l][1]][jjj[l][2]].  Similarly, for k.  
+If we are NOT in the case where there are no unramified degree one primes
+above p[l], we choose the indices j,k according to the guidelines in
+Section 9.  As with i0 we represent j by a sequence of two integers jjj[l]
+in such a way that theta^{(j)} is represented by
+thetap[l][jjj[l][1]][jjj[l][2]].  Similarly, for k.
 
-Suppose we find a choice of j,k that lets us use Lemma 7.4 to compute n_l 
-immediately.  If we compute a value for n_l that is not a nonnegative 
-integer, we move onto the next case using the continue command.  If we 
-compute a value for n_l that is nonnegative, then we absorb 
-pi_l^n_l = ppi[l]^n_l into alpha and stop considering the index l in the 
-rest of the algorithm, except in the last steps. 
+Suppose we find a choice of j,k that lets us use Lemma 7.4 to compute n_l
+immediately.  If we compute a value for n_l that is not a nonnegative
+integer, we move onto the next case using the continue command.  If we
+compute a value for n_l that is nonnegative, then we absorb
+pi_l^n_l = ppi[l]^n_l into alpha and stop considering the index l in the
+rest of the algorithm, except in the last steps.
 
-If there are no unramified degree one primes above p[l], we know that the 
-value of n_l is zero and we will stop considering the index l in the 
+If there are no unramified degree one primes above p[l], we know that the
+value of n_l is zero and we will stop considering the index l in the
 algorithm, except in the last steps.
 
 For l = 1,...,v:
 If we know the value of n_l, then ValueOfn[l]:= that value
 If we don't know the value of n_l, then ValueOfn[l]:=-1
 
-JJ = set of those indices l in {1,...,v} for which there is at least one 
+JJ = set of those indices l in {1,...,v} for which there is at least one
 unramified degree one prime above p[l].
 
-By the end of this block of code, 
-J = the set of all indices in {1,...,v} that we need to consider in the 
-rest of the algorithm, except the last steps.  These are the indices l 
-for which there is at least one unramified degree one prime above p[l] 
-and there is no choice of j,k that lets us use Lemma 7.4 to compute n_l. 
+By the end of this block of code,
+J = the set of all indices in {1,...,v} that we need to consider in the
+rest of the algorithm, except the last steps.  These are the indices l
+for which there is at least one unramified degree one prime above p[l]
+and there is no choice of j,k that lets us use Lemma 7.4 to compute n_l.
 
 It will be convenient to have defined the following set of indices
-JJJ := {1} union { 1+l : l in J} union { 1+v+i : i in {1,...,r}} 
+JJJ := {1} union { 1+l : l in J} union { 1+v+i : i in {1,...,r}}
 
-I = set of those l in J for which there is no choice of j,k that lets us 
+I = set of those l in J for which there is no choice of j,k that lets us
 use Lemma 8.3 to bound n_l.
 
 I2 = J - I.
@@ -2278,13 +2276,13 @@ We will compute delta_1 and delta_2 for each l in J
 We will compute the numbers alpha_i from Section 8 for each l in J:
 alpha_i = LogarithmicAlphap[l][i]
 
-We could compute the alpha_i and delta1, delta2 from Section 8 for each 
-l in {1,...,v} for which there is at least one unramified degree one prime 
-above p[l] or even for each l in {1,...,v}, 
+We could compute the alpha_i and delta1, delta2 from Section 8 for each
+l in {1,...,v} for which there is at least one unramified degree one prime
+above p[l] or even for each l in {1,...,v},
 but we don't.
 
 For l in I:
-SpecialCase[l] = true if the choice of j,k puts us in the special 
+SpecialCase[l] = true if the choice of j,k puts us in the special
 case of Section 17.
 SpecialCase[l] = false otherwise (general case)
 
@@ -2292,7 +2290,7 @@ Nstar[l] = N_{l}^{*} from Section 11.
 
 Initialize ihat[l] from Section 17.  Note ihat[l] in JJJ, ihat[l] neq 2.
 
-Intizalize istar[l]. 
+Intizalize istar[l].
 
 Eventually, istar[l] will be the index in {2,...,1+v+r} such that
 ihat[l] = JJJ[istar[l]].
@@ -2339,20 +2337,20 @@ J[l]:=l;
 end for;
 
 
-/* 
-Remove from J all the indices l such that p[l] has no unramified degree one primes above it.  
-After they are removed, we know that, for every l in J, g has at least one linear factor 
-in Q_{p_l}.  Also set the value of n_l for these indices l. 
+/*
+Remove from J all the indices l such that p[l] has no unramified degree one primes above it.
+After they are removed, we know that, for every l in J, g has at least one linear factor
+in Q_{p_l}.  Also set the value of n_l for these indices l.
 */
 for l:=1 to v do
 if kk[l] eq m[l]+1 then /*no degree one unramified primes above p_l*/
-ValueOfn[l]:=0; 
+ValueOfn[l]:=0;
 /* now absorb pi_l^n_l = ppi[l]^n_l into alpha and remove the index l from J */
 //alpha:=alpha*ppi[l]^ValueOfn[l]; //this does nothing!
 Exclude(~J,l);
-end if; 
+end if;
 end for;
- 
+
 /*JJ = set of those indices l in {1,...,v} for which there is at least one unramified degree one prime above p[l].*/
 JJ:=J;
 
@@ -2402,14 +2400,14 @@ delta2[l]:= ((thetap[l][jjj[l][1]][jjj[l][2]] - thetap[l][kkk[l][1]][kkk[l][2]])
 
 tempValueOfnl:=(Min([Valuation(delta1[l]),0]) - Valuation(delta2[l]))/hh[l];
 
-if not IsIntegral(tempValueOfnl) or tempValueOfnl lt 0 then 
+if not IsIntegral(tempValueOfnl) or tempValueOfnl lt 0 then
 fprintf LogFile, "No solutions possible in case iiii = %o\n", iiii;
 fprintf LogFile, "Valuation(delta1[l]) = %o, ValueOfn[l] = %o\n", Valuation(delta1[l]), tempValueOfnl;
 continue iiii; // b/c no solutions
 end if;
 
 ValueOfn[l]:=Integers() ! tempValueOfnl;
- 
+
 /* now absorb pi_l^n_l = ppi[l]^n_l into alpha and remove the index l from J */
 alpha:=alpha*ppi[l]^ValueOfn[l];
 Exclude(~J,l);
@@ -2421,7 +2419,7 @@ ImageOfalphap[l][i1]:=[**];
 for j1:=1 to e[l][i1]*f[l][i1] do
 ImageOfalphap[l][i1][j1]:=0;
 for ii1:= 1 to n do
-ImageOfalphap[l][i1][j1]:=ImageOfalphap[l][i1][j1] 
+ImageOfalphap[l][i1][j1]:=ImageOfalphap[l][i1][j1]
 + alpha[ii1]*ImageOfIntegralBasisElementp[l][i1][j1][ii1];
 end for; //ii1
 end for; //j1
@@ -2432,12 +2430,12 @@ ImageOfalphaC:=[ComplexField()|];
 for i1:=1 to n do
 ImageOfalphaC[i1]:=0;
 for ii1:= 1 to n do
-ImageOfalphaC[i1]:=ImageOfalphaC[i1] 
+ImageOfalphaC[i1]:=ImageOfalphaC[i1]
 + alpha[ii1]*ImageOfIntegralBasisElementC[i1][ii1];
 end for; //ii1
 end for; //i1
 
-//found a choice of j,k that gives ord_{p_l}(delta_1) \neq 0 for the current l, 
+//found a choice of j,k that gives ord_{p_l}(delta_1) \neq 0 for the current l,
 //move onto the next l
 continue l;
 end if; // controlled by Valuation(delta1[l]) ne 0
@@ -2449,8 +2447,8 @@ end for; //end i loop
 end for; //end l loop
 
 //We are now finished defining J
-/*J = the set of all indices in {1,...,v} that we need to consider in the rest of the algorithm, 
-except the last steps.  These are the indices l for which there is at least one unramified degree 
+/*J = the set of all indices in {1,...,v} that we need to consider in the rest of the algorithm,
+except the last steps.  These are the indices l for which there is at least one unramified degree
 one prime above p[l] and there is no choice of j,k that lets us use Lemma 6.4 to compute n_l.*/
 
 nJ:=#J;
@@ -2472,8 +2470,8 @@ Append(~JJJ,1+v+i);
 end for;
 nJJJ:=#JJJ;
 
-/*we start with I = J and remove indices from I as we go. 
-Want to make I = set of those l in J for which there is 
+/*we start with I = J and remove indices from I as we go.
+Want to make I = set of those l in J for which there is
 no choice of j,k that lets us use Lemma 8.3 to bound n_l.*/
 I:=J;
 
@@ -2549,17 +2547,17 @@ end for;
 /*Check if Lemma 8.3 can be applied and, if so, compute Nstar[l] = N_{l}^{*}.*/
 min:=Valuation(LogarithmicAlphap[l][JJJ[2]]);
 for iii:=2 to nJJJ do
-if Valuation(LogarithmicAlphap[l][JJJ[iii]]) lt min then 
-min:=Valuation(LogarithmicAlphap[l][JJJ[iii]]); 
+if Valuation(LogarithmicAlphap[l][JJJ[iii]]) lt min then
+min:=Valuation(LogarithmicAlphap[l][JJJ[iii]]);
 end if;
-end for; 
+end for;
 
 if Valuation(LogarithmicAlphap[l][1]) lt min then
-temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))), 
+temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
 Ceiling((1/hh[l])*(min - Valuation(delta2[l])))-1  ]);
-if temp lt 0 then 
+if temp lt 0 then
 fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
-continue iiii; 
+continue iiii;
 end if; //no solutions in the current case
 if temp lt Nstar[l] then Nstar[l]:=temp; end if;
 end if;
@@ -2572,16 +2570,16 @@ else
 min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[2]][hhh]);
 for iii:=2 to nJJJ do
 //fprintf LogFile, "Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) = %o\n", Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
-if Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) lt min then 
-min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]); 
+if Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) lt min then
+min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
 end if;
 end for; //end iii loop
 if Valuation(CoefficientsLogarithmicAlphap[l][1][hhh]) lt min then
-temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))), 
+temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
 Ceiling((1/hh[l])*(u[l] + min - Valuation(delta2[l])))-1   ]);
-if temp lt 0 then 
+if temp lt 0 then
 fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
-continue iiii; 
+continue iiii;
 end if; //no solutions in the current case
 if temp lt Nstar[l] then Nstar[l]:=temp; end if;
 end if;
@@ -2591,21 +2589,21 @@ end for; //end hhh loop
 
 if Nstar[l] lt bestNstarl then
 //we've found a choice of j,k that lets us use Lemma 8.3 to bound n_l
-//and its better (smaller bound) than the previous best choice for j,k that lets us 
+//and its better (smaller bound) than the previous best choice for j,k that lets us
 //use Lemma 8.3.
 bestjjjl:=jjj[l];
-bestkkkl:=kkk[l]; 
-bestNstarl:=Nstar[l]; 
+bestkkkl:=kkk[l];
+bestNstarl:=Nstar[l];
 end if;
 
 /*
-if Nstar[l] lt padicprecision[l]+1 then 
+if Nstar[l] lt padicprecision[l]+1 then
 //we've found a choice of j,k that lets us use Lemma 8.3 to bound n_l
 Exclude(~I,l);
-continue l; 
+continue l;
 end if;
 */
- 
+
 end if; //controlled by IsZeroLocal(pAdicLog(delta1[l],p[l],padicprecision[l]),SS[l])
 
 end for;
@@ -2620,21 +2618,21 @@ jjj[l]:=bestjjjl;
 kkk[l]:=bestkkkl;
 Nstar[l]:=bestNstarl;
 Exclude(~I,l);
-continue l; 
+continue l;
 end if;
 
 end if; //controlled by FindAll
 
 
 /*
-If the program makes it this far, we know that there is no choice of j,k 
-such that ord_{p_l}(delta_1) \neq 0 and also there is no choice of j,k 
-that lets us use Lemma 8.3 to get an upper bound on n_l.  So we will 
-eventually need to use linear forms in logs + lattice reduction to get 
+If the program makes it this far, we know that there is no choice of j,k
+such that ord_{p_l}(delta_1) \neq 0 and also there is no choice of j,k
+that lets us use Lemma 8.3 to get an upper bound on n_l.  So we will
+eventually need to use linear forms in logs + lattice reduction to get
 a small upper bound on n_l
-  
-Now we try to find a choice of j,k according to the remaining guidlines 
-in Section 9.  The whole point is to try to choose j,k so that 
+
+Now we try to find a choice of j,k according to the remaining guidlines
+in Section 9.  The whole point is to try to choose j,k so that
 alpha_i /  alpha_{ihat} is in Q_{p_l} for all i in J.
 
 For each candidate j,k, we first do some simple checks for conditions that imply alpha_i /  alpha_{ihat} is in Q_{p_l} for all i in J.  If we are forced to check directly whether alpha_i /  alpha_{ihat} is in Q_{p_l} for all i, we do this for all candidates for ihat.  If we find a candidate for ihat that works, we remember it.
@@ -2646,33 +2644,33 @@ jfound:=false;
 for i:=1 to m[l] do
 if i eq i0[l][1] then continue i; end if;
 if Degree(gp[l][i]) eq 1 then
- 
-if jfound eq false then 
+
+if jfound eq false then
 jjj[l]:=[i,1];
 jfound:=true;
 continue i;
 end if;
 
-if jfound eq true then 
+if jfound eq true then
 kkk[l]:=[i,1];
 /* we've found a choice for j,k so that theta^{(j)},theta^{(k)} are roots of linear factors of g(t) in Q_{p_l}[t] Section 17 */
 SpecialCase[l]:=true;
-continue l; 
+continue l;
 end if;
 
 end if;
 end for; //end i loop
 
 
-/* 
-check if we can take j,k so that theta^{(j)}, theta^{(k)} are the roots of a degree 2 factor of g(t) Q_{p_l}[t] 
+/*
+check if we can take j,k so that theta^{(j)}, theta^{(k)} are the roots of a degree 2 factor of g(t) Q_{p_l}[t]
 */
 for i:=1 to m[l] do
 if Degree(gp[l][i]) eq 2 then
 jjj[l]:=[i,1];
 kkk[l]:=[i,2];
-/* 
-we've found a j,k so that theta^{(j)}, theta^{(k)} are the roots of a degree 2 factor of g(t) Q_{p_l}[t] 
+/*
+we've found a j,k so that theta^{(j)}, theta^{(k)} are the roots of a degree 2 factor of g(t) Q_{p_l}[t]
 */
 SpecialCase[l]:=true;
 continue l;
@@ -2681,39 +2679,39 @@ end for; //end i loop
 
 
 /*
-If there is a nonlinear factor g^{\prime}(t) of g(t) in Q_{p_l}[t] such that the 
-extension of Q_{p_l} that g^{\prime}(t) generates contains all the 
-roots of g^{\prime}(t) (equivalently, the extension is Galois), then 
-taking j,k so that \theta^{(j)},\theta^{(k)} are two roots of 
-g^{\prime}(t) will ensure that alpha_i /  alpha_{ihat} is in Q_{p_l} 
+If there is a nonlinear factor g^{\prime}(t) of g(t) in Q_{p_l}[t] such that the
+extension of Q_{p_l} that g^{\prime}(t) generates contains all the
+roots of g^{\prime}(t) (equivalently, the extension is Galois), then
+taking j,k so that \theta^{(j)},\theta^{(k)} are two roots of
+g^{\prime}(t) will ensure that alpha_i /  alpha_{ihat} is in Q_{p_l}
 for all i.
 
-If an irreducible polynomial over Q_{p_l}[t] is neither inertial nor 
-eisenstein, MAGMA does not support directly constructing the extension 
-of Q_{p_l} generated by the polynomial.  However, we know that the 
-extension of Q_{p_l} generated by g^{\prime}(t) is isomorphic to the 
-completion of K at the prime ideal above p_l which corresponds to 
-g^{\prime}(t).  
+If an irreducible polynomial over Q_{p_l}[t] is neither inertial nor
+eisenstein, MAGMA does not support directly constructing the extension
+of Q_{p_l} generated by the polynomial.  However, we know that the
+extension of Q_{p_l} generated by g^{\prime}(t) is isomorphic to the
+completion of K at the prime ideal above p_l which corresponds to
+g^{\prime}(t).
 
-Note also that irreducible polynomials over p-adic fields have no 
+Note also that irreducible polynomials over p-adic fields have no
 repeated roots (since p-adic fields have characteristic zero).
 */
 
 for i:=1 to m[l] do
-if Degree(gp[l][i]) gt 1 and 
+if Degree(gp[l][i]) gt 1 and
 #Roots(gp[l][i],Kpp[l][i]) eq Degree(gp[l][i]) then
 jjj[l]:=[i,1];
 kkk[l]:=[i,2];
-/* 
+/*
 we've found j,k that ensure alpha_i / alpha_{ihat} is in Z_{p_l} for all i and all candidates for ihat.
 */
 SpecialCase[l]:=true;
 continue l;
 end if;
-end for; 
+end for;
 
-/* 
-Now we do the more difficult checks to see if we can choose j,k such that 
+/*
+Now we do the more difficult checks to see if we can choose j,k such that
 alpha_i /  alpha_{ihat} is in Z_{p_l} for all i,j
 */
 
@@ -2748,8 +2746,8 @@ CoefficientsLogarithmicAlphap[l][iii]:=GetCoefficients(LogarithmicAlphap[l][iii]
 end for;
 
 
-/* 
-Check if there is a choice of j,k such that the alpha_i (i in JJJ) all belong to $\QQ_{p_l}$.  
+/*
+Check if there is a choice of j,k such that the alpha_i (i in JJJ) all belong to $\QQ_{p_l}$.
 */
 flag:=true;
 for iii in JJJ do
@@ -2757,9 +2755,9 @@ for hhh:=2 to SS[l] do
 if not IsZero(CoefficientsLogarithmicAlphap[l][iii][hhh]) then flag:=false; break iii; end if;
 end for;
 end for;
-if flag eq true then 
+if flag eq true then
 //we've found a choice of j,k with desired properties
-SpecialCase[l]:=true; 
+SpecialCase[l]:=true;
 continue l;
 end if;
 
@@ -2772,14 +2770,14 @@ Now we check directly whether we have alpha_i /  alpha_{ihat} in Q_{p_l} for all
 candidatesforistar:=[];
 min:=Valuation(LogarithmicAlphap[l][JJJ[2]]);
 for iii:=JJJ[2] to JJJ[nJJJ] do
-if Valuation(LogarithmicAlphap[l][iii]) lt min then 
-min:=Valuation(LogarithmicAlphap[l][iii]); 
+if Valuation(LogarithmicAlphap[l][iii]) lt min then
+min:=Valuation(LogarithmicAlphap[l][iii]);
 end if;
 end for;
 for iiiiii:=2 to nJJJ do
 iii:=JJJ[iiiiii];
 if min eq Valuation(LogarithmicAlphap[l][iii]) then Append(~candidatesforistar,iiiiii); end if;
-end for; 
+end for;
 
 
 /* For all candidates for ihat, check whether alpha_i /  alpha_{ihat} in Q_{p_l} for all i in JJJ */
@@ -2795,11 +2793,11 @@ for hhh:=2 to SS[l] do
 if not IsZero(temp[iii][hhh]) then flag:=false; break iii; end if;
 end for;
 end for;
-if flag eq true then 
+if flag eq true then
 /* we've found a choice of j,k with the desired properties */
 SpecialCase[l]:=true;
 ihat[l]:=ihathat;
-istar[l]:=istarstar; 
+istar[l]:=istarstar;
 continue l;
 end if;
 end for;
@@ -2812,18 +2810,18 @@ end for; //i
 
 
 /*
-If the program makes it this far, it means there is no choice of j,k for 
-which ord_{p_l}(delta_1) = 0, no choice for which Lemma 8.3 gives an upper 
-bound for n_l, and no choice which puts us in the special case of Section 17 
+If the program makes it this far, it means there is no choice of j,k for
+which ord_{p_l}(delta_1) = 0, no choice for which Lemma 8.3 gives an upper
+bound for n_l, and no choice which puts us in the special case of Section 17
 (alpha_i /  alpha_{ihat} in Z_{p_l} for all i).
 
-We know that there are at most two degree one factors of g(t) in Q_{p_l}[t] 
-and there are no degree two factors.  So there is at least one factor of 
-degree >= 3.  We choose a nonlinear factor of g(t) in Q_{p_l}[t] of minimal 
+We know that there are at most two degree one factors of g(t) in Q_{p_l}[t]
+and there are no degree two factors.  So there is at least one factor of
+degree >= 3.  We choose a nonlinear factor of g(t) in Q_{p_l}[t] of minimal
 degree and choose j,k so that \theta^{(j)}, \theta^{(k)} are roots of that factor.
 */
 
-minimaldegreegreaterthan1:=Degree(FFFppF[l],PrimeField(FFFppF[l])); 
+minimaldegreegreaterthan1:=Degree(FFFppF[l],PrimeField(FFFppF[l]));
 //initialize, no gp[l][i] can have degree strictly larger than this
 
 for i:=1 to m[l] do
@@ -2855,14 +2853,14 @@ end for;
 
 ///////////////////////////////////////////////////////////////////////////
 /*
-For each l in I, we will find a value for the index ihat 
+For each l in I, we will find a value for the index ihat
 and compute the beta_i's from Section 17: ihat[l], beta[l][i]
 
 We also define d_l from Section 17: dd[l]
 
-If we are in the special case, it can be that a choice of ihat[l] was 
-already made in the last step. If ihat[l] >0, we know this choice has 
-been made. Otherwise, ihat[l] = 0 and we know a choice hasn't been 
+If we are in the special case, it can be that a choice of ihat[l] was
+already made in the last step. If ihat[l] >0, we know this choice has
+been made. Otherwise, ihat[l] = 0 and we know a choice hasn't been
 made yet.
 */
 //////////////////////////////////////////////////////////////////////////
@@ -2899,7 +2897,7 @@ ihat[l]:=JJJ[2];
 istar[l]:=2;
 for i:=3 to #JJJ do
 iii:=JJJ[i];
-if Valuation(LogarithmicAlphap[l][iii]) lt min then 
+if Valuation(LogarithmicAlphap[l][iii]) lt min then
 min:=Valuation(LogarithmicAlphap[l][iii]);
 ihat[l]:=iii;
 istar[l]:=i;
@@ -2909,10 +2907,10 @@ end if;
 
 for iii:=1 to 1+v+r do
 beta[l][iii] := -LogarithmicAlphap[l][iii]/LogarithmicAlphap[l][ihat[l]];
-/* 
-For l in I, we know that the beat_i's live in Z_{p_l}.  So their 
-coefficients on the power basis for FFFppF[l] are all zero, except for the 
-first.  We can use this to save on computations with the beta_i's: 
+/*
+For l in I, we know that the beat_i's live in Z_{p_l}.  So their
+coefficients on the power basis for FFFppF[l] are all zero, except for the
+first.  We can use this to save on computations with the beta_i's:
 */
 beta[l][iii] := GetCoefficients(beta[l][iii],l)[1];
 end for;
@@ -2934,7 +2932,7 @@ ihat[l]:=JJJ[2];
 istar[l]:=2;
 for i:=3 to #JJJ do
 iii:=JJJ[i];
-if Valuation(CoefficientsLogarithmicAlphap[l][iii][hhh]) lt min then 
+if Valuation(CoefficientsLogarithmicAlphap[l][iii][hhh]) lt min then
 min:=Valuation(CoefficientsLogarithmicAlphap[l][iii][hhh]);
 ihat[l]:=iii;
 istar[l]:=i;
@@ -2966,7 +2964,7 @@ end for; //end l
 ////////////////////////////////////
 /////////////////
 /*
-Compute c_1(l) = c1[l] for each l in I 
+Compute c_1(l) = c1[l] for each l in I
 */
 ////////////////
 ///////////////////////////////////
@@ -2990,7 +2988,7 @@ PreimageOfalphak = preimage in FFF of \alpha^{(k)} under the embedding sigma = m
 
 PreimageOfzetak = preimage in FFF of \zeta^{(k)} under the embedding sigma = mFFFppF[L] of FFF into FFFppF[l]
 
-We also find the preimages of 
+We also find the preimages of
 pi_{i}^{(j)}, pi_{i}^{(k)}, eps_{i}^{(j)}, eps_{i}^{(k)}
 */
 /////////////////////
@@ -3057,7 +3055,7 @@ PreimageOfalphak:=PreimageOfalphak + alpha[i]*ImageOfIntegralBasisElementF[ikkk]
 end for; //i
 
 /*
-Note that: 
+Note that:
 preimage of pi_{i}^{(j)} = ImageOfpiF[i][kk[i]][ijjj]
 preimage of pi_{i}^{(k)} = ImageOfpiF[i][kk[i]][ikkk]
 preimage of eps_{i}^{(j)} = ImageOfepsF[i][ijjj]
@@ -3168,7 +3166,7 @@ kappa1:=2190;
 kappa4:=1890;
 end if;
 end if;
-end if;  
+end if;
 
 c2:=((((mm+1)^(mm+2)) * d^(mm+2))/(Factorial(mm-1))) * ( p[l]^ff / (ff*Log(p[l]))^3 ) * Max([1,Log(d)]) * Max( [4+Log(mm+1)+Log(d),eppL,ff*Log(p[l])] );
 
@@ -3224,7 +3222,7 @@ if c4prime lt c4primeprime then c4:=c4primeprime; end if;
 
 c5:=0;
 for l in I do
-if c5 lt -Valuation(delta2[l])/hh[l] then c5:=-Valuation(delta2[l])/hh[l]; 
+if c5 lt -Valuation(delta2[l])/hh[l] then c5:=-Valuation(delta2[l])/hh[l];
 end if;
 end for;
 
@@ -3237,8 +3235,8 @@ max:=c1[l]/hh[l]; if Exp(2) gt max then max:=Exp(2); end if;
 c6:=2*(-Valuation(delta2[l])/hh[l] + max*Log(max));
 
 for l in I do
-max:=c1[l]/hh[l]; if Exp(2) gt max then max:=Exp(2); end if; 
-if 2*( -Valuation(delta2[l])/hh[l] + max*Log(max)) gt c6 then 
+max:=c1[l]/hh[l]; if Exp(2) gt max then max:=Exp(2); end if;
+if 2*( -Valuation(delta2[l])/hh[l] + max*Log(max)) gt c6 then
 c6:=2*( -Valuation(delta2[l])/hh[l] + max*Log(max));
 end if;
 end for;
@@ -3247,7 +3245,7 @@ c6:=Ceiling(c6)-1;
 end if;
 
 c7:=2;
-if c4primeprime gt c7 then c7:=c4primeprime; end if; 
+if c4primeprime gt c7 then c7:=c4primeprime; end if;
 
 c7:=Max([2,c4primeprime,c6]);
 
@@ -3258,7 +3256,7 @@ Compute c_{8}^{\prime}, c_{8}^{\prime \prime}, c_{9}^{\prime}, c_{9}^{\prime \pr
 ///////////////////////////////////////////////////////////////////////////
 min:=Abs(ImageOfalphaC[1]*ImageOfzetaC[1]);
 for i:=2 to n do
-if Abs(ImageOfalphaC[i]*ImageOfzetaC[i]) lt min then min:=Abs(ImageOfalphaC[i]*ImageOfzetaC[i]); end if; 
+if Abs(ImageOfalphaC[i]*ImageOfzetaC[i]) lt min then min:=Abs(ImageOfalphaC[i]*ImageOfzetaC[i]); end if;
 end for;
 c8prime:=Abs(a);
 for i:=1 to v do
@@ -3277,8 +3275,8 @@ prod:=prod*ImageOfpiC[i][kk[i]][1];
 end for;
 min:=Abs(prod);
 for ii:=2 to n do
-prod:=1; 
-for i in J do 
+prod:=1;
+for i in J do
 l:=i;
 prod:=prod*ImageOfpiC[i][kk[i]][ii];
 end for;
@@ -3292,7 +3290,7 @@ c9prime:=Log(c9prime/min);
 
 max:=Abs(ImageOfalphaC[1]*ImageOfzetaC[1]);
 for i:=2 to n do
-if Abs(ImageOfalphaC[i]*ImageOfzetaC[i]) gt max then max:=Abs(ImageOfalphaC[i]*ImageOfzetaC[i]); end if; 
+if Abs(ImageOfalphaC[i]*ImageOfzetaC[i]) gt max then max:=Abs(ImageOfalphaC[i]*ImageOfzetaC[i]); end if;
 end for;
 c8primeprime:=Log(max);
 
@@ -3302,8 +3300,8 @@ prod:=prod*ImageOfpiC[i][kk[i]][1];
 end for;
 max:=Abs(prod);
 for ii:=2 to n do
-prod:=1; 
-for i in J do 
+prod:=1;
+for i in J do
 prod:=prod*ImageOfpiC[i][kk[i]][ii];
 end for;
 if Abs(prod) gt max then max:=Abs(prod); end if;
@@ -3344,8 +3342,8 @@ if j eq i0i0i0 then continue j; end if;
 for k:=j+1 to s do
 if k eq i0i0i0 then continue k; end if;
 OneOverc16:=(Abs(thetaC[i0i0i0] - thetaC[j])/2)*(Abs(thetaC[k] - thetaC[i0i0i0])/Abs(thetaC[j] - thetaC[k]));
-if OneOverc16 gt max then 
-max:=OneOverc16; 
+if OneOverc16 gt max then
+max:=OneOverc16;
 jjjjjj[i0i0i0]:=j;
 kkkkkk[i0i0i0]:=k;
 end if;
@@ -3390,7 +3388,7 @@ PreimageOfalphak = preimage in FFF of \alpha^{(k)} under the embedding sigma of 
 
 PreimageOfzetak = preimage in FFF of \zeta^{(k)} under the embedding sigma of FFF into \CC
 
-We also find the preimages of 
+We also find the preimages of
 pi_{i}^{(j)}, pi_{i}^{(k)}, eps_{i}^{(j)}, eps_{i}^{(k)}
 */
 //////////////////////////
@@ -3442,7 +3440,7 @@ PreimageOfalphak:=PreimageOfalphak + alpha[i]*ImageOfIntegralBasisElementF[ikkk]
 end for; //i
 
 /*
-Note that: 
+Note that:
 preimage of pi_{i}^{(j)} = ImageOfpiF[i][kk[i]][ijjj]
 preimage of pi_{i}^{(k)} = ImageOfpiF[i][kk[i]][ikkk]
 preimage of eps_{i}^{(j)} = ImageOfepsF[i][ijjj]
@@ -3471,7 +3469,7 @@ d:=Degree(LL);
 mm:=1+#J+r;
 
 ////////////////////////////////////
-/* 
+/*
 Compute c17.
 
 Also compute the alpha_i as defined in Sections 18 and 20: LogarithmicAlphaC[i0i0i0][i]
@@ -3540,8 +3538,8 @@ for i:=1 to t do
 j:=s-1 + 2*i;
 k:=j+1;
 OneOverc16:=(Abs(thetaC[i0i0i0] - thetaC[j])/2)*(Abs(thetaC[k] - thetaC[i0i0i0])/Abs(thetaC[j] - thetaC[k]));
-if OneOverc16 gt max then 
-max:=OneOverc16; 
+if OneOverc16 gt max then
+max:=OneOverc16;
 jjjjjj[i0i0i0]:=j;
 kkkkkk[i0i0i0]:=k;
 end if;
@@ -3586,7 +3584,7 @@ PreimageOfalphak = preimage in FFF of \alpha^{(k)} under the embedding sigma of 
 
 PreimageOfzetak = preimage in FFF of \zeta^{(k)} under the embedding sigma of FFF into \CC
 
-We also find the preimages of 
+We also find the preimages of
 pi_{i}^{(j)}, pi_{i}^{(k)}, eps_{i}^{(j)}, eps_{i}^{(k)}
 */
 //////////////////////////
@@ -3638,7 +3636,7 @@ PreimageOfalphak:=PreimageOfalphak + alpha[i]*ImageOfIntegralBasisElementF[ikkk]
 end for; //i
 
 /*
-Note that: 
+Note that:
 preimage of pi_{i}^{(j)} = ImageOfpiF[i][kk[i]][ijjj]
 preimage of pi_{i}^{(k)} = ImageOfpiF[i][kk[i]][ikkk]
 preimage of eps_{i}^{(j)} = ImageOfepsF[i][ijjj]
@@ -3668,7 +3666,7 @@ mm:=2+#J+r;
 
 
 ////////////////////////////////////
-/* 
+/*
 Compute c17.
 
 Also compute the alpha_i as defined in Sections 18 and 20: LogarithmicAlphaC[i0i0i0][i]
@@ -3725,7 +3723,7 @@ Done computing the indices j=j(i0), k=k(i0), and the numbers c16=c16(i0), c17=c1
 ////////////////////////////////////////
 ///////////////////
 /*
-Choose c11 to minimize the value of c22, the upper bound for H.  In the process, compute the constants that depend on c11: 
+Choose c11 to minimize the value of c22, the upper bound for H.  In the process, compute the constants that depend on c11:
 c11, c12, c13, c14, c15, c19, c20, c21, c22
 */
 //////////////////
@@ -3750,9 +3748,9 @@ end if;
 if c14 lt 2 then c14:=2; end if;
 
 /*
-In the thesis, the roots of g in C are ordered so that 
+In the thesis, the roots of g in C are ordered so that
 thetaC[s+i] = overline(thetaC[s+t+i]) (i=1,...,t)
-Magma (and hence this program) orders the roots so that 
+Magma (and hence this program) orders the roots so that
 thetaC[s+2i-1] = overline(thetaC[s+2i]) (i=1,...,t).
 */
 
@@ -3978,7 +3976,7 @@ UpperBoundForH:= current best upper bound for H = H_0 from Section 15.
 
 UpperBoundForA:= current best upper bound for A = A_0 from Section 15.
 
-ConditionalUpperBoundForA[i0]:= current best i_0-conditonal upper bound for A 
+ConditionalUpperBoundForA[i0]:= current best i_0-conditonal upper bound for A
 = A_0(i_0) from Section 19.
 
 UpperBoundForn[l]:= current best upper bound for n_l = N_l from Section 15.
@@ -4030,11 +4028,11 @@ end for;
 
 /////////////////////////////////////////////
 /*
-If UpperBoundForA < 0, then we know there are 
+If UpperBoundForA < 0, then we know there are
 no solutions for the current case of (11).
 
-If UpperBoundForn[i] < 0 for some i in J, then 
-we know there are no solutions for the current 
+If UpperBoundForn[i] < 0 for some i in J, then
+we know there are no solutions for the current
 case of (11).
 */
 /////////////////////////////////////////////
@@ -4043,7 +4041,7 @@ PrintFile(LogFile, "No solutions in the current case.");
 fprintf LogFile, "UpperBoundForA = %o\n", UpperBoundForA;
 continue iiii;
 end if;
-for l in J do 
+for l in J do
 if UpperBoundForn[l] lt 0 then
 PrintFile(LogFile, "No solutions in the current case.");
 fprintf LogFile, "p[l] = %o\n", p[l];
@@ -4077,7 +4075,7 @@ ExceptionalTuplesInsideLoop:=[];
 
 /////////////////////////////////////////////////////////////////////
 /*
-If the number of tuples to sieve through is small enough, jump directly to the 
+If the number of tuples to sieve through is small enough, jump directly to the
 final sieving procedure.
 */
 //////////////////////////////////////////////////////////////////////////////
@@ -4086,8 +4084,8 @@ for i in J do
 prod:=prod*(UpperBoundForn[i]+1);
 end for;
 prod:=prod*(2*UpperBoundForA + 1)^r;
-if prod lt 1000000 then 
-break; 
+if prod lt 1000000 then
+break;
 end if; //prod = number of tuples to sieve
 
 
@@ -4138,11 +4136,11 @@ end for;
 
 /*
 mmmm0:=Ceiling(
-( (#JJJ - 1)/(2*Log(p[l])) )*Log( 2^(#JJJ - 1) * QQ / prod^(2/(#JJJ - 1)) )  
+( (#JJJ - 1)/(2*Log(p[l])) )*Log( 2^(#JJJ - 1) * QQ / prod^(2/(#JJJ - 1)) )
 );
 */
 mmmm0:=Ceiling(
-( (#JJJ - 1)/(2*Log(p[l])) )*Log( QQ / prod^(2/(#JJJ - 1)) )  
+( (#JJJ - 1)/(2*Log(p[l])) )*Log( QQ / prod^(2/(#JJJ - 1)) )
 );
 if mmmm0 le 0 then mmmm0:=1; end if;
 
@@ -4155,13 +4153,13 @@ Tm:=ScalarMatrix(IntegerRing(),#JJJ-1,1);
 /*initialize as #JJJ-1 by #JJJ-1 identity matrix*/
 
 ///////////////////////////////////////////////////////////////////////////
-/* 
+/*
 Start while loop that will increase m until the p_l-adic reduction yeilds a new upper bound for n_l or until a number of increases has been made with no success
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
 RunThroughNumber:=0;
-while flag do 
+while flag do
 
 /////////////////////////////////////////////////////////////////////////////
 /*
@@ -4210,8 +4208,8 @@ RemoveRow(~Am,1);
 //Am is now a #JJJ-1 by #JJJ-1 matrix
 
 Am:=Am*Transpose(Tm); //Transpose(Tm) = Um from Setion 15
-/* 
-If this is the first run through, Tm is the identity. If this is not 
+/*
+If this is the first run through, Tm is the identity. If this is not
 the first run through, this will save computation time.
 */
 
@@ -4225,13 +4223,13 @@ Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the trans
 
 temp,Tm,rank:=LLL( Transpose(Am) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-Bm:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp); 
+Bm:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_m
 
 /*
-Here Tm*Transpose(Am) = Transpose(Bm). 
+Here Tm*Transpose(Am) = Transpose(Bm).
 So with Um=Transpose(Tm) we have Am*Um = Bm,
-and With 
+and With
 Vm = Bm*Transpose(Tm)*Bm^(-1) = Am*Transpose(Tm)*Am^(-1), we have Vm*Am = Bm.
 */
 
@@ -4283,7 +4281,7 @@ delta[#JJJ-1]:=0;
 
 /*
 //RGBRGB
-for i:=1 to #JJJ-1 do 
+for i:=1 to #JJJ-1 do
 print("DistanceToNearestInteger(sss[i][1])");
 print("i=");
 i;
@@ -4331,16 +4329,16 @@ end if;
 
 
 else
- 
+
 RunThroughNumber+:=1;  //increase m and try again
 ///
 /*
-If increasing m 20 times (in which case m will be double its original value) fails to 
-produce a new upper bound for n_l, move onto the next value of l in I.  Also, print a 
+If increasing m 20 times (in which case m will be double its original value) fails to
+produce a new upper bound for n_l, move onto the next value of l in I.  Also, print a
 message indicating that the basic p_l-adic reduction procedure was unsuccesful.
 */
 /////
-if RunThroughNumber eq 20 then 
+if RunThroughNumber eq 20 then
 PrintFile(LogFile, "Basic p-adic reduction taking a long time.");
 fprintf LogFile, "Case: iiii = %o\n", iiii;
 fprintf LogFile, "l = %o\n", l;
@@ -4401,7 +4399,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1 with a certain value of c11
 if max lt MIN then MIN:=max; end if;
 
@@ -4420,7 +4418,7 @@ if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
 if max lt c15 then max:=c15; end if;
-//now max is the upper bound for A in Lemma 19.1 with a certain value of c11 
+//now max is the upper bound for A in Lemma 19.1 with a certain value of c11
 if max lt MIN then MIN:=max; end if;
 
 for i:=1 to 999 do
@@ -4456,7 +4454,7 @@ end if;
 else //s > 0
 //////////////////////////////////////////////////////////////////////////////
 /*
-s>0 Case 
+s>0 Case
 */
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -4468,12 +4466,12 @@ Real Case, i.e., s \geq 3
 if s ge 3 then // s>=3 real case
 
 JumpToEndOfRealReduction:=false;
-for i0:=1 to s do 
+for i0:=1 to s do
 
 
 ////////////////////////////////////////////////////////////////////////////
 /*
-Define 
+Define
 weights W[i] (Section 19)
 R (Section 19)
 S (Section 19)
@@ -4500,7 +4498,7 @@ W[JJJ[i]]:=RoundP(H0prime/ RNTO(B[JJJ[i]]) );
 end for;
 
 R:=0;
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i];
 end for;
 R:=(1/2)*R;
@@ -4517,12 +4515,12 @@ prod:=prod*W[JJJ[i]];
 end for;
 
 /*
-LogC:= ((#JJJ-1)/2)*Log( 
+LogC:= ((#JJJ-1)/2)*Log(
 (R^2 + S) / ( 2^(-(#JJJ-1)) * (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) )
 );
 */
 
-LogC:= ((#JJJ-1)/2)*Log(  
+LogC:= ((#JJJ-1)/2)*Log(
 (R^2 + S) / ( 2^(-2*(#JJJ-1)) * (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) )
 );
 
@@ -4554,17 +4552,17 @@ Calculate R.
 ////////////////////////////////////////////////////////////////////////////
 CCCCCC:=Ceiling(Exp(LogC + RunThroughNumber1*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC));
 
-if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
 end if;
-if RunThroughNumber1 eq 22 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 22 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
 end if;
 /*
-if RunThroughNumber1 eq 23 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 23 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
 end if;
-if RunThroughNumber1 eq 24 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 24 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
 end if;
 */
@@ -4591,7 +4589,7 @@ end for;
 
 /*
 if Abs(phi[JJJ[#JJJ]]) lt 2 then
-if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then 
+if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then
 phi[JJJ[#JJJ]]:=2;
 else
 phi[JJJ[#JJJ]]:=-2;
@@ -4608,7 +4606,7 @@ end if;
 */
 
 if phi[JJJ[#JJJ]] eq 0 then
-if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then 
+if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then
 phi[JJJ[#JJJ]]:=1;
 else
 phi[JJJ[#JJJ]]:=-1;
@@ -4623,7 +4621,7 @@ Include(~ExceptionalTuplesInsideLoop,bbb);
 end if;
 
 R:=0;
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i]*Abs( CCCCCC*LogarithmicAlphaC[i0][i] -  phi[i] );
 end for;
 
@@ -4667,13 +4665,13 @@ Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the trans
 
 temp,TC,rank:=LLL(Transpose(AC) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-BC:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp); 
+BC:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_C
 
 /*
-Here TC*Transpose(AC) = Transpose(BC). 
+Here TC*Transpose(AC) = Transpose(BC).
 So with UC=Transpose(TC) we have AC*UC = BC,
-and With 
+and With
 VC = BC*Transpose(TC)*BC^(-1) = AC*Transpose(TC)*AC^(-1), we have VC*AC = BC.
 */
 
@@ -4810,13 +4808,13 @@ else
 RunThroughNumber2:=RunThroughNumber2+1; //increase C and try again
 ////////
 /*
-In case we find a new conditional upper bound that fails to improve on 
-the current unconditional upper bound for A, we decrease log(C) by 25 percent 
-and try again. If this doesn't result in an improved bound, we then we abort 
+In case we find a new conditional upper bound that fails to improve on
+the current unconditional upper bound for A, we decrease log(C) by 25 percent
+and try again. If this doesn't result in an improved bound, we then we abort
 the real reduction procedure.  There is no need to print a message in this case.
 */
 ///////
-if RunThroughNumber2 eq 2 then 
+if RunThroughNumber2 eq 2 then
 JumpToEndOfRealReduction:=true;
 break i0;
 end if;
@@ -4827,18 +4825,18 @@ else //controlled by lowerbound gt (R^2 + S)^(1/2)
 RunThroughNumber1:=RunThroughNumber1+1; //increase C and try again
 /////
 /*
-If increasing log(C) 22 times (with log(C) being increased 5% the first 
-twenty times and by 1000% the last two times, so that log(C) will be 
-20 times original value) fails to produce a new conditional upper 
-bound for A, then we abort the real reduction procedure.  Also, print 
-a message to the user indicating the basic real reduction procedure 
-was unsuccesful for this reason.  Note: tries 21 and 22 only happen 
-if the upper for A has not been reduced much (or at all) from the linear 
+If increasing log(C) 22 times (with log(C) being increased 5% the first
+twenty times and by 1000% the last two times, so that log(C) will be
+20 times original value) fails to produce a new conditional upper
+bound for A, then we abort the real reduction procedure.  Also, print
+a message to the user indicating the basic real reduction procedure
+was unsuccesful for this reason.  Note: tries 21 and 22 only happen
+if the upper for A has not been reduced much (or at all) from the linear
 forms in logs bound.
 */
 ////
 if RunThroughNumber1 eq 23 then
-PrintFile(LogFile,"Basic real reduction taking a long time."); 
+PrintFile(LogFile,"Basic real reduction taking a long time.");
 fprintf LogFile, "case: iiii = %o\n", iiii;
 fprintf LogFile, "i0 = %o\n", i0;
 fprintf LogFile, "Improvement = %o\n", Improvement;
@@ -4847,14 +4845,14 @@ fprintf LogFile, "UpperBoundForA = %o\n", UpperBoundForA;
 fprintf LogFile, "Log(CCCCCC) = %o\n", Log(CCCCCC);
 
 if UpperBoundForA gt 1000000000000 then //10^12
-print "Basic real reduction taking a long time."; 
+print "Basic real reduction taking a long time.";
 printf "case: iiii = %o\n", iiii;
 printf "i0 = %o\n", i0;
 printf "Improvement = %o\n", Improvement;
 printf "UpperBoundForn = %o\n", UpperBoundForn;
 printf "UpperBoundForA = %o\n", UpperBoundForA;
 printf "Log(CCCCCC) = %o\n", Log(CCCCCC);
-PrintFile(OutFile,"Basic real reduction taking a long time."); 
+PrintFile(OutFile,"Basic real reduction taking a long time.");
 fprintf OutFile, "case: iiii = %o\n", iiii;
 fprintf OutFile, "i0 = %o\n", i0;
 fprintf OutFile, "Improvement = %o\n", Improvement;
@@ -4880,9 +4878,9 @@ end for; //end i0 loop
 
 if JumpToEndOfRealReduction eq false then
 /////////////
-/* 
-Choose c11 to find an optimal i0-conditional upper bound for A for 
-i0 in {s+1,...,s+2t} from Lemma 19.1 
+/*
+Choose c11 to find an optimal i0-conditional upper bound for A for
+i0 in {s+1,...,s+2t} from Lemma 19.1
 */
 ///////////
 MIN:=UpperBoundForA;
@@ -4903,7 +4901,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -4923,7 +4921,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -4944,7 +4942,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 end for;  //end i loop
@@ -4968,7 +4966,7 @@ end if;
 
 end if; //controlled by JumpToEndOfRealReduction
 
-if UpperBoundForA lt 0 then 
+if UpperBoundForA lt 0 then
 //there are no solutions to the current case of (11)
 fprintf LogFile, "UpperBoundForA lt 0. No solutions possible in case iiii = %o\n", iiii;
 continue iiii;
@@ -4990,7 +4988,7 @@ end for;
 
 
 JumpToEndOfRealReduction:=false;
-for i0:=1 to s do 
+for i0:=1 to s do
 
 //RGB
 //print("basic real, s=, i0=");
@@ -5000,7 +4998,7 @@ for i0:=1 to s do
 
 ////////////////////////////////////////////////////////////////////////////
 /*
-Define 
+Define
 weights W[i] (Section 19)
 R (Section 19)
 S (Section 19)
@@ -5031,7 +5029,7 @@ end for;
 //B;
 
 R:=B[2+v+r];
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i];
 end for;
 R:=(1/2)*R;
@@ -5048,11 +5046,11 @@ prod:=prod*W[JJJ[i]];
 end for;
 
 /*
-LogC:= ((#JJJ)/2)*Log( 
+LogC:= ((#JJJ)/2)*Log(
 (R^2 + S) / ( 2^(-(#JJJ)) * (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) )
 );
 */
-LogC:= ((#JJJ)/2)*Log( 
+LogC:= ((#JJJ)/2)*Log(
 (R^2 + S) / ( 2^(-2*(#JJJ)) * (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) )
 );
 
@@ -5086,10 +5084,10 @@ Calculate R.
 */
 ////////////////////////////////////////////////////////////////////////////
 CCCCCC:=Ceiling(Exp( LogC + RunThroughNumber1*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC ));
-if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
 end if;
-if RunThroughNumber1 eq 22 and UpperBoundForA gt 100000 then 
+if RunThroughNumber1 eq 22 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 19*LogC));
 end if;
 
@@ -5112,8 +5110,8 @@ phi[2+v+r]:=Round(CCCCCC*LogarithmicAlphaC[i0][2+v+r]);
 
 /*This will never happen because LogarithmicAlphaC[i0][2+v+r] = Pi */
 /*
-if Abs(phi[2+v+r]) lt 2 then 
-if CCCCCC*LogarithmicAlphaC[i0][2+v+r] ge 0 then 
+if Abs(phi[2+v+r]) lt 2 then
+if CCCCCC*LogarithmicAlphaC[i0][2+v+r] ge 0 then
 phi[2+v+r]:=2;
 else
 phi[2+v+r]:=-2;
@@ -5140,7 +5138,7 @@ end if;
 
 
 R:=B[2+v+r]*Abs( CCCCCC*LogarithmicAlphaC[i0][2+v+r] -  phi[2+v+r] );
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i]*Abs( CCCCCC*LogarithmicAlphaC[i0][i] -  phi[i] );
 end for;
 
@@ -5172,7 +5170,7 @@ RemoveColumn(~AC,1);
 //AC is now a #JJJ by #JJJ matrix
 
 AC:=AC*Transpose(TC);
-/* If this is the first run through Transpose(TC) is the identity. 
+/* If this is the first run through Transpose(TC) is the identity.
 Otherwise Transpose(TC) is UC.  This will time in the LLL reduction. */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -5185,13 +5183,13 @@ Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the trans
 
 temp,TC,rank:=LLL(Transpose(AC) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-BC:=MatrixRing(RationalField(),#JJJ) ! Transpose(temp); 
+BC:=MatrixRing(RationalField(),#JJJ) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_C
 
 /*
-Here TC*Transpose(AC) = Transpose(BC). 
+Here TC*Transpose(AC) = Transpose(BC).
 So with UC=Transpose(TC) we have AC*UC = BC,
-and With 
+and With
 VC = BC*Transpose(TC)*BC^(-1) = AC*Transpose(TC)*AC^(-1), we have VC*AC = BC.
 */
 
@@ -5296,13 +5294,13 @@ else
 RunThroughNumber2:=RunThroughNumber2+1; //increase C and try again
 ////////
 /*
-In case we find a new conditional upper bound that fails to improve on 
-the current unconditional upper bound for A, we decrease log(C) by 25 percent 
-and try again. If this doesn't result in an improved bound, we then we abort 
+In case we find a new conditional upper bound that fails to improve on
+the current unconditional upper bound for A, we decrease log(C) by 25 percent
+and try again. If this doesn't result in an improved bound, we then we abort
 the real reduction procedure.  There is no need to print a message in this case.
 */
 ///////
-if RunThroughNumber2 eq 2 then 
+if RunThroughNumber2 eq 2 then
 JumpToEndOfRealReduction:=true;
 break i0;
 end if;
@@ -5313,18 +5311,18 @@ else //controlled by lowerbound gt (R^2 + S)^(1/2)
 RunThroughNumber1:=RunThroughNumber1+1; //increase C and try again
 /////
 /*
-If increasing log(C) 22 times (with log(C) being increased 5% the first 
-twenty times and by 1000% the last two times, so that log(C) will be 
-20 times original value) fails to produce a new conditional upper 
-bound for A, then we abort the real reduction procedure.  Also, print 
-a message to the user indicating the basic real reduction procedure 
-was unsuccesful for this reason.  Note: tries 21 and 22 only happen 
-if the upper for A has not been reduced much (or at all) from the linear 
+If increasing log(C) 22 times (with log(C) being increased 5% the first
+twenty times and by 1000% the last two times, so that log(C) will be
+20 times original value) fails to produce a new conditional upper
+bound for A, then we abort the real reduction procedure.  Also, print
+a message to the user indicating the basic real reduction procedure
+was unsuccesful for this reason.  Note: tries 21 and 22 only happen
+if the upper for A has not been reduced much (or at all) from the linear
 forms in logs bound.
 */
 ////
-if RunThroughNumber1 eq 23 then 
-PrintFile(LogFile,"Basic real reduction taking a long time."); 
+if RunThroughNumber1 eq 23 then
+PrintFile(LogFile,"Basic real reduction taking a long time.");
 fprintf LogFile, "case: iiii = %o\n", iiii;
 fprintf LogFile, "i0 = %o\n", i0;
 fprintf LogFile, "Improvement = %o\n", Improvement;
@@ -5333,7 +5331,7 @@ fprintf LogFile, "UpperBoundForA = %o\n", UpperBoundForA;
 fprintf LogFile, "Log(CCCCCC) = %o\n", Log(CCCCCC);
 
 if UpperBoundForA gt 1000000000000 then //10^12
-print "Basic real reduction taking a long time."; 
+print "Basic real reduction taking a long time.";
 printf "case: iiii = %o\n", iiii;
 printf "i0 = %o\n", i0;
 printf "Improvement = %o\n", Improvement;
@@ -5355,8 +5353,8 @@ end for; //end i0 loop
 
 if JumpToEndOfRealReduction eq false then
 /////////////
-/* 
-Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1 
+/*
+Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1
 */
 ///////////
 MIN:=UpperBoundForA;
@@ -5377,7 +5375,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -5397,7 +5395,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -5418,7 +5416,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 end for;  //end i loop
@@ -5444,7 +5442,7 @@ end if;
 
 end if; //controlled by JumpToEndOfRealReduction
 
-if UpperBoundForA lt 0 then 
+if UpperBoundForA lt 0 then
 //there are no solutions to the current case of (11)
 fprintf LogFile, "UpperBoundForA lt 0. No solutions possible in case iiii = %o\n", iiii;
 continue iiii;
@@ -5454,7 +5452,7 @@ end if;
 
 end if; //end of IF for distinguishing (s>=3) (s=1,2) cases
 
-end if; //end of IF for s=0, s>=3, s=1or2 cases    
+end if; //end of IF for s=0, s>=3, s=1or2 cases
 
 //done finding new upper bound for A
 
@@ -5485,11 +5483,11 @@ fprintf LogFile, "UpperBoundForA = %o\n", UpperBoundForA;
 
 /////////////////////////////////////////////////////////////////////////////
 /*
-Initialize the set of exceptional tuples.  It will be filled as we work through 
+Initialize the set of exceptional tuples.  It will be filled as we work through
 the refined redcution procedures.
 
-At the end, it will consist of the tuples that pass all the easy tests.  The tuples 
-will not have been tested for (11) directly and they won't all necessarily be 
+At the end, it will consist of the tuples that pass all the easy tests.  The tuples
+will not have been tested for (11) directly and they won't all necessarily be
 soltutions of (11).  We will test them more in the final sieve step.
 
 Each element of ExceptionalTuples will be a sequence of the form
@@ -5510,16 +5508,16 @@ Start Of Loop For Repeated Refined Reductions
 ////////////////////////////////////////////////////////////////////////////
 Improvement:=true;
 
-while Improvement do 
+while Improvement do
 Improvement:=false;
 ExceptionalTuplesInsideLoop:=[];
 
 /////////////////////////////////////////////////////////////////////////////
 /*
-If the number of tuples to sieve through is small enough, jump directly to the 
+If the number of tuples to sieve through is small enough, jump directly to the
 final sieving procedure.
 
-If the number of exceptional tuples has grown excessively large, jump to the 
+If the number of exceptional tuples has grown excessively large, jump to the
 final sieving procedure and inform that user that this has been done.
 */
 //////////////////////////////////////////////////////////////////////////////
@@ -5528,13 +5526,13 @@ for i in J do
 prod:=prod*(UpperBoundForn[i]+1);
 end for;
 prod:=prod*(2*UpperBoundForA + 1)^r;
-if prod lt 5000000 then 
-break; 
+if prod lt 5000000 then
+break;
 end if; //prod = number of tuples to sieve
 
-if #ExceptionalTuples gt 100000 then 
+if #ExceptionalTuples gt 100000 then
 fprintf LogFile, "The number of exceptional tuples is large. Jumping to the final sieving procedure. Case iiii = %o\n", iiii;
-break; 
+break;
 end if;
 
 
@@ -5594,13 +5592,13 @@ end for;
 
 /*
 mmmm0:=Ceiling(
-(3/4)*( (#JJJ - 1)/(2*Log(p[l])) )*Log( 2^(#JJJ - 1) * QQ / prod^(2/(#JJJ-1)) )  
+(3/4)*( (#JJJ - 1)/(2*Log(p[l])) )*Log( 2^(#JJJ - 1) * QQ / prod^(2/(#JJJ-1)) )
 );
 */
 
 mmmm0:=Min([
 Ceiling(
-(2/3)*( (#JJJ - 1)/(2*Log(p[l])) )*Log( QQ / prod^(2/(#JJJ-1)) )  
+(2/3)*( (#JJJ - 1)/(2*Log(p[l])) )*Log( QQ / prod^(2/(#JJJ-1)) )
 ),
 Ceiling((2/3)*UpperBoundForn[l])
 ]);
@@ -5615,15 +5613,15 @@ end for;
 Tm:=ScalarMatrix(IntegerRing(),#JJJ-1,1);/*initialize as #JJJ-1 by #JJJ-1 identity matrix*/
 
 ///////////////////////////////////////////////////////////////////////////
-/* 
-Start while loop that will increase m until the p_l-adic reduction yeilds a 
-new upper bound for n_l or until a number of increases has been made with no 
+/*
+Start while loop that will increase m until the p_l-adic reduction yeilds a
+new upper bound for n_l or until a number of increases has been made with no
 success
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
 RunThroughNumber:=0;
-while flag do 
+while flag do
 
 /////////////////////////////////////////////////////////////////////////////
 /*
@@ -5638,8 +5636,8 @@ end for;
 
 /////////////////////////////////////////////////////////////////////////////
 /*
-Compute the (soon to be) new upper bound for n_l.  If it is better than the 
-old upper bound, then we do the enumeration procedure.  If it is not better, 
+Compute the (soon to be) new upper bound for n_l.  If it is better than the
+old upper bound, then we do the enumeration procedure.  If it is not better,
 there is no need to do the enumeration and we move on to the next l in I
 */
 /////////////////////////////////////////////////////////////////////////////
@@ -5691,8 +5689,8 @@ RemoveRow(~Am,1);
 //Am is now a #JJJ-1 by #JJJ-1 matrix
 
 Am:=Am*Transpose(Tm); //Transpose(Tm) = Um from Setion 15
-/* 
-If this is the first run through, Tm is the identity. 
+/*
+If this is the first run through, Tm is the identity.
 If this is not the first run through, this will save computation time.
 */
 
@@ -5703,16 +5701,16 @@ Compute an LLL reduced basis for the lattice Gamma_m generated by columns of A_m
 Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the transpose of A_m.  Similarly, it spits out the transpose of B_m and the transpose of U_m
 */
 //////////////////////////////////////////////////////////////////////////////
-//time 
+//time
 temp,Tm,rank:=LLL( Transpose(Am) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-Bm:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp); 
+Bm:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_m
 
 /*
-Here Tm*Transpose(Am) = Transpose(Bm). 
+Here Tm*Transpose(Am) = Transpose(Bm).
 So with Um=Transpose(Tm) we have Am*Um = Bm,
-and With 
+and With
 Vm = Bm*Transpose(Tm)*Bm^(-1) = Am*Transpose(Tm)*Am^(-1), we have Vm*Am = Bm.
 */
 
@@ -5776,26 +5774,26 @@ DDD:=DDD+min;
 /*
 Construct the lattice Gamma_m.  The MAGMA function Lattice() assumes
 
-Use the function EnumerationCost to compute an estimate the number of nodes 
-in the tree to be visited during the execution of the algorithm that will 
-enumerate all lattice vectors u with |u| \leq D.  The number of nodes is 
+Use the function EnumerationCost to compute an estimate the number of nodes
+in the tree to be visited during the execution of the algorithm that will
+enumerate all lattice vectors u with |u| \leq D.  The number of nodes is
 essentially directly proportional to the time needed for the enumeration.
 
-If the number of nodes is too large for the enumration to be done in a 
-reasonable amount of time, we increase m and try the reduction procedure 
-again.  If several increases of m fail to result in a small enough estimate 
+If the number of nodes is too large for the enumration to be done in a
+reasonable amount of time, we increase m and try the reduction procedure
+again.  If several increases of m fail to result in a small enough estimate
 for the number of nodes, then we move onto the next l in I.
 
-In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration 
-algorithm has a traversal rate of about 7.5 millon nodes per second.  
-Based on the examples in the MAGMA Handbook, the rate is appears to be 20 to 
-40 millon nodes per second. We will assume a traversal rate of 10 millon nodes 
-per second.  Assuming we want the enumeration to take less than 10 minutes, we 
+In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration
+algorithm has a traversal rate of about 7.5 millon nodes per second.
+Based on the examples in the MAGMA Handbook, the rate is appears to be 20 to
+40 millon nodes per second. We will assume a traversal rate of 10 millon nodes
+per second.  Assuming we want the enumeration to take less than 10 minutes, we
 want to abort if the estimated number of nodes is > 10*60*10^7 = 6000000000
 
-The enumeration algorithm may be fast, but the extraction and testing of the 
-tuples can take time. So we abort if the estimated number of nodes is 
-> 10*60*10^4 
+The enumeration algorithm may be fast, but the extraction and testing of the
+tuples can take time. So we abort if the estimated number of nodes is
+> 10*60*10^4
 
 Note: To MAGMA, Norm(v) = |v|^2.
 */
@@ -5811,14 +5809,14 @@ if EnumerationCost(Gammam,RealField() ! DDD^2) gt 6000000 then
 RunThroughNumber+:=1;  //increase m and try again
 ///
 /*
-If increasing m 20 times (with m being increased by 5% each time, so that 
-m will be double its original value after 20 increases) fails to result in 
-a sufficiently small estimate for the number of nodes, then we move on to the 
-next value of l in I.  Also, print a message indicating that the refined 
+If increasing m 20 times (with m being increased by 5% each time, so that
+m will be double its original value after 20 increases) fails to result in
+a sufficiently small estimate for the number of nodes, then we move on to the
+next value of l in I.  Also, print a message indicating that the refined
 p_l-adic reduction procedure was unsuccesful.
 */
 /////
-if RunThroughNumber eq 20 then 
+if RunThroughNumber eq 20 then
 fprintf LogFile, "Refined p-adic reduction taking too long. Case iiii = %o, l = %o\n", iiii, l;
 continue l;
 end if;
@@ -5827,7 +5825,7 @@ else // EnumerationCost(Gammam,UpperBoundForu^2) <= 6000000
 flag:=false; //ready to get out of while loop that increases m if necessary
 ///////////////////////////////////////////////////////////////////////////
 /*
-Create a process P to enumerate all the vectors u in the lattice Gamma_m with length squared |u|^2 <= D^2 (equivalently length |u| <= D).  
+Create a process P to enumerate all the vectors u in the lattice Gamma_m with length squared |u|^2 <= D^2 (equivalently length |u| <= D).
 
 To enumerate the vectors, we will need to repeatedly call NextVector(P).  Calling NextVector(P) will return the next vector found in the enumeration (along with its norm).
 
@@ -5838,7 +5836,7 @@ P:=ShortVectorsProcess(Gammam,Floor(DDD^2));
 
 ///////////////////////////////////////////////////////////////////////////
 /*
-Enumerate those lattice vectors u with ||u|| <= D, extract 
+Enumerate those lattice vectors u with ||u|| <= D, extract
 the corresponding tuples, and test those tuples.
 
 Extracted tuple = (b_{JJJ[2]},...,b_{JJJ[#JJJ]})
@@ -5948,7 +5946,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -5966,7 +5964,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -5985,7 +5983,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 end for;  //end i loop
@@ -6001,7 +5999,7 @@ end if;
 else //s > 0
 //////////////////////////////////////////////////////////////////////////////
 /*
-s>0 Case 
+s>0 Case
 */
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -6013,7 +6011,7 @@ if s ge 3 then // s>=3 real case
 
 
 JumpToEndOfRealReduction:=false;
-for i0:=1 to s do 
+for i0:=1 to s do
 
 
 //RGB
@@ -6023,7 +6021,7 @@ for i0:=1 to s do
 
 ////////////////////////////////////////////////////////////////////////////
 /*
-Define 
+Define
 weights W[i] (Section 21)
 R (approximation) (Section 21)
 S (Section 21)
@@ -6057,7 +6055,7 @@ end for;
 //B;
 
 R:=0;
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i];
 end for;
 R:=(1/2)*R;
@@ -6074,14 +6072,14 @@ prod:=prod*W[JJJ[i]];
 end for;
 
 /*
-LogC:= (3/4) * ((#JJJ-1)/2) * Log( 
-(R^2 + S) / ( 2^(-(#JJJ-1)) * (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) ) 
+LogC:= (3/4) * ((#JJJ-1)/2) * Log(
+(R^2 + S) / ( 2^(-(#JJJ-1)) * (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) )
 );
 */
 
 LogC:= Min([
-(2/3) * ((#JJJ-1)/2) * Log( 
-(R^2 + S) / (  (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) ) 
+(2/3) * ((#JJJ-1)/2) * Log(
+(R^2 + S) / (  (Abs(LogarithmicAlphaC[i0][JJJ[#JJJ]])*prod)^(2/(#JJJ-1)) )
 ),
 (2/3)*UpperBoundForA
 ]);
@@ -6137,7 +6135,7 @@ end for;
 
 /*
 if Abs(phi[JJJ[#JJJ]]) lt 2 then
-if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then 
+if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then
 phi[JJJ[#JJJ]]:=2;
 else
 phi[JJJ[#JJJ]]:=-2;
@@ -6154,7 +6152,7 @@ end if;
 */
 
 if phi[JJJ[#JJJ]] eq 0 then
-if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then 
+if CCCCCC*LogarithmicAlphaC[i0][JJJ[#JJJ]] ge 0 then
 phi[JJJ[#JJJ]]:=1;
 else
 phi[JJJ[#JJJ]]:=-1;
@@ -6163,7 +6161,7 @@ end if;
 
 
 R:=0;
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i]*Abs( CCCCCC*LogarithmicAlphaC[i0][i] -  phi[i] );
 end for;
 
@@ -6261,17 +6259,17 @@ fprintf LogFile, "UpperBoundForN = %o\n", UpperBoundForN;
 */
 
 
-if NewConditionalUpperBoundForAi0 ge OldUnconditionalUpperBoundForA then 
+if NewConditionalUpperBoundForAi0 ge OldUnconditionalUpperBoundForA then
 RunThroughNumber2:=RunThroughNumber2+1; //decrease C and try again
 ////////
 /*
-In case we find a new conditional upper bound that fails to improve on 
-the current unconditional upper bound for A, we decrease log(C) by 25 percent 
-and try again. If this doesn't result in an improved bound, we then we abort 
+In case we find a new conditional upper bound that fails to improve on
+the current unconditional upper bound for A, we decrease log(C) by 25 percent
+and try again. If this doesn't result in an improved bound, we then we abort
 the real reduction procedure.  There is no need to print a message in this case.
 */
 ///////
-if RunThroughNumber2 eq 2 then 
+if RunThroughNumber2 eq 2 then
 JumpToEndOfRealReduction:=true;
 break i0;
 end if;
@@ -6316,16 +6314,16 @@ Compute an LLL reduced basis for the lattice Gamma_C generated by columns of A_C
 Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the transpose of A_C.  Similarly, it spits out the transpose of B_C and the transpose of U_C
 */
 ///////////////////////////////////////////////////////////////////////////////
-//time 
+//time
 temp,TC,rank:=LLL(Transpose(AC) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-BC:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp); 
+BC:=MatrixRing(RationalField(),#JJJ-1) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_C
 
 /*
-Here TC*Transpose(AC) = Transpose(BC). 
+Here TC*Transpose(AC) = Transpose(BC).
 So with UC=Transpose(TC) we have AC*UC = BC,
-and With 
+and With
 VC = BC*Transpose(TC)*BC^(-1) = AC*Transpose(TC)*AC^(-1), we have VC*AC = BC.
 */
 
@@ -6368,7 +6366,7 @@ Choosettt(~yyytttpotentialtttFloorsss,~min,~BC,~mm,1);
 
 zzz:=BC*ttt;
 
-/*Now zzz is likely the closest vector in the lattice Gamma_C to yyy and 
+/*Now zzz is likely the closest vector in the lattice Gamma_C to yyy and
 min = |zzz-yyy|*/
 
 
@@ -6376,29 +6374,29 @@ min = |zzz-yyy|*/
 /*
 Construct the lattice Gamma_C.  The MAGMA function Lattice() assumes
 
-Use the function EnumerationCost to compute an estimate the number of 
-nodes in the tree to be visited during the execution of the algorithm 
-that will enumerate all lattice vectors u with |u| \leq D + |y-z|.  The 
-number of nodes is essentially directly proportional to the time needed 
+Use the function EnumerationCost to compute an estimate the number of
+nodes in the tree to be visited during the execution of the algorithm
+that will enumerate all lattice vectors u with |u| \leq D + |y-z|.  The
+number of nodes is essentially directly proportional to the time needed
 for the enumeration.
 
-If the number of nodes is too large for the enumration to be done in a 
-reasonable amount of time, we increase C and try the reduction procedure 
-again.  If several increases of C fail to result in a small enough 
-estimate for the number of nodes, then we abort the refined real reduction 
-(there is no point in moving on to the next i0 in {1,...,s} because the 
+If the number of nodes is too large for the enumration to be done in a
+reasonable amount of time, we increase C and try the reduction procedure
+again.  If several increases of C fail to result in a small enough
+estimate for the number of nodes, then we abort the refined real reduction
+(there is no point in moving on to the next i0 in {1,...,s} because the
 uncondtional upper bound on A will not be improved).
 
-In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration 
-algorithm has a traversal rate of about 7.5 millon nodes per second.  
-Based on the examples in the MAGMA Handbook, the rate is appears to be 
-20 to 40 millon nodes per second. We will assume a traversal rate of 10 
-millon nodes per second.  Assuming we want the enumeration to take less 
-than 10 minutes, we want to abort if the estimated number of nodes is 
+In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration
+algorithm has a traversal rate of about 7.5 millon nodes per second.
+Based on the examples in the MAGMA Handbook, the rate is appears to be
+20 to 40 millon nodes per second. We will assume a traversal rate of 10
+millon nodes per second.  Assuming we want the enumeration to take less
+than 10 minutes, we want to abort if the estimated number of nodes is
 > 10*60*10^7 = 6000000000
 
-The enumeration algorithm may be fast, but the extraction and testing of the 
-tuples can take time. So we abort if the estimated number of nodes is 
+The enumeration algorithm may be fast, but the extraction and testing of the
+tuples can take time. So we abort if the estimated number of nodes is
 > 10*60*10^4
 
 Note: To MAGMA, Norm(v) = |v|^2.
@@ -6418,7 +6416,7 @@ RunThroughNumber1+:=1;  //increase C and try again
 If increasing log(C) 20 times (with log(C) being increased 5% each time, so that log(C) will be double its original value) fails to produce a new conditional upper bound for A, then we abort the real reduction procedure.  Also, print a message to the user indicating the refined real reduction procedure was unsuccesful for this reason.
 */
 ////
-if RunThroughNumber1 eq 20 then 
+if RunThroughNumber1 eq 20 then
 fprintf LogFile, "Refined real reduction taking too long. Case iiii = %o, i0 = %o\n", iiii, i0;
 JumpToEndOfRealReduction:=true;
 break i0;
@@ -6439,7 +6437,7 @@ P:=ShortVectorsProcess(GammaC,Floor((DDD+min)^2));
 
 /////////////////////////////////////////////////////////////////////////
 /*
-Enumerate those lattice vectors u with |u| <= D+|y-z|, extract 
+Enumerate those lattice vectors u with |u| <= D+|y-z|, extract
 the corresponding tuples, and test those tuples.
 
 Extracted tuple = (b_{JJJ[2]},...,b_{JJJ[#JJJ]})
@@ -6500,8 +6498,8 @@ end for; //end i0 loop
 
 if JumpToEndOfRealReduction eq false then
 /////////////
-/* 
-Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1 
+/*
+Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1
 */
 ///////////
 MIN:=UpperBoundForA;
@@ -6522,7 +6520,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -6542,7 +6540,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -6563,7 +6561,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 end for;  //end i loop
@@ -6587,7 +6585,7 @@ end if;
 
 end if; //controlled by JumpToEndOfRealReduction
 
-if UpperBoundForA lt 0 then 
+if UpperBoundForA lt 0 then
 //there are no solutions to the current case of (11)
 fprintf LogFile, "UpperBoundForA lt 0. No solutions possible in case iiii = %o\n", iiii;
 continue iiii;
@@ -6609,12 +6607,12 @@ end for;
 
 
 JumpToEndOfRealReduction:=false;
-for i0:=1 to s do 
+for i0:=1 to s do
 
 
 ////////////////////////////////////////////////////////////////////////////
 /*
-Define 
+Define
 weights W[i] (Section 21)
 R (approximation) (Section 21)
 S (Section 21)
@@ -6644,7 +6642,7 @@ W[1+i]:=2*W[i+1];
 end for;
 
 R:=B[2+v+r];
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i];
 end for;
 R:=(1/2)*R;
@@ -6661,14 +6659,14 @@ prod:=prod*W[JJJ[i]];
 end for;
 
 /*
-LogC:= (3/4) * ((#JJJ)/2) * Log( 
-(R^2 + S) / ( 2^(-(#JJJ)) * (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) ) 
+LogC:= (3/4) * ((#JJJ)/2) * Log(
+(R^2 + S) / ( 2^(-(#JJJ)) * (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) )
 );
 */
 
 LogC:= Min([
-(2/3) * ((#JJJ)/2) * Log( 
-(R^2 + S) / ( (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) ) 
+(2/3) * ((#JJJ)/2) * Log(
+(R^2 + S) / ( (Abs(LogarithmicAlphaC[i0][2+v+r])*prod)^(2/(#JJJ)) )
 ),
 (2/3)*UpperBoundForA
 ]);
@@ -6717,8 +6715,8 @@ phi[2+v+r]:=Round(CCCCCC*LogarithmicAlphaC[i0][2+v+r]);
 
 /*This will never happen because LogarithmicAlphaC[i0][2+v+r] = Pi */
 /*
-if Abs(phi[2+v+r]) lt 2 then 
-if CCCCCC*LogarithmicAlphaC[i0][2+v+r] ge 0 then 
+if Abs(phi[2+v+r]) lt 2 then
+if CCCCCC*LogarithmicAlphaC[i0][2+v+r] ge 0 then
 phi[#JJJ]:=2;
 else
 phi[#JJJ]:=-2;
@@ -6736,7 +6734,7 @@ end if;
 
 
 R:=B[2+v+r]*Abs( CCCCCC*LogarithmicAlphaC[i0][2+v+r] -  phi[2+v+r] );
-for i in JJJ do 
+for i in JJJ do
 R:=R + B[i]*Abs( CCCCCC*LogarithmicAlphaC[i0][i] -  phi[i] );
 end for;
 
@@ -6774,7 +6772,7 @@ if max lt MIN then MIN:=max; end if;
 for i:=1 to 999 do
 c11:=(i/1000)*c10/(n-1);
 max:=Max([
-Ceiling((1/c11)*( Log(4*Arcsin(1/4)*c16[i0]) + Log(CCCCCC) 
+Ceiling((1/c11)*( Log(4*Arcsin(1/4)*c16[i0]) + Log(CCCCCC)
 - Log((DDD^2 - S)^(1/2) - R) ))-1,
 Ceiling((c8prime + c9prime*UpperBoundForN)/(c10 - (n-1)*c11))-1,
 Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10 - c11))-1,
@@ -6787,17 +6785,17 @@ end for; //end i loop
 NewConditionalUpperBoundForAi0:=MIN;
 OldUnconditionalUpperBoundForA:=UpperBoundForA;
 
-if NewConditionalUpperBoundForAi0 ge OldUnconditionalUpperBoundForA then 
+if NewConditionalUpperBoundForAi0 ge OldUnconditionalUpperBoundForA then
 RunThroughNumber2:=RunThroughNumber2+1; //increase C and try again
 ////////
 /*
-In case we find a new conditional upper bound that fails to improve on 
-the current unconditional upper bound for A, we decrease log(C) by 25 percent 
-and try again. If this doesn't result in an improved bound, we then we abort 
+In case we find a new conditional upper bound that fails to improve on
+the current unconditional upper bound for A, we decrease log(C) by 25 percent
+and try again. If this doesn't result in an improved bound, we then we abort
 the real reduction procedure.  There is no need to print a message in this case.
 */
 ///////
-if RunThroughNumber2 eq 2 then 
+if RunThroughNumber2 eq 2 then
 JumpToEndOfRealReduction:=true;
 fprintf LogFile, "refined real, s < 3, RunThroughNumber2 = %o\n", RunThroughNumber2;
 fprintf LogFile, "NewConditionalUpperBoundForAi0 = %o\n", NewConditionalUpperBoundForAi0;
@@ -6848,16 +6846,16 @@ Compute an LLL reduced basis for the lattice Gamma_C generated by columns of A_C
 Note: LLL(X) assumes ROWS of X span the lattice, so we need to feed it the transpose of A_C.  Similarly, it spits out the transpose of B_C and the transpose of U_C
 */
 ///////////////////////////////////////////////////////////////////////////////
-//time 
+//time
 temp,TC,rank:=LLL(Transpose(AC) : Proof:=true, Method:="Integral", Delta:=0.75, Eta:=0.5 );
 
-BC:=MatrixRing(RationalField(),#JJJ) ! Transpose(temp); 
+BC:=MatrixRing(RationalField(),#JJJ) ! Transpose(temp);
 //columns are LLL-reduced basis for Gamma_C
 
 /*
-Here TC*Transpose(AC) = Transpose(BC). 
+Here TC*Transpose(AC) = Transpose(BC).
 So with UC=Transpose(TC) we have AC*UC = BC,
-and With 
+and With
 VC = BC*Transpose(TC)*BC^(-1) = AC*Transpose(TC)*AC^(-1), we have VC*AC = BC.
 */
 
@@ -6900,7 +6898,7 @@ Choosettt(~yyytttpotentialtttFloorsss,~min,~BC,~mm,1);
 
 zzz:=BC*ttt;
 
-/*Now zzz is likely the closest vector in the lattice Gamma_C to yyy and 
+/*Now zzz is likely the closest vector in the lattice Gamma_C to yyy and
 min = |zzz-yyy|*/
 
 
@@ -6908,29 +6906,29 @@ min = |zzz-yyy|*/
 /*
 Construct the lattice Gamma_C.  The MAGMA function Lattice() assumes
 
-Use the function EnumerationCost to compute an estimate the number of 
-nodes in the tree to be visited during the execution of the algorithm 
-that will enumerate all lattice vectors u with |u| \leq D + |y-z|.  The 
-number of nodes is essentially directly proportional to the time needed 
+Use the function EnumerationCost to compute an estimate the number of
+nodes in the tree to be visited during the execution of the algorithm
+that will enumerate all lattice vectors u with |u| \leq D + |y-z|.  The
+number of nodes is essentially directly proportional to the time needed
 for the enumeration.
 
-If the number of nodes is too large for the enumration to be done in a 
-reasonable amount of time, we increase C and try the reduction procedure 
-again.  If several increases of C fail to result in a small enough 
-estimate for the number of nodes, then we abort the refined real 
-reduction (there is no point in moving on to the next i0 in {1,...,s} 
+If the number of nodes is too large for the enumration to be done in a
+reasonable amount of time, we increase C and try the reduction procedure
+again.  If several increases of C fail to result in a small enough
+estimate for the number of nodes, then we abort the refined real
+reduction (there is no point in moving on to the next i0 in {1,...,s}
 because the uncondtional upper bound on A will not be improved).
 
-In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration 
-algorithm has a traversal rate of about 7.5 millon nodes per second.  
-Based on the examples in the MAGMA Handbook, the rate is appears to be 
-20 to 40 millon nodes per second. We will assume a traversal rate of 10 
-millon nodes per second.  Assuming we want the enumeration to take less 
-than 10 minutes, we want to abort if the estimated number of nodes is 
+In Stehle and Watkins (2006), it is asserted that MAGMA's enumeration
+algorithm has a traversal rate of about 7.5 millon nodes per second.
+Based on the examples in the MAGMA Handbook, the rate is appears to be
+20 to 40 millon nodes per second. We will assume a traversal rate of 10
+millon nodes per second.  Assuming we want the enumeration to take less
+than 10 minutes, we want to abort if the estimated number of nodes is
 > 10*60*10^7 = 6000000000
 
-The enumeration algorithm may be fast, but the extraction and testing of 
-the tuples can take time. So we abort if the estimated number of nodes is 
+The enumeration algorithm may be fast, but the extraction and testing of
+the tuples can take time. So we abort if the estimated number of nodes is
 > 10*60*10^4
 
 Note: To MAGMA, Norm(v) = |v|^2.
@@ -6949,7 +6947,7 @@ RunThroughNumber1+:=1;  //increase C and try again
 If increasing log(C) 20 times (with log(C) being increased 5% each time, so that log(C) will be double its original value) fails to produce a new conditional upper bound for A, then we abort the real reduction procedure.  Also, print a message to the user indicating the refined real reduction procedure was unsuccesful for this reason.
 */
 ////
-if RunThroughNumber1 eq 20 then 
+if RunThroughNumber1 eq 20 then
 fprintf LogFile, "Refined real reduction taking too long. Case iiii = %o, i0 = %o\n", iiii, i0;
 JumpToEndOfRealReduction:=true;
 break i0;
@@ -6970,7 +6968,7 @@ P:=ShortVectorsProcess(GammaC,Floor((DDD+min)^2));
 
 /////////////////////////////////////////////////////////////////////////
 /*
-Enumerate those lattice vectors u with |u| <= D+|y-z|, extract 
+Enumerate those lattice vectors u with |u| <= D+|y-z|, extract
 the corresponding tuples, and test those tuples.
 
 Extracted tuple = (b_{JJJ[2]},...,b_{JJJ[#JJJ]},b_{2+v+r})
@@ -7034,8 +7032,8 @@ end for; //end i0 loop
 
 if JumpToEndOfRealReduction eq false then
 /////////////
-/* 
-Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1 
+/*
+Choose c11 to find an optimal i0-conditional upper bound for A for i0 in {s+1,...,s+2t} from Lemma 19.1
 */
 ///////////
 MIN:=UpperBoundForA;
@@ -7056,7 +7054,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -7076,7 +7074,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 
@@ -7097,7 +7095,7 @@ max:=Ceiling((c8prime + c9prime*UpperBoundForN)/(c10-(n-1)*c11))-1;
 if max lt Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1 then
 max:=Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10-c11))-1;
 end if;
-if max lt c15 then max:=c15; end if; 
+if max lt c15 then max:=c15; end if;
 //now max is the upper bound for A in Lemma 19.1
 if max lt MIN then MIN:=max; end if;
 end for;  //end i loop
@@ -7123,7 +7121,7 @@ end if;
 
 end if; //controlled by JumpToEndOfRealReduction
 
-if UpperBoundForA lt 0 then 
+if UpperBoundForA lt 0 then
 //there are no solutions to the current case of (11)
 fprintf LogFile, "UpperBoundForA lt 0. No solutions possible in case iiii = %o\n", iiii;
 continue iiii;
@@ -7133,7 +7131,7 @@ end if;
 
 end if; //end of IF for distinguishing (s>=3) (s=1,2) cases
 
-end if; //end of IF for s=0, s>=3, s=1or2 cases    
+end if; //end of IF for s=0, s>=3, s=1or2 cases
 
 //done finding new upper bound for A
 
@@ -7172,14 +7170,14 @@ end for;
 UpperBoundForA:=Ceiling( Max(UpperBoundForn)*(130/100) );
 
 NumberOfTuplesToCheck:=1;
-for i in J do 
+for i in J do
 NumberOfTuplesToCheck := NumberOfTuplesToCheck * (UpperBoundForn[i] + 1);
 end for;
 NumberOfTuplesToCheck := NumberOfTuplesToCheck * (2*UpperBoundForA + 1)^r;
 
-if NumberOfTuplesToCheck lt 10000000000 then 
-fprintf LogFile, "Log(NumberOfTuplesToCheck)/Log(10) = %o\n", Log(NumberOfTuplesToCheck)/Log(10); 
-break j; 
+if NumberOfTuplesToCheck lt 10000000000 then
+fprintf LogFile, "Log(NumberOfTuplesToCheck)/Log(10) = %o\n", Log(NumberOfTuplesToCheck)/Log(10);
+break j;
 end if;
 
 end for;
@@ -7202,7 +7200,7 @@ Final Sieve (Section 22)
 Compute
 NumberOfTuplesToCheck = the number of tuples to sieve through (excluding the [small number of] exceptional tuples)
 
-Select rational primes q_1,...q_k such that each q_i has at least three prime ideal factors in O_K that have residue degree one and such that the product 
+Select rational primes q_1,...q_k such that each q_i has at least three prime ideal factors in O_K that have residue degree one and such that the product
 q_1 ... q_k is > NumberOfTuplesToCheck
 
 For each q=q_h, pick three residue degree 1 prime ideal factors of q in O_K: qq_1, qq_2, qq_3.  For each  qq_i, we compute the integers m_i, A_i, P_ij, E_ij from Section 22.  Actually, we compute these not as integers but as elements in the finite field Z/qZ.  We store these elements in the sequence
@@ -7216,7 +7214,7 @@ We don't store the primes q_1,...,q_k or their prime ideal factors.
 */
 /////////////////////////////////////////////////////////////////////////////
 NumberOfTuplesToCheck:=1;
-for i in J do 
+for i in J do
 NumberOfTuplesToCheck := NumberOfTuplesToCheck * (UpperBoundForn[i] + 1);
 end for;
 NumberOfTuplesToCheck := NumberOfTuplesToCheck * (2*UpperBoundForA + 1)^r;
@@ -7248,14 +7246,14 @@ for i:=#ListOfPrimesInInterval to 1 by -1 do
 if ProductOfAllqSelected gt NumberOfTuplesToCheck then break i; end if;
 q:=ListOfPrimesInInterval[i];
 DecompositionOfq:=Decomposition(OK,q);
-if #DecompositionOfq ge 3 then 
+if #DecompositionOfq ge 3 then
 IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered:=[];
 for ii:=1 to #DecompositionOfq do
-if InertiaDegree(DecompositionOfq[ii][1]) eq 1 then 
-Append(~IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered,ii); 
+if InertiaDegree(DecompositionOfq[ii][1]) eq 1 then
+Append(~IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered,ii);
 end if;
-if #IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered eq 3 then 
-break ii; 
+if #IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered eq 3 then
+break ii;
 end if;
 end for; //ii
 if #IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered eq 3 then
@@ -7266,11 +7264,11 @@ ProductOfAllqSelected:=ProductOfAllqSelected*q;
 ZmodqZ:=FiniteField(q, 1);
 for ii in IndicesOfFirstThreeResidueDegreeOnePrimesAboveqEncountered do
 temp:=[];
-for jj:=1 to #J do 
-temp[jj]:=ZmodqZ ! (pi[J[jj]][kk[J[jj]]] mod DecompositionOfq[ii][1]); 
+for jj:=1 to #J do
+temp[jj]:=ZmodqZ ! (pi[J[jj]][kk[J[jj]]] mod DecompositionOfq[ii][1]);
 end for;
 for jj:=1 to r do
-temp[#J+jj]:=ZmodqZ ! (eps[jj] mod DecompositionOfq[ii][1]); 
+temp[#J+jj]:=ZmodqZ ! (eps[jj] mod DecompositionOfq[ii][1]);
 end for;
 temp[1+#J+r]:=ZmodqZ ! ((OK ! alpha*zeta) mod DecompositionOfq[ii][1]);
 temp[2+#J+r]:=ZmodqZ ! ((OK ! theta) mod DecompositionOfq[ii][1]);
@@ -7359,14 +7357,14 @@ end for;
 
 if passes eq true then
 
-/* 
-Use the tuple bbb (where bbb[i]=b_{JJJ[1+i]}, i=1 to #JJJ-1) to get 
+/*
+Use the tuple bbb (where bbb[i]=b_{JJJ[1+i]}, i=1 to #JJJ-1) to get
 the tuple
-bb (where bb[i] = b_{1+i}, i=1 to v).  Compute the corresponding X,Y. 
-Test if (X,Y,b_{2},...,b_{1+v}) gives a solution of the Thue-Mahler 
-equation (1) and record the solution if so. 
+bb (where bb[i] = b_{1+i}, i=1 to v).  Compute the corresponding X,Y.
+Test if (X,Y,b_{2},...,b_{1+v}) gives a solution of the Thue-Mahler
+equation (1) and record the solution if so.
 */
-ThueMahlerEquationTest(~bbb,~Solutions,~Input);  
+ThueMahlerEquationTest(~bbb,~Solutions,~Input);
 
 end if;
 
@@ -7381,12 +7379,12 @@ end for;
 
 //////////////////////////////////////////////////////////////////////////
 /*
-At this point almost all of the solutions of the sign-relaxed version of 
-the Thue-Mahler equation have been found.  In the language of Section 6, 
-the ones we have found come from instances of (11) with \zeta equal to an 
-element of T^{\prime}.  The missing ones come from instances of (11) with 
-\zeta equal to an element of $T \setminus T^{\prime}$.  The missing ones 
-are of the form (-x,-y,z_1,...,z_v) where (x,y,z_1,...,z_v) is a solution 
+At this point almost all of the solutions of the sign-relaxed version of
+the Thue-Mahler equation have been found.  In the language of Section 6,
+the ones we have found come from instances of (11) with \zeta equal to an
+element of T^{\prime}.  The missing ones come from instances of (11) with
+\zeta equal to an element of $T \setminus T^{\prime}$.  The missing ones
+are of the form (-x,-y,z_1,...,z_v) where (x,y,z_1,...,z_v) is a solution
 we have found.
 
 Now we find the missing solutions.
@@ -7409,10 +7407,10 @@ for i:=1 to n-1 do
 LHSexpression:=LHSexpression + c[i]*sol[1]^(n-i)*sol[2]^i;
 end for;
 
-/*Test if sol=(-X,-Y,z_1,...,z_v) is a solution of the Thue-Mahler 
-equation (in the form Abs(LHSexpression)-Abs(RHSexpression) = 0).  
+/*Test if sol=(-X,-Y,z_1,...,z_v) is a solution of the Thue-Mahler
+equation (in the form Abs(LHSexpression)-Abs(RHSexpression) = 0).
 If so, append it to Solutions*/
-if IsZero(Abs(LHSexpression)-Abs(RHSexpression)) then 
+if IsZero(Abs(LHSexpression)-Abs(RHSexpression)) then
 Include(~Solutions,sol);
 end if;
 
@@ -7421,10 +7419,10 @@ end for;
 
 //////////////////////////////////////////////////////////////////////////
 /*
-At this point all the solutions of the sign-relaxed version of the 
-Thue-Mahler equation have been found.  
+At this point all the solutions of the sign-relaxed version of the
+Thue-Mahler equation have been found.
 
-It is now a simple matter to go through these solutions and eliminate 
+It is now a simple matter to go through these solutions and eliminate
 the ones that are not solutions of the Thue-Mahler equation proper.
 WE SKIP THIS.
 
@@ -7446,11 +7444,11 @@ for i:=1 to n-1 do
 LHSexpression:=LHSexpression + c[i]*SolutionsCopy[ii][1]^(n-i)*SolutionsCopy[ii][2]^i;
 end for;
 
-//test if =(X,Y,z_1,...,z_v) is a solution of the Thue-Mahler 
-//equation (in the form LHSexpression-RHSexpression = 0).  
+//test if =(X,Y,z_1,...,z_v) is a solution of the Thue-Mahler
+//equation (in the form LHSexpression-RHSexpression = 0).
 //If not, remove it from Solutions
-if not IsZero(LHSexpression-RHSexpression) then 
-Remove(~Solutions,ii); 
+if not IsZero(LHSexpression-RHSexpression) then
+Remove(~Solutions,ii);
 end if;
 
 end for; //end ii loop
@@ -7486,7 +7484,7 @@ end intrinsic;
 intrinsic pAdicMyLog(x::FldPadElt,p::RngIntElt,padicprecision::RngIntElt) -> FldPadElt
 {}
 /*
-Input: p = rational prime, x = p-adic unit belonging to a finite 
+Input: p = rational prime, x = p-adic unit belonging to a finite
 extension of Q_p
 output: the p-adic logarithm of x
 */
@@ -7517,7 +7515,7 @@ end intrinsic;
 
 
 ////////////////////////////////////////////////////////////
-intrinsic pAdicLog(x::FldPadElt, p::RngIntElt, padicprecision::RngIntElt) -> FldPadElt 
+intrinsic pAdicLog(x::FldPadElt, p::RngIntElt, padicprecision::RngIntElt) -> FldPadElt
 {}
 /*
 Input: p = rational prime, x = p-adic unit belonging to a finite extension of Q_p
@@ -7549,7 +7547,7 @@ intrinsic RoundP(x::FldRatElt) -> RngIntElt
 {}
 /*
 Input: x = a real number
-Ouput: The nearest positive integer to x.  If two postive integers are the 
+Ouput: The nearest positive integer to x.  If two postive integers are the
 same distance to x, take the largest of the two.
 */
 require x ge 0: "Argument 1 is < 0";
@@ -7562,7 +7560,7 @@ end intrinsic;
 intrinsic SmallestNonnegativeRemainderModpLToThem(x::FldPadElt, p::RngIntElt, m::RngIntElt, padicprecision::RngIntElt) -> RngIntElt
 {}
 /*
-Input: m = positive integer, p a prime 
+Input: m = positive integer, p a prime
 x = an element in the p-adic field Q_{p} that belongs to the subring Z_{p} (the ring of p-adic integers in Q_{p}).
 Output: The unique integer x^{m} in [0,p^m - 1] with ord_{p}(x - x^{m}) >= m
 */
@@ -7596,7 +7594,7 @@ intrinsic MaxAbsLog(a::FldNumElt) -> FldReElt
 {}
 /*
 Input: a = number field element
-Output: The maximum of the numbers |Log(a^{(1)})|,..., =|Log(a^{(n)})|, 
+Output: The maximum of the numbers |Log(a^{(1)})|,..., =|Log(a^{(n)})|,
 where the a^{(i)} are the conjugates of a in \CC and Log denotes the principal branch of the complex logarithm
 */
 minpoly:=MinimalPolynomial(a,IntegerRing());
@@ -7618,7 +7616,7 @@ RNTO = Round Nonpositive to One
 Input: x = a real number
 Output: x if x > 0, 1 if x <= 0
 */
-if x le 0 then 
+if x le 0 then
 return 1;
 else
 return x;
@@ -7637,10 +7635,10 @@ Input: Bm is a given mm by mm matrix with real entries
 Input: potentialttt = yyytttpotentialtttFloorsss[3] is a mm by 1 vector used as a placeholder by this procedure
 Input: ttt = yyytttpotentialtttFloorsss[2] is a mm by 1 column vector
 Input: min is a real number
-Assumption: This procedure calls itself.  When it is called by the user, we assume min is equal to the length of the column vector Bm*Floorsss - yyy 
+Assumption: This procedure calls itself.  When it is called by the user, we assume min is equal to the length of the column vector Bm*Floorsss - yyy
 Input: k is a postive integer
 Assumption: This procedure calls itself.  When this procedure is called by the user, we assume k=1.
-Result:  If the three assumptions above hold, then, after this procedure is completed ttt, will be a mm by 1 column vector with integer entries such that 
+Result:  If the three assumptions above hold, then, after this procedure is completed ttt, will be a mm by 1 column vector with integer entries such that
 |ttt[i][1] - sss[i][1]| <= 1 and such that the length of Bm*ttt - yyy is minimal (among all choices of ttt with integral and |ttt[i][1] - sss[i][1]| <= 1).  Also, min will be the length of Bm*ttt - yyy.
 */
 if k eq mm+1 then
@@ -7674,7 +7672,7 @@ Input: A boolean variable
 Assumption: bbb[i] = b_{JJJ[1+i]}, i=1 to #JJJ-1
 Note: bbb[i] = b_{JJJ[1+i]} = b_{1+J[i]}=n_{J[i]} for i:=1 to #J
 Note: bbb[#J+i] = b_{JJJ[1+#J+i]} = b_{1+v+i}=a_i for i:=1 to r
-Assumption: q has at least three residue degree one prime ideals of OK above it. Assumption: For i=1,2,3, 
+Assumption: q has at least three residue degree one prime ideals of OK above it. Assumption: For i=1,2,3,
 Qh[i]=[P_{i,JJJ[2]-1}, ..., P_{i,JJJ[1+#J]-1}, E_i1, ..., E_ir, A_i, m_i]
      =[P_{i,J[1]}, ..., P_{i,J[#J]}, E_i1, ..., E_ir, A_i, m_i]
 where m_i, A_i, P_ij, E_ij are the numbers from Section 22 corresponding to three residue degree one prime ideals of OK above q.
@@ -7693,8 +7691,8 @@ prod3 *:= Q[hhh][3][ii]^bbb[ii];
 end for;
 
 if IsZero(
-(Q[hhh][2][nJr[3]]-Q[hhh][3][nJr[3]])*prod1 + 
-(Q[hhh][3][nJr[3]]-Q[hhh][1][nJr[3]])*prod2 + 
+(Q[hhh][2][nJr[3]]-Q[hhh][3][nJr[3]])*prod1 +
+(Q[hhh][3][nJr[3]]-Q[hhh][1][nJr[3]])*prod2 +
 (Q[hhh][1][nJr[3]]-Q[hhh][2][nJr[3]])*prod3
 ) then
 else
@@ -7706,12 +7704,12 @@ end intrinsic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 intrinsic ThueMahlerEquationTest(~bbb::SeqEnum,~Solutions::SeqEnum,~Input::List)
 {}
-/* 
+/*
 Use the tuple bbb (where bbb[i]=b_{JJJ[1+i]}, i=1 to #JJJ-1) and the sequence ValueOfn to get the tuple bb (where bb[i] = b_{1+i}=n_i, i=1 to v).
-  
+
 Compute the corresponding X,Y.  We can actually compute X,Y before the getting bb because \pi_{l}^{n_{l}} for l not in J is already part of \alpha.  We do this.
 
-Test if (X,Y,b_{2},...,b_{1+v+r}) gives solution of the Thue-Mahler equation (1) and record it if so. 
+Test if (X,Y,b_{2},...,b_{1+v+r}) gives solution of the Thue-Mahler equation (1) and record it if so.
 
 Note: bbb[i]=b_{JJJ[1+i]} = b_{1+J[i]}=n_{J[i]}=bb[J[i]] for i:=1 to #J
 Note: bbb[#J+i]=b_{JJJ[1+#J+i]} = b_{1+v+i}=a_i=bb[v+i] for i:=1 to r
@@ -7805,12 +7803,12 @@ LHSexpression:=LHSexpression + c[i]*X^(n-i)*Y^i;
 end for;
 
 /*test if (X,Y,bb[1],...,bb[v])=(X,Y,b_{2},...,b_{1+v}) gives a solution of the sign-relaxed Thue-Mahler equation (in the form |LHS|-|RHS| = 0) */
-if IsZero(Abs(LHSexpression) - Abs(RHSexpression)) and Gcd(X,Y) eq 1 then 
+if IsZero(Abs(LHSexpression) - Abs(RHSexpression)) and Gcd(X,Y) eq 1 then
 temp:=[X,Y];
 for i:=1 to v do
 Append( ~temp, bb[i]*hh[i] + ss[i] + tt[i] );
 end for;
-Include(~Solutions,temp); 
+Include(~Solutions,temp);
 end if;
 
 end intrinsic;
@@ -7824,7 +7822,7 @@ This procedure calls itself.
 
 When this procedure is called by the user, we assume that k=1 and Solutions is a (possibly empty) list of solutions for the Thue-Mahler equation.
 
-After this procedure is finished executing its call by the user, Solutions will contain all the solutions (X,Y,n_1,...,n_v,a_1,...,a_r) of the sign-relaxed version of the Thue-Mahler equation that satisfy the currently known bounds on the n_i and the a_i and that satisfy the current case of (11).  Note that these bounds miss finitely many explicitly known exceptional tuples.  
+After this procedure is finished executing its call by the user, Solutions will contain all the solutions (X,Y,n_1,...,n_v,a_1,...,a_r) of the sign-relaxed version of the Thue-Mahler equation that satisfy the currently known bounds on the n_i and the a_i and that satisfy the current case of (11).  Note that these bounds miss finitely many explicitly known exceptional tuples.
 
 Recall:  Every solution of the Thue-Mahler equation satisfies some case of (11).
 */
@@ -7854,7 +7852,7 @@ if passes eq true then
 
 /* Use the tuple bbb (where bbb[i]=b_{JJJ[1+i]}, i=1 to #JJJ-1) to get the tuple
 bb (where bb[i] = b_{1+i}, i=1 to v).  Compute the corresponding X,Y. Test if (X,Y,b_{2},...,b_{1+v}) gives a solution of the sign-relaxed version of the Thue-Mahler equation (1) and record it if so. */
-ThueMahlerEquationTest(~bbb,~Solutions,~Input); 
+ThueMahlerEquationTest(~bbb,~Solutions,~Input);
 
 end if;
 
@@ -7865,7 +7863,7 @@ bbb[k]:=i;
 SieveBox(~bbb,~Solutions,~Bupperlower,~Q,~Input,k+1);
 end for;
 
-end if; 
+end if;
 
 end intrinsic;
 
@@ -7940,7 +7938,7 @@ LogarithmicAlphap:=TestTuplePadicInput[14];
 B:=TestTuplePadicInput[15];
 I:=TestTuplePadicInput[16];
 
-while true do //this while loop is a hack to provide a way to "jump to line X" 
+while true do //this while loop is a hack to provide a way to "jump to line X"
 
 for i:=2 to nJJJ do
 if not IsIntegral(bbb[i]) then passes:=false; break; end if;
@@ -7962,11 +7960,11 @@ if bbb[jl[l]] le NewUpperBoundFornl then passes:=false; break; end if;
 
 
 LAMBDAprime:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDAprime:=LAMBDAprime + bbb[i]*beta[l][JJJ[i]];
 end for;
 if SpecialCase[l] eq true then
-if Valuation(LAMBDAprime) ne bbb[jl[l]]*hh[l] + dd[l] then passes:=false; break; end if; 
+if Valuation(LAMBDAprime) ne bbb[jl[l]]*hh[l] + dd[l] then passes:=false; break; end if;
 else //SpecialCase[l] eq false
 if Valuation(LAMBDAprime) lt bbb[jl[l]]*hh[l] + dd[l] then passes:=false; break; end if;
 end if;
@@ -7976,12 +7974,12 @@ for ll in I do
 if ll ne l then
 
 LAMBDAprime:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDAprime:=LAMBDAprime + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if SpecialCase[ll] eq true then
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) ne bbb[jl[ll]]*hh[ll] + dd[ll] then
-passes:=false; break ll; 
+passes:=false; break ll;
 end if;
 else //SpecialCase[ll] eq false
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) lt bbb[jl[ll]]*hh[ll] + dd[ll] then
@@ -8000,20 +7998,20 @@ for i:=1 to nJJJ do
 LAMBDA:=LAMBDA + bbb[i]*LogarithmicAlphap[l][JJJ[i]];
 end for;
 if Valuation(LAMBDA) ne bbb[jl[l]]*hh[l] + Valuation(delta2[l]) then passes:=false; break; end if;
-end if; //end IF controlled by SpecialCase[l] 
+end if; //end IF controlled by SpecialCase[l]
 
 
 for ll in I do
 if ll ne l then
 if SpecialCase[ll] eq false then
 LAMBDA:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDA:=LAMBDA + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDA) ne bbb[jl[ll]]*hh[ll] + Valuation(delta2[ll]) then
 passes:=false; break ll;
 end if;
-end if; //end IF controlled by SpecialCase[ll] 
+end if; //end IF controlled by SpecialCase[ll]
 end if;
 end for;
 if passes eq false then break; end if;
@@ -8075,7 +8073,7 @@ B:=TestTupleRealCaseInput[12];
 I:=TestTupleRealCaseInput[13];
 beta:=TestTupleRealCaseInput[14];
 
-while true do //this while loop is a hack to provide a way to "jump to line X" 
+while true do //this while loop is a hack to provide a way to "jump to line X"
 
 for i:=2 to nJJJ do
 if not IsIntegral(bbb[i]) then passes:=false; break; end if;
@@ -8095,20 +8093,20 @@ if passes eq false then break; end if;
 /*Test if the tuple fits in the new box.  If so, throw it away (it's not exceptional).*/
 FitsInTheNewBox:=true;
 for i:=2+nJ to nJJJ do
-if Abs(bbb[i]) gt NewConditionalUpperBoundForAi0 then 
-FitsInTheNewBox:=false; break i; 
+if Abs(bbb[i]) gt NewConditionalUpperBoundForAi0 then
+FitsInTheNewBox:=false; break i;
 end if;
 end for;
 if FitsInTheNewBox eq true then passes:=false; break; end if;
 
 for ll in I do
 LAMBDAprime:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDAprime:=LAMBDAprime + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if SpecialCase[ll] eq true then
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) ne bbb[jl[ll]]*hh[ll] + dd[ll] then
-passes:=false; break ll; 
+passes:=false; break ll;
 end if;
 else //SpecialCase[ll] eq false
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) lt bbb[jl[ll]]*hh[ll] + dd[ll] then
@@ -8121,7 +8119,7 @@ if passes eq false then break; end if;
 for ll in I do
 if SpecialCase[ll] eq false then
 LAMBDA:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDA:=LAMBDA + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDA) ne bbb[jl[ll]]*hh[ll] + Valuation(delta2[ll]) then
@@ -8189,7 +8187,7 @@ I:=TestTupleComplexCaseInput[14];
 beta:=TestTupleComplexCaseInput[15];
 
 
-while true do //this while loop is a hack to provide a way to "jump to line X" 
+while true do //this while loop is a hack to provide a way to "jump to line X"
 
 for i:=2 to nJJJ do
 if not IsIntegral(bbb[i]) then passes:=false; break; end if;
@@ -8213,20 +8211,20 @@ if bbb[nJJJ+1] gt B[twoplusvplusr] or bbb[nJJJ+1] lt -B[twoplusvplusr] then pass
 /*Test if the tuple fits in the new box.  If so, throw it away (it's not exceptional). */
 FitsInTheNewBox:=true;
 for i:=2+nJ to nJJJ do
-if Abs(bbb[i]) gt NewConditionalUpperBoundForAi0 then 
-FitsInTheNewBox:=false; break i; 
+if Abs(bbb[i]) gt NewConditionalUpperBoundForAi0 then
+FitsInTheNewBox:=false; break i;
 end if;
 end for;
 if FitsInTheNewBox eq true then passes:=false; break; end if;
 
 for ll in I do
 LAMBDAprime:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDAprime:=LAMBDAprime + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if SpecialCase[ll] eq true then
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) ne bbb[jl[ll]]*hh[ll] + dd[ll] then
-passes:=false; break ll; 
+passes:=false; break ll;
 end if;
 else //SpecialCase[ll] eq false
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDAprime) lt bbb[jl[ll]]*hh[ll] + dd[ll] then
@@ -8239,7 +8237,7 @@ if passes eq false then break; end if;
 for ll in I do
 if SpecialCase[ll] eq false then
 LAMBDA:=0;
-for i:=1 to nJJJ do 
+for i:=1 to nJJJ do
 LAMBDA:=LAMBDA + bbb[i]*beta[ll][JJJ[i]];
 end for;
 if bbb[jl[ll]] gt (1/hh[ll])*(1/(p[ll]-1) - Valuation(delta2[ll])) and Valuation(LAMBDA) ne bbb[jl[ll]]*hh[ll] + Valuation(delta2[ll]) then
