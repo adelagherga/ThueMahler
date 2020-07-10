@@ -20,7 +20,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
 	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt | parallel -j32 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations.m 2>&1 &
+	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si
             2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
@@ -33,7 +33,6 @@ DONE 4. check if we need to print anything else out for Thue equations
 Example:
 
 */
-
 
 SeqEnumToString:= function(X : Quotations:=true)
 
@@ -1256,6 +1255,8 @@ BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
 RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
 
 // delimiter for form
+print CommaSplit[2][1];
+print CommaSplit[5][#CommaSplit[5]];
 assert CommaSplit[2][1] eq "(" and CommaSplit[5][#CommaSplit[5]] eq ")";
 // delimiter for optimal form
 assert CommaSplit[6][1] eq "(" and CommaSplit[9][#CommaSplit[9]] eq ")";
@@ -1446,7 +1447,7 @@ if IsEmpty(partialObstruction) then
 else
     strPartialObs:= SeqEnumToString(partialObstruction);
 end if;
-exitline:= hash cat "," cat strFclist cat "," cat strPartialObs cat ","
+hash:= hash cat "," cat strFclist cat "," cat strPartialObs cat ","
        cat IntegerToString(ClK`classnumber) cat "," cat IntegerToString(r) cat
        "," cat IntegerToString(#afplist) cat "," cat IntegerToString(#ThueToSolve);
 strTimings:= Sprint([timings[i][1] : i in [1..#timings]]);
@@ -1458,6 +1459,8 @@ for i in [1..#strTimings] do
     end if;
 end for;
 strTimings:= "," cat &cat[strTimings[i] : i in [1..#strTimings] | i notin toRemove];
+hash:= hash cat strTimings;
+
 // write each element of the integral basis of K as a power basis
 IntegralBasisK:=IntegralBasis(K);
 powerbasis:= [];
