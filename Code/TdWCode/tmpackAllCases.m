@@ -1083,14 +1083,14 @@ thetap[l][i][j]:= theta_i^{(j)} from Section 3 with p=p_l
 //////////////////////////////////////////////////////////////////////
 thetap:=[];
 for l:=1 to v do
-thetap[l]:=[];
-for i:=1 to m[l] do
-thetap[l][i]:=[**];
-temp:=Roots(gp[l][i],FFFppF[l]);
-for j:=1 to #temp do             //#temp = degree of gp[l][i] = e[l][i]*f[l][i]
-thetap[l][i][j]:=temp[j][1];
-end for;
-end for;
+    thetap[l]:=[];
+    for i:=1 to m[l] do
+	thetap[l][i]:=[**];
+	temp:=Roots(gp[l][i],FFFppF[l]);
+	for j:=1 to #temp do             //#temp = degree of gp[l][i] = e[l][i]*f[l][i]
+	    thetap[l][i][j]:=temp[j][1];
+	end for;
+    end for;
 end for;
 
 ///////////////////////////////////////////////////////////////
@@ -1100,19 +1100,19 @@ ImageOfIntegralBasisElementp[L][i][j][k] = image of the kth element in the integ
 ///////////////////////////////////////////////////////////////
 ImageOfIntegralBasisElementp:=[];
 for l:=1 to v do
-ImageOfIntegralBasisElementp[l]:=[];
-for i:=1 to m[l] do
-ImageOfIntegralBasisElementp[l][i]:=[];
-for j:=1 to e[l][i]*f[l][i] do
-ImageOfIntegralBasisElementp[l][i][j]:=[**];
-for k:=1 to n do
-ImageOfIntegralBasisElementp[l][i][j][k]:=0;
-for ii:= 1 to n do
-ImageOfIntegralBasisElementp[l][i][j][k]:=ImageOfIntegralBasisElementp[l][i][j][k] + CoefficientsOfIntegralBasisElement[k][ii]*thetap[l][i][j]^(ii-1);
-end for; //ii
-end for; //k
-end for; //j
-end for; //i
+    ImageOfIntegralBasisElementp[l]:=[];
+    for i:=1 to m[l] do
+	ImageOfIntegralBasisElementp[l][i]:=[];
+	for j:=1 to e[l][i]*f[l][i] do
+	    ImageOfIntegralBasisElementp[l][i][j]:=[**];
+	    for k:=1 to n do
+		ImageOfIntegralBasisElementp[l][i][j][k]:=0;
+		for ii:= 1 to n do
+		    ImageOfIntegralBasisElementp[l][i][j][k]:=ImageOfIntegralBasisElementp[l][i][j][k] + CoefficientsOfIntegralBasisElement[k][ii]*thetap[l][i][j]^(ii-1);
+		end for; //ii
+	    end for; //k
+	end for; //j
+    end for; //i
 end for; //l
 
 ////////////////////////////////////////////////////////////////////////
