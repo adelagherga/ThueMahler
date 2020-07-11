@@ -20,7 +20,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
 	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
+	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j1 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si
             2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
@@ -1281,7 +1281,7 @@ if (#BracketSplit eq 3) then
 else
     partialObstruction:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
     classnumber:= StringToInteger(Split(BracketSplit[3],",")[2]);
-    r:= StringToInteger(Split(BracketSplit[3],",")[2]);
+    r:= StringToInteger(Split(BracketSplit[3],",")[3]);
     NoIdealEq:= StringToInteger(Split(BracketSplit[3],",")[4]);
     NoThueEq:= StringToInteger(Split(BracketSplit[3],",")[5]);
     ranks:= [StringToInteger(i) : i in Split(BracketSplit[4],",")];
