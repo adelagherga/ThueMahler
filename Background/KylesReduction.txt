@@ -1,5 +1,8 @@
 Understainding Kyle's reduction procedure, implemented after the PIRL.
 
+0. Initate precision loop;
+   Set p-adic, real, complex precision; this will end after going through all cases.
+
 1. Iterate through each case.
 
 2. Generate image of zeta, alpha

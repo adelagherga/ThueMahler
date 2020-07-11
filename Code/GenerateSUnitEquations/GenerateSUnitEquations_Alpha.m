@@ -1255,13 +1255,11 @@ BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
 RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
 
 // delimiter for form
-print CommaSplit[2][1];
-print CommaSplit[5][#CommaSplit[5]];
-assert CommaSplit[2][1] eq "(" and CommaSplit[5][#CommaSplit[5]] eq ")";
+assert CommaSplit[2][2] eq "(" and CommaSplit[5][#CommaSplit[5]-1] eq ")";
 // delimiter for optimal form
-assert CommaSplit[6][1] eq "(" and CommaSplit[9][#CommaSplit[9]] eq ")";
+assert CommaSplit[6][2] eq "(" and CommaSplit[9][#CommaSplit[9]-1] eq ")";
 // delimiter for min poly
-assert CommaSplit[10][1] eq "(" and CommaSplit[13][#CommaSplit[13]] eq ")";
+assert CommaSplit[10][2] eq "(" and CommaSplit[13][#CommaSplit[13]-1] eq ")";
 assert (#BracketSplit eq 3) or (#BracketSplit eq 5);
 assert #RBracketSplit eq 7;
 
@@ -1282,10 +1280,10 @@ if (#BracketSplit eq 3) then
     ranks:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
 else
     partialObstruction:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
-    classnumber:= StringToInteger(Split(BracketSplit[3],",")[1]);
+    classnumber:= StringToInteger(Split(BracketSplit[3],",")[2]);
     r:= StringToInteger(Split(BracketSplit[3],",")[2]);
-    NoIdealEq:= StringToInteger(Split(BracketSplit[3],",")[3]);
-    NoThueEq:= StringToInteger(Split(BracketSplit[3],",")[4]);
+    NoIdealEq:= StringToInteger(Split(BracketSplit[3],",")[4]);
+    NoThueEq:= StringToInteger(Split(BracketSplit[3],",")[5]);
     ranks:= [StringToInteger(i) : i in Split(BracketSplit[4],",")];
 end if;
 
