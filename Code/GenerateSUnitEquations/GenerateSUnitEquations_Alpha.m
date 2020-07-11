@@ -1374,6 +1374,7 @@ toRemove:= [];
 for i in [1..#afplist] do
     fplist:= afplist[i][4];
     if IsEmpty(fplist) then
+	i;
 	a:= afplist[i][1]`newa;
 	aduset:= afplist[i][1]`adu;
 	primelist:= afplist[i][2];
@@ -1384,11 +1385,12 @@ for i in [1..#afplist] do
 	tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
 	if tf then
 	    for adu in aduset do
+		adu;
 		zz:= [tt[i] - Valuation(adu[3]*adu[1],primelist[i]) : i in [1..v]];
 		rhs:= Integers()! adu[1]*&*[primelist[i]^zz[i] : i in [1..v]];
 		assert adu[3]*rhs eq Integers()!a*&*[primelist[i]^tt[i] : i in [1..v]];
 		// store Thue equations to be solved
-		if rhs notin ThueToSolve then
+		if (rhs in Integers()) and (rhs notin ThueToSolve) then
 		    Append(~ThueToSolve, rhs);
 		end if;
 	    end for;
