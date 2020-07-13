@@ -20,7 +20,7 @@ Description: This program generates all S-unit equations corresponding to the Th
 Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
 	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j1 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
+	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si
             2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
@@ -406,27 +406,15 @@ ijkAutL:= function(fieldLinfo)
     assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
 
     ijk:= [];
-    if Order(G.1) eq 3 then
-        assert G.1^3 eq Id(G);
-        if (tau(G.1))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.1);
-            ijk[2]:= tau(G.1^2);
-        else
-            ijk[1]:= tau(G.1^2);
-            ijk[2]:= tau(G.1);
-        end if;
-        ijk[3]:= tau(G.1^3); // identity map
-    elif Order(G.2) eq 3 then
-        assert G.2^3 eq Id(G);
-        if (tau(G.2))(tl[1]) eq tl[2] then
-            ijk[1]:= tau(G.2);
-            ijk[2]:= tau(G.2^2);
-        else
-            ijk[1]:= tau(G.2^2);
-            ijk[2]:= tau(G.2);
-        end if;
-        ijk[3]:= tau(G.2^3); // identity map
-    end if;
+    for x in G do
+	if (Order(x) eq 3) and (tau(x)(tl[1]) eq tl[2]) then
+	    assert x^3 eq Id(G);
+	    ijk[1]:= tau(x);
+	    ijk[2]:= tau(x^2);
+	    ijk[3]:= tau(x^3); // identity map
+	    break x;
+	end if;
+    end for;
 
     AutL:= [];
     for x in G do
@@ -1396,6 +1384,7 @@ for i in [1..#afplist] do
 	Append(~toRemove,i);
     end if;
 end for;
+Sort(~ThueToSolve);
 
 // remove cases covered by Thue solver
 afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemove];

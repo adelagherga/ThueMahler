@@ -967,7 +967,7 @@ Lemma352:= function(fieldKinfo,alpha,fplist,caseprimes,vecR,allprimeInfo)
     ideal_a:= ideal<OK | alpha>;
     lemtf:= false;
 
-    // geberate a record to store relevant p-adic map info
+    // generate a record to store relevant p-adic map info
     pi0jkInfo:= recformat<prime,i0,j,k>;
     pi0jk:= [];
 
