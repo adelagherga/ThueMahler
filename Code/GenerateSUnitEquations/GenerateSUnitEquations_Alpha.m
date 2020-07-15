@@ -985,7 +985,6 @@ pAdicLog:= function(primeInfo,x)
 
     assert Lp eq Parent(x);
     assert Ordp(Lp,x) eq 0; // verify x is a p-adic unit
-    assert Ordp(Lp,x-1) gt 0;
 
     r:=1;
     for r in divs do
