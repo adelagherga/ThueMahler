@@ -1005,9 +1005,10 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
             fieldLinfo:= record of the splitting field L of K = Q(th)
 	    ijkL:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
 	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
-            pAdicPrec:=
-     Output: allprimeInfo:=
-             lemmattaInfo:=
+            pAdicPrec:= precision on all p-adic fields
+     Output: allprimeInfo:= record of relevant rational prime data across all cases
+             lemmattaInfo:= <alphgamlist index,p, bound 3.5.2, bound 5.5.5> where lemma 3.5.2
+	     		    or lemma 3.5.5 of Gh hold, if at all
      Example:
    */
 
@@ -1036,9 +1037,8 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
     Sort(~allprimes);
 
     allprimeInfo:= [];
-    // store < C,p,lemma 3.5.2,lemma 3.5.2 bound,lemma 3.5.5,lemma 3.5.5 bound >,
-    // where lemma 3.5.2 or 3.5.5 hold
-    // lemma 3.5.2 and lemma 3.5.5 are listed as true or false, but not both
+    // store < C,p,3.5.2 bound,3.5.5 bound >,
+    // where lemma 3.5.2 or 3.5.5 hold, respectively
     lemmattaInfo:= [];
 
     // generate a record to store relevant rational prime data across all cases
@@ -1164,7 +1164,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	    if (ord_delta1L ne 0) then
 		l352bound:= Min(ord_delta1L,0) - ord_delta2L;
 		exitline:= "\"(" cat IntegerToString(C) cat "," cat IntegerToString(p) cat
-			   ",true," cat IntegerToString(l352bound) cat ",false,None)\"";
+			   "," cat IntegerToString(l352bound) cat ",None)\"";
 		Append(~lemmattaInfo, exitline);
 	    else
 		// generate images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
@@ -1209,7 +1209,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		    cl:= Ceiling(minord - ord_delta2L);
 		    l355bound:= Max( fl, cl - 1);
 		    exitline:= "\"(" cat IntegerToString(C) cat "," cat IntegerToString(p)
-			       cat ",false,None,true," cat IntegerToString(l355bound) cat
+			       cat ",None," cat IntegerToString(l355bound) cat
 			       ")\"";
 		    Append(~lemmattaInfo, exitline);
 		end if;
@@ -1241,9 +1241,7 @@ timings:= [];
 SUnitErr:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/SUnitErr_Alpha.txt";
 
 // .csv format is
-// N,"form","optimal form","(alphgamlist index,p,lemma 3.5.2,lemma 3.5.2 bound,lemma 3.5.5,
-// lemma 3.5.5 bound)"
-// lemma 3.5.2, lemma 3.5.5 may be output as true or false, but not both
+// N,"form","optimal form","(alphgamlist index,p,lemma 3.5.2 bound,lemma 3.5.5 bound)"
 Lemmatta:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/Lemmatta.csv";
 
 // .csv format is
