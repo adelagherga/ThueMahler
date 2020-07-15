@@ -25,9 +25,7 @@ Commentary: This algorithm uses the output "TMFormData.csv" of "GenerateSUnitEqu
 	    In this algorithm, neither Thue nor Thue-Mahler equations are solved.
             Generate "Lemmatta.csv", "ThueEqToSolve.csv", "TMFormData.csv" with appropriate
 	    headings before running the algorithm with
-
-// edit
-nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
+nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j20 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
 
 To do list: 1. Reference list for: BeGhRe, Gh, Si, Ha
             2. Algorithm for ThueEqToSolve.m from GenerateSUnitEquations.m
@@ -989,6 +987,7 @@ pAdicLog:= function(primeInfo,x)
     assert Ordp(Lp,x) eq 0; // verify x is a p-adic unit
     assert Ordp(Lp,x-1) gt 0;
 
+    r:=1;
     for r in divs do
 	if Ordp(Lp, x^r - 1) gt 0 then
 	    break r;
