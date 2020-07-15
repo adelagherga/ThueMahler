@@ -7,28 +7,31 @@ Copyright © 2020, Adela Gherga, all rights reserved.
 Created:  8 July 2020
 
 Description: This program generates all S-unit equations corresponding to the Thue-Mahler
-	     forms of absolute discriminant <= 10^{10}. Output is printed among
-	     "SUnitErr.txt", "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv",
-	     "ThueEqToSolve.csv", and "TMFormData.csv". The corresponding S-unit equations are
-	     printed on "TMFormData.csv," while "NoSUnitEqPossible.csv" lists the Thue-Mahler
-	     equations which cannot yield solutions. The file "NoSUnitEqNeeded.csv" lists
-	     Thue-Mahler forms which either reduce to Thue equations or which do not yield any
-	     S-unit equations. The file "ThueEqToSolve.csv" lists all Thue equations remaining
-	     to be solved. Each such file is manually generated as a .csv file with
-	     appropriately listed headings. Finally, "SUnitErr.txt" tracks any arising errors.
+	     forms of absolute discriminant <= 10^{10}, supplementing the results of
+	     "GenerateSUnitEquations.m". Output is printed among "SUnitErr_Alpha.txt",
+	     "Lemmatta.csv", "ThueEqToSolve.csv", and "TMFormData_Alpha.csv". The corresponding
+	     S-unit equations are printed on "TMFormData_Alpha.csv," with the results of
+	     Lemmatta 3.5.2 and 3.5.5 of Gh listed on "Lemmatta.csv". The file
+	     "ThueEqToSolve.csv" lists all Thue equations remaining to be solved. Each such
+	     file is manually generated as a .csv file with appropriately listed headings.
+	     Finally, "SUnitErr.txt" tracks any arising errors.
 
-Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
-            Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
-	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
+Commentary: This algorithm uses the output "TMFormData.csv" of "GenerateSUnitEquations.m" as
+	    its input, using the optimal form as its input, and outputing all correponding
+	    alpha values for each S-unit equation in "TMFormData_Alpha.csv". Further, the file
+	    "ThueEqToSolve.csv" supercedes the "ThueEqToSolve" of "GenerateSUnitEquations.m",
+	    which is now rendered obsolete.
 
-To do list: 1. Reference list for: BeGhRe, Gh, Si
-            2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
+	    In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+            Generate "Lemmatta.csv", "ThueEqToSolve.csv", "TMFormData.csv" with appropriate
+	    headings before running the algorithm with
 
-1. print alpha,
-2. print primesets,
-3. check Lemma 3.5.2 and 3.5.5,
-DONE 4. check if we need to print anything else out for Thue equations
+// edit
+nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j5 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
+
+To do list: 1. Reference list for: BeGhRe, Gh, Si, Ha
+            2. Algorithm for ThueEqToSolve.m from GenerateSUnitEquations.m
+            3. Internal error algorithm
 
 Example:
 
@@ -40,6 +43,8 @@ SeqEnumToString:= function(X : Quotations:=true)
      Description: convert a SeqEnum into a string without whitespace, enclosed by "( )" for
      		  .csv input
      Input: X:= [x_1, _2, \dots, x_n] where Type(X):= SeqEnum
+            Quotiations:= boolean value determining whether to enclose the output in quotations
+                          default is set to true
      Output: stX:= "\"(x_1, \dots ,x_n)\"", where Type(strX):= MonStgElt
      Example:
    */
@@ -69,19 +74,16 @@ prep0:= function(N,clist,fclist,partialObstruction)
 
     /*
      Description: Verify conditions of Theorem 1 of BeGhRe for clist, N
-     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
-            N:= conductor of corresponding elliptic curves in question
+     Input: N:= conductor of corresponding elliptic curves in question
+     	    clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+	    fclist:= [1,c_1, \dots, c_n], the coefficients of monic polynomial defining
+                     the number field K = Q(th)
+            partialObstruction:= set of primes p for which solutions can only be possible
+     	    			 with p having exponent 0 on RHS of the TM equation
      Output: f:= monic polynomial defining the number field K = Q(th)
-             enterTM:= boolean value determining whether to enter the TM solver
-             RemainingCasesAllAs:= list of primelist and all corresponding a values
-                                   comprising the RHS of F(x,y)
-             partialObstruction:= set of primes p for which solutions can only be possible
-     	     			  with p having exponent 0 on RHS of the TM equation
+     	     remainingCase:= list of primelist and all corresponding a values
+             		     comprising the RHS of F(x,y)
              ThueToSolve:= Thue equations to be solved, stored as [ RHS ]
-             exitline:= string to be appended to hash for .csv input in exitfile; if enterTM
-	     		is true, this is the empty string
-             exitfile:= string indicating appropriate .csv file for exitline; if enterTM is
-	     		true, this is the empty string
      Example:
    */
 
@@ -809,7 +811,8 @@ end function;
 principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
 
     /*
-     Description: convert ideal equation (3.8), given by ideal_a, fplist, into S-unit		 equations (3.9) via procedure of Section 3.4.2 of Gh
+     Description: convert ideal equation (3.8), given by ideal_a, fplist, into S-unit
+                  equations (3.9) via procedure of Section 3.4.2 of Gh
      Input: fieldKinfo:= record of the field K = Q(th)
             ClK:= record of relevant class group info of the field K = Q(th)
             ideal_a:= the ideal as in (3.8) of Gh
@@ -886,7 +889,8 @@ prep2:=function(fieldKinfo,ClK,afplist)
     OK:=fieldKinfo`ringofintegers;
 
     // generate a record to store relevant S-unit equation info
-    SUnitInfo:= recformat< primelist,newa,adu,alpha,gammalist,matA,vecR,ideallist,bound,pi0jk >;
+    SUnitInfo:= recformat< primelist,newa,adu,alpha,gammalist,matA,
+			   vecR,ideallist,bound,pi0jk >;
 
     alphgamlist:=[ ];
     for pr in afplist do
@@ -934,7 +938,8 @@ ImageInL:= function(mapsLL,x)
     /*
      Description: Apply the automorphisms i0,j,k: L -> L to the element x in K or L,
      		  corresponding to th -> thetaL[i][j]
-     Input: x:= an element in K or L
+     Input: mapsLL:= automorphishs i0,j,k: L -> L
+            x: an element of K or L
      Output: xImage:= all images of x in L under the automorphisms i0,j,k: L -> L,
                       where Image[i][j]:= x_i^(j), corresponding to th -> thetaL[i][j]
      Example:
@@ -954,7 +959,7 @@ end function;
 Ordp:= function(Fp,x)
 
     /*
-     Description: Compute the p-adic order of x in Qp
+     Description: Compute the p-adic order of x in Fp, a finite extension of Qp
      Input: Fp:= a field extension of Qp, complete with respect to the p-adic valuation
             x:= an element of Fp
      Output: ord_px:= ord_p(x), extended to Fp as ord_p(x) = 1/[Fp:Qp]*ord_p(N_{Fp/Qp}(x))
@@ -965,42 +970,46 @@ Ordp:= function(Fp,x)
     return ord_px;
 end function;
 
-pAdicLog:= function(elt,p)
+pAdicLog:= function(primeInfo,x)
 
 /*
-     Description:
-     Input:
-     Output:
+     Description: Compute the p-adic log of x in Lp, a finite extension of Qp
+     Input: primeInfo:= record of rational prime data and corresponding field Lp
+            x:= an element of Lp
+     Output: log_px:= log_p(x), the p-adic logarithm of x
      Example:
 */
 
+    p:= primeInfo`prime;
+    Lp:= primeInfo`Lp;
+    k:= primeInfo`logk;
+    divs:= primeInfo`logdivs;
 
-    // DETAILS TO ADD
-    //Input: p = rational prime, x = p-adic unit belonging to a finite extension of Q_p
-    //output: the p-adic logarithm of x
+    assert Lp eq Parent(x);
+    assert Ordp(Lp,x) eq 0; // verify x is a p-adic unit
+    assert Ordp(Lp,x-1) gt 0;
 
-    e:=AbsoluteRamificationIndex(Parent(elt));
-    f:=AbsoluteInertiaDegree(Parent(elt));
-    r:=1;
-    for o in Divisors(p^f - 1) do
-        if Valuation(elt^o - 1) gt 0 then
-            r:=o;
-            break;
-        end if;
+    for r in divs do
+	if Ordp(Lp, x^r - 1) gt 0 then
+	    break r;
+	end if;
     end for;
-    k:=1;
-    while p^k le e do
-        k:= k+1;
-    end while;
-    return Log( elt^(r*p^k) )/(r*p^k);
+    log_px:= Log( x^(r*p^k) )/(r*p^k);
+
+    return log_px;
 end function;
 
 thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 
     /*
      Description:
-     Input:
-     Output:
+     Input: fieldKinfo:= record of the field K = Q(th)
+            fieldLinfo:= record of the splitting field L of K = Q(th)
+	    ijkL:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
+	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
+            pAdicPrec:=
+     Output: allprimeInfo:=
+             lemmattaInfo:=
      Example:
    */
 
@@ -1029,12 +1038,13 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
     Sort(~allprimes);
 
     allprimeInfo:= [];
-    // store < C,p,lemma 3.5.2, lemma 3.5.5 >, where lemma 3.5.2 or 3.5.5 hold
+    // store < C,p,lemma 3.5.2,lemma 3.5.2 bound,lemma 3.5.5,lemma 3.5.5 bound >,
+    // where lemma 3.5.2 or 3.5.5 hold
     // lemma 3.5.2 and lemma 3.5.5 are listed as true or false, but not both
     lemmattaInfo:= [];
 
     // generate a record to store relevant rational prime data across all cases
-    pInfo:= recformat<prime,ideals,Lp,mapLLp,Kp,mapKKp,mapsLL,thetaL>;
+    pInfo:= recformat<prime,ideals,Lp,logk,logdivs,mapLLp,Kp,mapKKp,mapsLL,thetaL>;
 
     for l in [1..#allprimes] do
 	p:= allprimes[l];
@@ -1043,6 +1053,14 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	fprs:= [f[1] : f in Factorization(p*OK)]; // prime ideals in K over p
 	// at least one prime ideal above p must have e(P|p)*f(P|p) = 1 to be unbounded
 	assert &or([RamificationDegree(fp)*InertiaDegree(fp) eq 1 : fp in fprs]);
+	eLp:= AbsoluteRamificationIndex(Lp);
+	fLp:= AbsoluteInertiaDegree(Lp);
+	// determine k, divisors of p^fLp - 1 for faster convergence of p-adic log, as in Ha
+	divs:= Divisors(p^fLp -1);
+	k:= 1;
+	while (p^k)*(p-1) le eLp do
+	    k:= k+1;
+	end while;
 	thetaL:= []; // roots of th in L, grouped according to prime factorization of p in K
 	mapsLL:= []; // automorphism of L such that mapsLL[i][j](th) = thetaL[i][j]
 
@@ -1054,7 +1072,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	    gp:= MinimalPolynomial(mapKKp(th), PrimeField(Kp));
 	    allroots:= Roots(gp, Lp);
 	    assert RamificationDegree(fprs[i])*InertiaDegree(fprs[i]) eq #allroots;
-	    // assert multiplicity of all roots of g(t) is 1
+	    // verify multiplicity of all roots of g(t) is 1
 	    assert &and[allroots[j][2] eq 1 : j in [1..#allroots]];
 	    allroots:= [allroots[j][1] : j in [1..#allroots]];
 
@@ -1072,12 +1090,12 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	assert &or([#thetaL[i] eq 1 : i in [1..#fprs]]);
 	assert (#thetaL eq 2) or (#thetaL eq 3);
 
-	allprimeInfo[l]:= rec<pInfo | prime:= p,ideals:= fprs,Lp:=Lp,mapLLp:=mapLLp,Kp:=Kp,
-				      mapKKp:=mapKKp,mapsLL:=mapsLL,thetaL:=thetaL>;
+	allprimeInfo[l]:= rec<pInfo | prime:= p,ideals:= fprs,Lp:=Lp,logk:=k,logdivs:=divs,
+				      mapLLp:=mapLLp,Kp:=Kp,mapKKp:=mapKKp,mapsLL:=mapsLL,
+				      thetaL:=thetaL>;
     end for;
 
-    // iterate through each S-unit equation
-    for C in [1..#alphgamlist] do
+    for C in [1..#alphgamlist] do // iterate through each S-unit equation
 	pi0jk:= [];
 	alpha:= alphgamlist[C]`alpha;
 	gammalist:= alphgamlist[C]`gammalist;
@@ -1103,15 +1121,15 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	    assert fp eq fplist[l];
 	    // determine and store index i0 of unbounded prime ideal fp above p
 	    // thus thetaL[pi0][1] and mapsLL[pi0][1] correspond to fp
-	    // where fp corresponds to g_1(t) such that g(t) = g_1(t)h(t) and deg(g_1(t)) = 1
+	    // where fp corresponds to f_1(t) such that f(t) = f_1(t)g(t) and deg(f_1(t)) = 1
 	    pi0:= [i : i in [1..#fprs] | fprs[i] eq fp];
 	    assert (#pi0 eq 1) and (#thetaL[pi0[1]] eq 1);
 	    pi0:= pi0[1];
 	    // choose indices j,k; these correspond to bounded prime ideals above p
 	    indjk:= [i : i in [1..#thetaL] | i ne pi0];
 	    if #thetaL eq 2 then
-		// select j,k corresponding to roots of g_2(t)
-		// here g(t) = g_1(t)g_2(t) where deg(g_2(t)) = 2
+		// select j,k corresponding to roots of f_2(t)
+		// here f(t) = f_1(t)f_2(t) where deg(f_2(t)) = 2
 		assert #indjk eq 1;
 		assert #thetaL[indjk[1]] eq 2;
 		pj:= [indjk[1],1];
@@ -1119,8 +1137,8 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		assert Ordp(Lp,mapLLp(thetaL[pj[1],pj[2]]))
 		       eq Ordp(Lp,mapLLp(thetaL[pk[1],pk[2]]));
 	    elif #thetaL eq 3 then
-		// select j,k corresponding to root of g_2(t),g_3(t) respectively
-		// here g(t) = g_1(t)g_2(t)g_3(t) where deg(g_2(t)) = deg(g_3(t)) = 1
+		// select j,k corresponding to root of f_2(t),f_3(t) respectively
+		// here f(t) = f_1(t)f_2(t)f_3(t) where deg(f_2(t)) = deg(f_3(t)) = 1
 		assert #indjk eq 2;
 		assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
 		pj:= [indjk[1],1];
@@ -1137,14 +1155,18 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	    // generate images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
 	    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
 	    tauL:= ImageInL(mapsLL,tau);
-	    delta1L:=
-		((thetaL[pi0,1]-thetaL[pj[1],pj[2]])/(thetaL[pi0,1]-thetaL[pk[1],pk[2]]))*
-		(tauL[pk[1],pk[2]]/tauL[pj[1],pj[2]]);
+	    delta1L:= ((thetaL[pi0,1]-thetaL[pj[1],pj[2]])*(tauL[pk[1],pk[2]]))/
+		      ((thetaL[pi0,1]-thetaL[pk[1],pk[2]])*(tauL[pj[1],pj[2]]));
+	    delta2L:= ((thetaL[pj[1],pj[2]]-thetaL[pk[1],pk[2]])*(tauL[pi0,1]))/
+		      ((thetaL[pk[1],pk[2]]-thetaL[pi0,1])*(tauL[pj[1],pj[2]]));
+	    ord_delta1L:= Ordp(Lp,mapLLp(delta1L));
+	    ord_delta2L:= Ordp(Lp,mapLLp(delta2L));
 
 	    // verify whether Lemma 3.5.2 of Gh holds
-	    if (Ordp(Lp,mapLLp(delta1L)) ne 0) then
+	    if (ord_delta1L ne 0) then
+		l352bound:= Min(ord_delta1L,0) - ord_delta2L;
 		exitline:= "\"(" cat IntegerToString(C) cat "," cat IntegerToString(p) cat
-			   ",true,false)\"";
+			   ",true," cat IntegerToString(l352bound) cat ",false,None)\"";
 		Append(~lemmattaInfo, exitline);
 	    else
 		// generate images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
@@ -1160,7 +1182,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		    assert &and[faci0[j][1] ne fack[j][1] : j in [1..#faci0]];
 		end for;
 
-		log_delta1L:= pAdicLog(mapLLp(delta1L),p);
+		log_delta1L:= pAdicLog(allprimeInfo[pindex],mapLLp(delta1L));
 		log_gammalistL:= [];
 		log_epslistL:= [];
 
@@ -1168,14 +1190,14 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		for i in [1..#epslist] do
 		    epsLkj:= epslistL[i][pk[1],pk[2]]/epslistL[i][pj[1],pj[2]];
 		    assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
-		    log_epslistL[i]:= pAdicLog(mapLLp(epsLkj),p);
+		    log_epslistL[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(epsLkj));
 		end for;
 
 		// compute p-adic log of gammalistL in Lp
 		for i in [1..#gammalist] do
 		    gamLkj:= gammalistL[i][pk[1],pk[2]]/gammalistL[i][pj[1],pj[2]];
 		    assert (Ordp(Lp,mapLLp(gamLkj)) eq 0);
-		    log_gammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
+		    log_gammalistL[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(gamLkj));
 		end for;
 
 		loglist:= log_gammalistL cat log_epslistL;
@@ -1185,8 +1207,12 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 
 		// verify whether Lemma 3.5.5 of Gh holds
 		if Ordp(Lp,log_delta1L) lt minord then
+		    fl:= Floor(1/(p-1) - ord_delta2L);
+		    cl:= Ceiling(minord - ord_delta2L);
+		    l355bound:= Max( fl, cl - 1);
 		    exitline:= "\"(" cat IntegerToString(C) cat "," cat IntegerToString(p)
-			       cat ",false,true)\"";
+			       cat ",false,None,true," cat IntegerToString(l355bound) cat
+			       ")\"";
 		    Append(~lemmattaInfo, exitline);
 		end if;
 	    end if;
@@ -1196,8 +1222,11 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 end function;
 
 /*
-     Description: generate all S-unit equations corresponding to N, clist
-     Input: set:=[N,[discF,c_1,c_2,c_3,c_4]], bash input
+     Description: generate all S-unit equations corresponding to N, optimal clist
+     Input: set:= N,"form","optimal form","min poly","partial obstructions",
+     	    	  class number,r,no ideal eq,no Thue eq,"S-unit ranks",
+		  local obstruction time,GL2Z action time,class group time,unit group time,
+		  ideal eq time,Thue eq time,S-unit time,bound time,total time
      Output: N/A
      Example:
 */
@@ -1214,18 +1243,21 @@ timings:= [];
 SUnitErr:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/SUnitErr_Alpha.txt";
 
 // .csv format is
-// N,"optimal form",alphgamlist index,p, lemma 3.5.2, lemma 3.5.5
+// N,"form","optimal form","(alphgamlist index,p,lemma 3.5.2,lemma 3.5.2 bound,lemma 3.5.5,
+// lemma 3.5.5 bound)"
 // lemma 3.5.2, lemma 3.5.5 may be output as true or false, but not both
 Lemmatta:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/Lemmatta.csv";
 
 // .csv format is
-// N,"form","Thue eq","RHSlist"
+// N,"form","optimal form","RHSlist"
+// optimal form is also Thue equation to solve
 ThueEqToSolve:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/ThueEqToSolve.csv";
 
 // .csv format is
 // N,"form","optimal form","min poly","partial obstructions",class number,r,no ideal eq,
-// no Thue eq,"S-unit ranks",local obstruction time,GL2Z action time,class group time,
-// unit group time,ideal eq time,Thue eq time,S-unit time,bound time,total time
+// no Thue eq,"setup time,splitting field time,class group time,
+// unit group time,ideal eq time,Thue eq time,S-unit time,thetas time,total time,
+// "adu","primelist","alpha"
 SUnitEq:= "/home/adela/ThueMahler/Data/SUnitEqData_Alpha/TMFormData_Alpha.csv";
 
 SetLogFile(SUnitErr);
@@ -1275,8 +1307,10 @@ else
     ranks:= [StringToInteger(i) : i in Split(BracketSplit[4],",")];
 end if;
 
-// add clist to hash in .csv format
-hash:= hash cat "\"(" cat RBracketSplit[4] cat ")\"";
+// add original form, clist to hash in .csv format
+hash:= hash cat "\"(" cat RBracketSplit[2] cat ")\"," cat
+       "\"(" cat RBracketSplit[4] cat ")\"";
+assert hash eq &cat[set[i] : i in [1..#hash]];
 
 // print out hash in LogFile in the event of errors
 printf hash cat "\n";
@@ -1326,7 +1360,7 @@ t4:= Cputime();
 U,psi:= UnitGroup(OK); // generate fundamental units
 Append(~timings,<Cputime(t4),"unit group">);
 
-// expresse the fundamental units as elts in OK in terms of the integral basis
+// express the fundamental units as elts in OK in terms of the integral basis
 epslist:=[psi(U.(i+1)) : i in [1..r]];
 assert (#epslist eq 1) or (#epslist eq 2);
 zetalist:= [psi(U.1)]; // generator for units of finite order
