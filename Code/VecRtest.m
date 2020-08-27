@@ -1200,11 +1200,15 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec,hash)
 			       ")\"";
 		    Append(~lemmattaInfo, exitline);
 		else
-		    strOrd_delta2L:= Sprint(ord_delta2L);
-		    strVecR:= SeqEnumToString(vecR);
-		    strMatA:= SeqEnumToString(Eltseq(matA));
-		    printf hash cat "," cat strOrd_delta2L cat"," cat strVecR cat "," cat
-			   strMatA cat "\n";
+		    if &and[v eq 0 : v in vecR] eq false then
+
+			strOrd_delta2L:= Sprint(ord_delta2L);
+			strVecR:= SeqEnumToString(vecR);
+			strMatA:= SeqEnumToString(Eltseq(matA));
+			printf hash cat "," cat strOrd_delta2L cat"," cat strVecR cat "," cat
+			       strMatA cat "\n";
+
+		    end if;
 		end if;
 	    end if;
 	end for;
