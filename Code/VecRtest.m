@@ -822,8 +822,8 @@ principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
         rr:=Eltseq(Zu!rr);
 	// update vector r to have only positive entries, to avoid precision errors
         for i in [1..#rr] do
-            while rr[i] lt 0 do
-                rr[i]:= rr[i]+ClK`classnumber;
+            while rr[i] gt 0 do
+                rr[i]:= rr[i]-ClK`classnumber;
             end while;
         end for;
         ker:= Kernel(phi);
@@ -1085,6 +1085,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec,hash)
 	caseprimes:= [Norm(fp) : fp in fplist];
 	tau:= alpha*fieldKinfo`zeta;
 	vecR:= alphgamlist[C]`vecR;
+	matA:= alphgamlist[C]`matA;
 
 	for l in [1..#caseprimes] do
 	    p:= caseprimes[l];
@@ -1201,7 +1202,9 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec,hash)
 		else
 		    strOrd_delta2L:= Sprint(ord_delta2L);
 		    strVecR:= SeqEnumToString(vecR);
-		    printf hash cat "," cat strOrd_delta2L cat"," cat strVecR cat "\n";
+		    strMatA:= SeqEnumToString(Eltseq(matA));
+		    printf hash cat "," cat strOrd_delta2L cat"," cat strVecR cat "," cat
+			   strMatA cat "\n";
 		end if;
 	    end if;
 	end for;
