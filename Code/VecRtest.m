@@ -8,6 +8,9 @@ Created: 26 August 2020
 Description:
 
 Commentary:
+nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j1 --joblog vectmplog magma set:={} /home/adela/ThueMahler/Code/VecRtest.m 2>&1 &
+
+
 
 To do list:
 
@@ -1196,7 +1199,9 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec,hash)
 			       ")\"";
 		    Append(~lemmattaInfo, exitline);
 		else
-		    printf hash cat "," cat ord_delta2L cat"," cat vecR;
+		    strOrd_delta2L:= Sprint(ord_delta2L);
+		    strVecR:= SeqEnumToString(vecR);
+		    printf hash cat "," cat strOrd_delta2L cat"," cat strVecR cat "\n";
 		end if;
 	    end if;
 	end for;
