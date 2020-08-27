@@ -1,0 +1,51 @@
+\BOOKMARK [0][-]{chapter.1}{To do list}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Theory}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Code}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Paper}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Preliminaries}{}% 5
+\BOOKMARK [1][-]{section.2.1}{p-adic valuations}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.2}{p-adic logarithms}{chapter.2}% 7
+\BOOKMARK [1][-]{section.2.3}{The Weil height}{chapter.2}% 8
+\BOOKMARK [1][-]{section.2.4}{Elliptic curves}{chapter.2}% 9
+\BOOKMARK [1][-]{section.2.5}{Cubic forms}{chapter.2}% 10
+\BOOKMARK [1][-]{section.2.6}{Lattices}{chapter.2}% 11
+\BOOKMARK [1][-]{section.2.7}{Continued fractions}{chapter.2}% 12
+\BOOKMARK [2][-]{subsection.2.7.1}{General continued fractions}{section.2.7}% 13
+\BOOKMARK [0][-]{chapter.3}{Algorithms for Thue-Mahler Equations}{}% 14
+\BOOKMARK [1][-]{section.3.1}{First steps}{chapter.3}% 15
+\BOOKMARK [1][-]{section.3.2}{The relevant algebraic number field}{chapter.3}% 16
+\BOOKMARK [1][-]{section.3.3}{The prime ideal removing lemma}{chapter.3}% 17
+\BOOKMARK [2][-]{subsection.3.3.1}{Computational remarks and refinements}{section.3.3}% 18
+\BOOKMARK [1][-]{section.3.4}{Factorization of the Thue-Mahler equation}{chapter.3}% 19
+\BOOKMARK [2][-]{subsection.3.4.1}{Avoiding the class group Cl\(K\)}{section.3.4}% 20
+\BOOKMARK [2][-]{subsection.3.4.2}{Using the class group Cl\(K\)}{section.3.4}% 21
+\BOOKMARK [2][-]{subsection.3.4.3}{The S-unit equation}{section.3.4}% 22
+\BOOKMARK [2][-]{subsection.3.4.4}{Computational remarks and comparisons}{section.3.4}% 23
+\BOOKMARK [1][-]{section.3.5}{A small upper bound for ul in a special case}{chapter.3}% 24
+\BOOKMARK [1][-]{section.3.6}{Lattice-Based Reduction}{chapter.3}% 25
+\BOOKMARK [2][-]{subsection.3.6.1}{The L3-lattice basis reduction algorithm}{section.3.6}% 26
+\BOOKMARK [2][-]{subsection.3.6.2}{The Fincke-Pohst algorithm}{section.3.6}% 27
+\BOOKMARK [2][-]{subsection.3.6.3}{Computational remarks and translated lattices}{section.3.6}% 28
+\BOOKMARK [0][-]{chapter.4}{Computing Elliptic Curves over Q}{}% 29
+\BOOKMARK [1][-]{section.4.1}{Elliptic curves}{chapter.4}% 30
+\BOOKMARK [1][-]{section.4.2}{Cubic forms: the main theorem and algorithm}{chapter.4}% 31
+\BOOKMARK [2][-]{subsection.4.2.1}{Remarks}{section.4.2}% 32
+\BOOKMARK [2][-]{subsection.4.2.2}{The algorithm}{section.4.2}% 33
+\BOOKMARK [1][-]{section.4.3}{Proof of Theorem Theorem 4.2.1}{chapter.4}% 34
+\BOOKMARK [1][-]{section.4.4}{Finding representative forms}{chapter.4}% 35
+\BOOKMARK [2][-]{subsection.4.4.1}{Irreducible Forms}{section.4.4}% 36
+\BOOKMARK [2][-]{subsection.4.4.2}{Reducible forms}{section.4.4}% 37
+\BOOKMARK [2][-]{subsection.4.4.3}{Computing forms of fixed discriminant}{section.4.4}% 38
+\BOOKMARK [2][-]{subsection.4.4.4}{GL2\(Z\) vs SL2\(Z\)}{section.4.4}% 39
+\BOOKMARK [0][-]{chapter.5}{Towards Efficient Resolution of Thue-Mahler Equations}{}% 40
+\BOOKMARK [1][-]{section.5.1}{Decomposition of the Weil height}{chapter.5}% 41
+\BOOKMARK [1][-]{section.5.2}{Initial height bounds}{chapter.5}% 42
+\BOOKMARK [1][-]{section.5.3}{Coverings of }{chapter.5}% 43
+\BOOKMARK [1][-]{section.5.4}{Construction of the ellipsoids}{chapter.5}% 44
+\BOOKMARK [2][-]{subsection.5.4.1}{The Archimedean ellipsoid: the real case}{section.5.4}% 45
+\BOOKMARK [2][-]{subsection.5.4.2}{The non-Archimedean ellipsoid}{section.5.4}% 46
+\BOOKMARK [1][-]{section.5.5}{The Archimedean sieve: the real case}{chapter.5}% 47
+\BOOKMARK [1][-]{section.5.6}{The non-Archimedean Sieve}{chapter.5}% 48
+\BOOKMARK [2][-]{subsection.5.6.1}{Applying Lemma 3.5.2}{section.5.6}% 49
+\BOOKMARK [2][-]{subsection.5.6.2}{Applying Lemma 3.5.5}{section.5.6}% 50
+\BOOKMARK [2][-]{subsection.5.6.3}{The reduction procedure}{section.5.6}% 51

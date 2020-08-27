@@ -1,4 +1,61 @@
 Understainding Kyle's reduction procedure, implemented after the PIRL.
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+Pre-PIRL
+--------
+
+1. Splitting field, roots of g in splitting field, OL
+2. Precision loop; initiate
+   a. real precision multiplier
+   b. p adic precision multiplier
+   c. precisionloopvariable (from 1-5; terminate algorithm if reaches 5) underwhich estimate
+      realpreicision, padic precision; SetDefaultRealField(RealField(realprecision));
+      PI:=Pi(RealField());
+3. Splitting of primes, generate theta
+4. Image of integral basis for K in Qp under theta -> theta[L][i][j]; image of gammas, eps under
+   this map
+5. Image of integral basis for K in C under theta -> conjugates(theta)[i]; image of gammas, eps
+   under this map
+6. Generate conjugates of theta in L (splitting field)
+7. Image of integral basis for K in L under theta -> conjugates(L)[i]; image of gammas, eps
+   under this map
+
+PIRL
+----
+
+1. Iterate through PIRL
+2. Build list of cases, discard those without principal ideal a
+
+Per Case
+-------
+
+1. Image of zeta, alpha in Qp
+2. Image of zeta, alpha in C
+3. Determine i0; initialize value of n_l (where known), Nstar (bounds on n_l); ihat, istar,
+   SpecialCase set (all as empty sets)
+4. Initialize delta1,delta2 in Qp as Qp! 1 (where Qp = completion of L at prime ideal)
+   (theta[L][i][j] lives in this Qp)
+5. Iterate through possibilities for j,k so that Ord_p(delta1) ne 0
+   NB. this seems to never be possible for us;
+   NB. i0 is fixed and determined by the unbounded prime ideal
+6. For each unbounded prime ideal, iterate through possible j,k to compute delta1,delta2 in Qp
+   for which Lemma 3.5.5 holds
+       a. Determine pAdicLog(delta1), pAdicLog(gammas in Qp), pAdicLog(eps in Qp)
+       CHECK IsZeroLocal(pAdicLog(delta1) - WHAT IS THIS?
+       CHECK GetCoefficients(pAdicLog(all elts above) - WHAT IS THIS?
+       b. Check if Valuation(pAdicLog(delta1) < Min(Valuation(pAdicLog(elts)))
+       CHECK IsZeroLocal(CoeffientsLogAlpha) - WHAT IS THIS?
+       c. Check if Lemma 3.5.5(b) holds using coefficients
+7. If cannot find j,k for which lemma 3.5.5 holds, choose j,k according to remaining guidelines
+   (ie. in such a way that alpha_i/alpha_{ihat} is in Zp for all i,j (Special Case)
+   NB. We are always in the Special Case, so this can always be done
+8. For each unbounded prime ideal in the Special Case, determine ihat, istar, beta_i's
+   CHECK GetCoefficients(beta) - WHAT IS THIS?
+9.
+
+
+
 
 0. Initate precision loop;
    Set p-adic, real, complex precision; this will end after going through all cases.
