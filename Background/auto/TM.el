@@ -6,16 +6,16 @@
    (TeX-add-to-alist 'LaTeX-provided-package-options
                      '(("parskip" "parfill") ("xy" "all") ("babel" "english") ("geometry" "top=1.3in" "bottom=1.6in" "left=1.3in" "right=1.3in") ("algorithm2e" "ruled" "vlined")))
    (add-to-list 'LaTeX-verbatim-environments-local "lstlisting")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "href")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperref")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperimage")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperbaseurl")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "nolinkurl")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "url")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "path")
    (add-to-list 'LaTeX-verbatim-macros-with-braces-local "lstinline")
-   (add-to-list 'LaTeX-verbatim-macros-with-delims-local "path")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "path")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "url")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "nolinkurl")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperbaseurl")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperimage")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperref")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "href")
    (add-to-list 'LaTeX-verbatim-macros-with-delims-local "lstinline")
+   (add-to-list 'LaTeX-verbatim-macros-with-delims-local "path")
    (TeX-run-style-hooks
     "latex2e"
     "report"
@@ -42,10 +42,6 @@
     "algorithm2e")
    (TeX-add-symbols
     '("edit" 1)
-    "ord"
-    "sgn"
-    "Cl"
-    "Gal"
     "eps"
     "arraystretch")
    (LaTeX-add-labels
@@ -196,8 +192,9 @@
     "sec:apply-lemma-refl"
     "sec:reduction-procedure"
     "Lem:19.1"
-    "lem:mainnonarch"
-    "lem:cpequiv")
+    "lem:lambdap"
+    "lem:nonarch1"
+    "cor:hvequiv")
    (LaTeX-add-index-entries
     "cubic forms"
     "Thue-Mahler equations"

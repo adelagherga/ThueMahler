@@ -2930,10 +2930,10 @@ We do not distinguish any $\varepsilon_l^*$. Instead, we will see later that the
 
 Let $b:= \text{lcm}\left(\sqrt{b_{\varepsilon_1}}, \dots, \sqrt{b_{\varepsilon_r}},Q_{n_1}, \dots, Q_{n_{\nu}}\right)$, where $Q_{n_1}, \dots, Q_{n_{\nu}}$ correspond to the denominators of the convergents of $\log^*(p_1), \dots, \log^*(p_{\nu})$ respectively. Recall that $b_{\varepsilon_i}$ is a square so that $\sqrt{b_{\varepsilon_i}}$ is an integer. We define the ellipsoid $\mathcal{E}_v \subseteq \mathbb{R}^{\nu + r}$ by
 \begin{align}\label{def:ellp}
-  & \mathcal{E}_v= \{q_v(\mathbf{x})\leq b(b_{\gamma}+r); \ \mathbf{x}\in\mathbb{R}^{r+\nu}\},
+  & \mathcal{E}_v= \{q_v(\mathbf{x})\leq b^2(b_{\gamma}+r); \ \mathbf{x}\in\mathbb{R}^{r+\nu}\},
 \end{align}
 where
-\[q_v(\mathbf{x})= b\left( q_f(x_1, \dots, x_{\nu}) +
+\[q_v(\mathbf{x})= b^2\left( q_f(x_1, \dots, x_{\nu}) +
     \sum_{i = 1}^r\frac{1}{b_{\varepsilon_i}}x_{\varepsilon_i}^2\right)\]
 and
 \[q_f(\mathbf{y}) = (A\mathbf{y})^{\text{T}}D^2A\mathbf{y}.\]
@@ -3228,11 +3228,12 @@ Immediate from Lemma \ref{lem:DiscG} and Lemma \ref{lem:Lambda}.
 \end{proof}
 
 Fix $l_v \in \mathbb{Z}$ such that
-\[\frac{l_v}{\log(p_v)} \geq \max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2).\]
+\[\frac{l_v}{\log(p_v)} \geq \max\left(0,\max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2)\right).\]
 Now, let $\mu$ be the largest element of $\mathbb{Z}_{\geq 0}$ at most
 \[\mu \leq \frac{l_v}{\log(p_v)} - \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2).\]
 
 \begin{lemma}
+  \label{lem:lambdap}
   Suppose $\ord_{p_v}(\delta_1) = 0$ and $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2).$
   Then
   \[ \sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) +
@@ -3262,10 +3263,6 @@ Hence, it follows that $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - 
 
 For each $x \in \mathbb{Z}_{p_v}$, let $x^{\{\mu\}}$ denote the unique rational integer in $[0,p_v^{\mu} - 1]$ such that $\ord_{p_v}(x - x^{\mu}) \geq \mu$ (ie. $x \equiv x^{\{\mu\}} \pmod{p_v^{\mu}}$).
 
-
-
-
-
 Let $\Gamma_{v}$ be the $(\nu+r)$-dimensional lattice determined by column vectors of the matrix $MA_{v}$, where $M$ is the matrix defining the ellipsoid $\mathcal{E}_v$ of \autoref{subsec:nonArchEllipsoid} and $A_{v}$ is the diagonal matrix having $\hat{i}^{\text{th}}$ row
 \[\left(\beta_2^{\{\mu\}}, \cdots, \beta_{\hat{i} - 1}^{\{\mu\}}, p_v^{\mu}, \beta_{\hat{i} + 1}^{\{\mu\}}, \cdots, \beta_{1+ \nu+ r}^{\{\mu\}}\right) \in \mathbb{Z}^{\nu+r}.\]
 Here, $p_v^{\mu}$ is the $(\hat{i},\hat{i})$ entry of $A_{v}$. That is,
@@ -3283,26 +3280,267 @@ Additionally, let
 \[\lambda = \frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}),\]
 and set
 \[\mathbf{w} = M(0, \dots 0, -\beta_1^{\{\mu\}},0, \dots, 0)^T \in \mathbb{Z}^{\nu + r}\]
-to be the product of $M$ and the vector whose only non-zero entry is the $\hat{i}^{\text{th}}$ element, $ -\beta_1^{\{\mu\}}$.
+to be the product of $M$ and the vector whose only non-zero entry is the $\hat{i}^{\text{th}}$ element, $ -\beta_1^{\{\mu\}}$. Of course, we must compute the $\beta_i$ to $p_v$-adic precision at least $\mu$ in order to avoid errors here.
 
 Choose a vector $\mathbf{z} \in \Gamma_v$ that is close to $\mathbf{w}$. An efficient way to do this is as follows. Compute the matrix $B_v$ whose column vectors $\mathbf{c_1},\dots, \mathbf{c_{\nu + r}}$ form an LLL-reduced basis for $\Gamma_v$ and write
 \[\mathbf{w} = s_1\mathbf{c_1} + \cdots + s_{\nu + r}\mathbf{c}_{\nu + r}, \quad s_i \in \mathbb{R}.\]
 In other words, compute $(s_1, \dots, s_{\nu + r})^T = B_v^{-1}\mathbf{w}$. Choose $\mathbf{t} \in \mathbb{Z}^{\nu + r}$ such that $|t_i - s_i| \leq 1$ for all $i$ and $|\mathbf{w} - B_v\mathbf{t}|$ is minimal. Then $B_v\mathbf{t}$ is likely the closes lattice vector to $\mathbf{w}$, so we take $\mathbf{z} = B_v\mathbf{t}$.
 
+\edit{change the vector $\mathbf{r}$ to be negative, maybe for the next part?}
 
+\begin{lemma}
+  \label{lem:nonarch1}
+  Let $(b_2, \dots, b_{1+\nu+r})$ be any solution of \eqref{eq:EfficientSunit} and set
+  \[\mathbf{x} = MA_v(b_2, \dots, b_{\hat{i} - 1}, \lambda, b_{\hat{i}+1}, \dots, b_{1+\nu+r})^T.\]
+  If $\ord_{p_v}(\delta_1) = 0,$ $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2),$ and
+\[\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}),\]
+  then $\mathbf{x} - \mathbf{z} \in \Gamma_{v}$ and
+\[|\mathbf{x} - \mathbf{z}| \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|.\]
+\end{lemma}
 
+Here, we
 
+\begin{proof}
+  We claim $(b_2, \dots, b_{\hat{i} - 1}, \lambda, b_{\hat{i}+1}, \dots, b_{1+\nu+r})^T \in \mathbb{Z}^{\nu + r}$. That is, $\lambda \in \mathbb{Z}$, meaning that $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$ is divisible by $p_v^{\mu}$, or equivalently,
+  \[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu.\]
+  Indeed, since
+  \[\ord_{p_{v}}\left(\beta_{i}^{\{\mu\}}-\beta_{i}\right) \geq \mu \quad \text { for } i=1, \dots, 1+\nu+r,\]
+  by definition, it follows that $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms and thus $\ord_{p_v}(\beta_i) = \ord_{p_v}(\beta_i^{\{\mu\}})$.
+  Now, to compute this order, we only need to concern ourselves with the first non-zero term in the series expansion of $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$. Since $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms, it follows that showing
+  \[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu\]
+  is equivalent to showing that
+  \[\ord_{p_l}(\Lambda_l') \geq \mu.\]
+  Of course, this latter inequality is true by Lemma~\ref{lem:lambdap}. Thus $\lambda \in \mathbb{Z}$. It follows that $\mathbf{x} \in \Gamma_v$ and thus $\mathbf{x} - \mathbf{z} \in \Gamma_v$.
 
+  Now,
+  \begin{align*}
+    \mathbf{x} - \mathbf{w}
+    & = MA_v(b_2, \dots, b_{\hat{i} - 1}, \lambda, b_{\hat{i}+1}, \dots, b_{1+\nu+r})^T -
+      M(0, \dots 0, -\beta_1^{\{\mu\}},0, \dots, 0)^T \\
+    & = M\left(
+      \begin{pmatrix}
+        1 &		&		&		&		&		&\\
+        & \ddots	& 		&		& 0		& 		&\\
+        &		& 1		&		&		&		&\\
+        \beta_2^{\{\mu\}}& \cdots & \beta_{\hat{i} - 1}^{\{\mu\}} & p_v^{\mu} & \beta_{\hat{i} + 1}^{\{\mu\}}& \cdots &\beta_{1+ \nu+ r}^{\{\mu\}}\\
+        & 		& 		& 		& 1		&		&\\
+        & 0		& 		& 		&		& \ddots	&\\
+        & 		& 		& 		&		& 		& 1\\
+      \end{pmatrix}
+    \begin{pmatrix}
+      b_2 \\ \vdots \\ b_{\hat{i} -1} \\ \lambda \\ b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1} \\
+    \end{pmatrix}
+    -
+    \begin{pmatrix}
+      0 \\ \vdots \\ 0 \\ -\beta_1^{\{\mu\}} \\ 0 \\ \vdots \\ 0 \\
+    \end{pmatrix}
+    \right)\\
+    & = M\left(
+      \begin{pmatrix}
+        b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b^* \\ b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1} \\
+      \end{pmatrix}
+    -
+    \begin{pmatrix}
+      0 \\ \vdots \\ 0 \\ -\beta_1^{\{\mu\}} \\ 0 \\ \vdots \\ 0 \\
+    \end{pmatrix}
+    \right).
+  \end{align*}
+  Here,
+  \begin{align*}
+    b^* & =b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} + \lambda
+          p_l^{\mu} + b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots +
+          b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}}\\
+        & = b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} +
+          p_l^{\mu} \frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}) +
+          b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots +
+          b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}}\\
+        & = b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} +
+          \sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}) +
+          b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots +
+          b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}}\\
+        & = b_1(-\beta_1^{\{\mu\}}) + b_{\hat{i}}(-\beta_{\hat{i}}^{\{\mu\}})\\
+        & = -\beta_1^{\{\mu\}} + b_{\hat{i}}
+  \end{align*}
+where the last equality follows from the fact that $b_1 = 1$ and
+\[-\beta_i = \frac{\alpha_{\hat{i}}}{\alpha_{\hat{i}}} =1.\]
 
+Thus,
+  \begin{align*}
+    \mathbf{x} - \mathbf{w}
+    & = M\left(
+      \begin{pmatrix}
+        b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b^* \\ b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1} \\
+      \end{pmatrix}
+    -
+    \begin{pmatrix}
+      0 \\ \vdots \\ 0 \\ -\beta_1^{\{\mu\}} \\ 0 \\ \vdots \\ 0 \\
+    \end{pmatrix}
+    \right)\\
+    & = M\left(
+      \begin{pmatrix}
+        b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b_{\hat{i}} -\beta_1^{\{\mu\}} \\ b_{\hat{i} +1} \\ \vdots
+        \\ b_{\nu+r+1} \\
+      \end{pmatrix}
+    -
+    \begin{pmatrix}
+      0 \\ \vdots \\ 0 \\ -\beta_1^{\{\mu\}} \\ 0 \\ \vdots \\ 0 \\
+    \end{pmatrix}
+    \right)\\
+    & = M \begin{pmatrix}
+      b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b_{\hat{i}}  \\ b_{\hat{i} +1} \\ \vdots  \\ b_{\nu+r+1} \\
+    \end{pmatrix}.
+  \end{align*}
+  Taking the vector norm, we obtain
+  \begin{align*}
+    |\mathbf{x} - \mathbf{w}| =
+    & |M(b_2, \dots, b_{\nu+r+1})^T| \\
+    & = \sqrt{(M(b_2, \dots, b_{\nu+r+1})^T)^TM(b_2, \dots, b_{\nu+r+1})^T}\\
+    & = \sqrt{(b_2, \dots, b_{\nu+r+1})M^TM(b_2, \dots, b_{\nu+r+1})^T}\\
+    & = \left((b_2, \dots, b_{\nu+r+1})b^2
+      \begin{pmatrix}
+        A^TD^2A & 0 & \dots & 0 & 0\\
+        0 & \frac{1}{b_{\varepsilon_1}} & \dots & 0 & 0\\
+        0 & 0  & \frac{1}{b_{\varepsilon_2}} & \dots & 0\\
+        \vdots & \vdots &0 &  \ddots & \vdots\\
+        0 & 0 & \dots & \dots & \frac{1}{b_{\varepsilon_r}}\\
+      \end{pmatrix}(b_2, \dots, b_{\nu+r+1})^T \right)^{1/2}\\
+    & = b\sqrt{b_{\gamma} + r}.
+  \end{align*}
+  Hence the lattice vector $\mathbf{x} - \mathbf{z}$ must satisfy
+  \[|\mathbf{x} - \mathbf{z}| = |\mathbf{x} - \mathbf{w}| + |\mathbf{w} - \mathbf{z}|
+    \leq b\sqrt{b_{\gamma}+r} + |\mathbf{w} - \mathbf{z}| .\]
+\end{proof}
 
-Of course, we must compute the $\beta_i$ to $p_v$-adic precision at least $\mu$ in order to avoid errors here.
+\edit{need a consistent way to refer to $h_v$, equivalently $h_{p_v}$}
 
+\textbf{Remark.} We claim that
+\begin{align*} \ord_{p_v}(\delta_1) = 0 \quad \text{ and } &  \quad \displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2)  \\
+&  \iff \sum_{i = 1}^{\nu} n_{i}a_{vi} > \max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} - \ord_{p_v}(\delta_2).
+\end{align*}
+\begin{proof}
+  Indeed if
+  \[\ord_{p_v}(\delta_1) = 0 \quad \text{ and } \quad \displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi}
+    > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2),\]
+  then $\max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} = \frac{1}{p-1} > 0$ so
+  \begin{align*}
+    \sum_{i = 1}^{\nu} n_{i}a_{vi}
+    & > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2)\\
+    & = \max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} - \ord_{p_v}(\delta_2).
+  \end{align*}
 
+  Conversely, suppose
+  \[\sum_{i = 1}^{\nu} n_{i}a_{vi} > \max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} - \ord_{p_v}(\delta_2).\]
+  If $\ord_{p_v}(\delta_1) = 0$, we obtain the desired result trivially. If $\ord_{p_v}(\delta_1) \neq 0$, we instead obtain that
+  \[\sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) = \min\{\ord_{p_v}(\delta_1),0\}.\]
+  If $\ord_{p_v}(\delta_1) < 0$, then
+  \[\max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} = \frac{1}{p_v-1} > 0 \]
+  so that
+  \begin{align*}
+    \sum_{i = 1}^{\nu} n_{i}a_{vi}
+    & > \max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\} - \ord_{p_v}(\delta_2)\\
+    & = \frac{1}{p_v-1} - \ord_{p_v}(\delta_2)
+  \end{align*}
+  hence
+  \[\sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) = \min\{\ord_{p_v}(\delta_1),0\} = \ord_{p_v}(\delta_1) > \frac{1}{p_v-1},\]
+  a contradiction.
+  Similarly, if $\ord_{p_v}(\delta_1) > 0$, then
+  \[\sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) = \min\{\ord_{p_v}(\delta_1),0\} = 0.\]
+  It follows that
+  \[ 0 = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2)
+    > \max\left\{\frac{1}{p_v-1},\ord_{p_v}(\delta_1)\right\},\]
+  a contradiction, as both $\frac{1}{p_v-1},\ord_{p_v}(\delta_1)$ are strictly positive numbers.
+  It follows that $\ord_{p_v}(\delta_1) = 0$, completing the proof.
+\end{proof}
 
+\begin{corollary} \label{cor:hvequiv}
+  Let $(b_2, \dots, b_{1+\nu+r})$ be any solution of \eqref{eq:EfficientSunit} satisfying
+  \[h_{p_v}(z) > l_v,\]
+  and set
+  \[\mathbf{x} = MA_v(b_2, \dots, b_{\hat{i} - 1}, \lambda, b_{\hat{i}+1}, \dots, b_{1+\nu+r})^T.\]
+  Then $\mathbf{x} - \mathbf{z} \in \Gamma_{v}$ and
+  \[|\mathbf{x} - \mathbf{z}| \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|.\]
+\end{corollary}
 
+\begin{proof}
+  Under the above assumption, $h_{p_v}(z) > l_v$, we prove that
+  \[\ord_{p_v}(\delta_1) = 0, \quad \displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2),\]
+  and
+  \[\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
+  Then the result follows from Lemma~\ref{lem:nonarch1}.
 
+  Recall that $l_v$ is an integer such that
+  \[\frac{l_v}{\log(p_v)} \geq \max\left(0,\max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2)\right).\]
+  That is
+  \[l_v\geq \max\left(0,\log(p_v)\left(\max\left\{ \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right\}
+        - \ord_{p_v}(\delta_2)\right)\right),\]
+  so that $l_v \geq 0$ and
+  \[l_v > \log(p_v)\left(\max\left\{ \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right\} -
+      \ord_{p_v}(\delta_2)\right).\]
+  Now, by assumption, we have
+  \[h_{p_v}(z) > l_v > \log(p_v)\left(\max\left\{ \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right\} -
+      \ord_{p_v}(\delta_2)\right),\]
 
+Recall from Proposition~\ref{prop:heightdecomp} that
+\[h_{p_v}(z) =
+\begin{cases}
+\log(p_v)|u_v - r_v| \\
+0
+\end{cases}.\]
+Since $h_{p_v}(z) > l_v > 0$, it follows that $h_{p_v}(z) = \log(p_v)|u_v - r_v|$. Hence the assumption becomes
+\[\log(p_v)|u_v - r_v| = h_{p_v}(z) > \log p_v\left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right),\]
+or equivalently,
+\[\left|\sum_{j = 1}^{\nu}n_ja_{vj}\right| > \max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2),\]
+that is
+\[\sum_{j = 1}^{\nu}n_ja_{vj} > \left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right).\]
+\edit{This part doesn't make sense if $\left|\sum_{j = 1}^{\nu}n_ja_{vj}\right|$ is negative. We'll have to force the vector $\mathbf{r}$ to be negative so that we force this absolute value to be positive. What else would change though? Does this mean anything if $\ord_{p_v}(\delta_1) \neq 0$, ie how do we end up with a positive value?}
 
+By the previous Remark, this means that
+$\ord_{p_v}(\delta_1) = 0$ and $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2)$.
+It remains to prove that
+\[\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
+Recall that $\mu$ is the largest element of $\mathbb{Z}_{\geq 0}$ at most
+\[\mu \leq \frac{l_v}{\log(p_v)} - \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2).\]
+That is
+\[\frac{l_v}{\log(p_v)} \geq \mu + \ord_{p_v}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\]
+so that
+\[h_v(z) > l_v \geq \log(p_v)\left(\mu + \ord_{p_l}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\right).\]
+Equivalently,
+\[\log(p_v)|u_v - r_v| = h_{p_v}(z) > \log(p_v)\left(\mu + \ord_{p_l}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\right)\]
+and thus
+\[\left|\sum_{j = 1}^{\nu}n_ja_{vj}\right| > \mu - \ord_{p_v}(\delta_2) +
+  \ord_{p_l}(\alpha_{\hat{i}})\]
+from which we obtain \edit{again, how do we obtain this without assuming that this is always positive? This needs to be fixed here}
+\[\sum_{j = 1}^{\nu}n_ja_{vj} > \mu - \ord_{p_v}(\delta_2) + \ord_{p_l}(\alpha_{\hat{i}}),\]
+as desired. It follows from Lemma~\ref{lem:mainnonarch} that $\mathbf{x} - \mathbf{z} \in \Gamma_{v}$ and
+\[|\mathbf{x} - \mathbf{z}| \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|,\]
+completing the proof.
+\end{proof}
+
+We are now in position to state the main result of this section. Let $\mathbf{l},\mathbf{h} \in \mathbb{Z}^{\nu+r}$ be vectors such that $\mathbf{0} \leq \mathbf{l} \leq \mathbf{h}$, with
+\[\frac{l_v}{\log(p_v)} \geq \max\left(0,\max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right)
+    - \ord_{p_v}(\delta_2)\right).\]
+\begin{corollary}
+  Let $p_v \in S$ and $(\tilde{x},\tilde{y}) \in \Sigma_v(\mathbf{l},\mathbf{h})$. Set $\mathbf{z},\mathbf{w}$ as above and
+  \[\mathbf{x} = MA_v(b_2, \dots, b_{\hat{i} - 1}, \lambda, b_{\hat{i}+1}, \dots, b_{1+\nu+r})^T,\]
+  where $(b_2,\dots, b_{1+\nu+r}\}$ corresponds $(\tilde{x},\tilde{y})$ which satisfy \eqref{eq:TrueSunit} and
+  \[\lambda = \frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}).\]
+  Then $\mathbf{x} - \mathbf{z} \in \Gamma_{v}$ and
+  \[|\mathbf{x} - \mathbf{z}| \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|.\]
+\end{corollary}
+
+\begin{proof}
+  Let $(\tilde{x},\tilde{y}) \in \Sigma_v(\mathbf{l},\mathbf{h})$ and let $(b_1, \dots, b_{1+\nu+r})$ be a solution of \eqref{eq:EfficientSunit} corresponding to $(\tilde{x},\tilde{y})$.
+  By definition of $\Sigma_v(\mathbf{l},\mathbf{h})$, we have that $(h_w(z)) \leq \mathbf{h}$ and $h_v(z) > l_v$. The result now follows from the previous corollary.
+\end{proof}
+
+The above result tells us that all solutions in $\Sigma_v(\mathbf{l},\mathbf{h})$ satisfy
+\[|\mathbf{x} - \mathbf{z}| \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|.\]
+We use Fincke-Pohst to find all vectors $\mathbf{u}\in \Gamma_v$ such that
+\[\mathbf{u} \leq b\sqrt{b_{\gamma} + r} + |\mathbf{w} - \mathbf{z}|.\]
+Each $\mathbf{u}$ is a candidate for $\mathbf{u} = \mathbf{x} - \mathbf{z}$. This assumption lets us write $\mathbf{x} - \mathbf{w} = \mathbf{u} + \mathbf{z} - \mathbf{w}$, and since we explicitly know $\mathbf{w}, \mathbf{u},$ and $\mathbf{z}$, we can recover our solution $(b_2, \dots, b_{1+\nu+r})$ via
+\[(b_1,\dots, b_{1+\nu+r})^T = M^{-1}(\mathbf{x} - \mathbf{w}) = M^{-1}(\mathbf{u} + \mathbf{z} - \mathbf{w}).\]
+
+\edit{Add p67-68}.
 
 
 
@@ -3310,26 +3548,28 @@ Of course, we must compute the $\beta_i$ to $p_v$-adic precision at least $\mu$ 
 % Let $v \in \{1, \dots, \nu\}$. We take vectors $\mathbf{l},\mathbf{h} \in \mathbb{R}^{\nu+r}$ with $\mathbf{0} \leq \mathbf{l} \leq \mathbf{h}$ and
 % \[\frac{l_v}{\log(p)} \geq \max\left( \frac{1}{p-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2)\]
 % and then consider the translated lattice $\Gamma_v \subseteq \mathbb{Z}^{\nu + r}$ defined below.
-We say that ${\mathbf{m} = (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{r + \nu}}$ is determined by some $\mathbf{y} \in \Gamma_v$ if the entries of $\mathbf{y}$ are a (fixed) permutation of the entries of $\mathbf{m}$. Let $\mathcal{E}_v$ be the ellipsoid constructed in \eqref{def:ellp}.
 
-\begin{lemma} \label{lem:mainnonarch}
-Any $(\tilde{x},\tilde{y}) \in \Sigma_v(l,h)$ is determined by some $\mathbf{y} \in \Gamma_v \cap \mathcal{E}_v$.
-\end{lemma}
 
-In the remainder of this section, we prove this lemma.
+% We say that ${\mathbf{m} = (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{r + \nu}}$ is determined by some $\mathbf{y} \in \Gamma_v$ if the entries of $\mathbf{y}$ are a (fixed) permutation of the entries of $\mathbf{m}$. Let $\mathcal{E}_v$ be the ellipsoid constructed in \eqref{def:ellp}.
 
-% We begin by applying the results of \autoref{sec:SmallBoundForSpecialCase}. In particular, we consider the form
-% \[\Lambda_v = \sum_{i = 1}^{1+\nu+r} b_i\alpha_i\]
-% where
-% \[b_1 = 1, \quad b_{1+i} = n_i \ \text{ for } i \in \{1, \dots, \nu\},\]
-% \[ b_{1 + \nu+i} = a_i \ \text{ for } i \in \{1, \dots, r\},\]
-% and
-% \[\alpha_1 = \log_{p_l} \delta_1, \quad \alpha_{1+i} = \log_{p_l}\left( \frac{\gamma_i^{(k)}}{\gamma_i^{(l)}}\right)  \ \text{ for } i \in \{1, \dots, \nu\},\]
-% \[\alpha_{1+ \nu+i} = \log_{p_l}\left( \frac{\varepsilon_i^{(k)}}{\varepsilon_i^{(l)}}\right)
-% \ \text{ for } i \in \{1, \dots, r\}.\]
+% \begin{lemma} \label{lem:mainnonarch}
+% Any $(\tilde{x},\tilde{y}) \in \Sigma_v(l,h)$ is determined by some $\mathbf{y} \in \Gamma_v \cap \mathcal{E}_v$.
+% \end{lemma}
 
-% We apply Lemma~\ref{lem:Delta1} by which $\sum_{j = 1}^{\nu} n_ja_{vj}$ can be computed directly provided ${\ord_{p_v}(\delta_1) \neq 0}$. In doing so, we assume for the remainder of this chapter that $\ord_{p_v}(\delta_1) = 0$. Furthermore, we apply Lemma~\ref{Lem:specialcase} to obtain a small bound on $\sum_{j = 1}^{\nu} n_ja_{vj}$ when $\ord_{p_v}(\alpha_1) < \displaystyle \min_{2 \leq i \leq 1+\nu+r} \ord_{p_v}(\alpha_i)$. Again, in doing so, we assume
-% \[\ord_{p_v}(\alpha_1) \geq \displaystyle \min_{2 \leq i \leq 1+\nu+r} \ord_{p_v}(\alpha_i)\]
+% In the remainder of this section, we prove this lemma.
+
+% % We begin by applying the results of \autoref{sec:SmallBoundForSpecialCase}. In particular, we consider the form
+% % \[\Lambda_v = \sum_{i = 1}^{1+\nu+r} b_i\alpha_i\]
+% % where
+% % \[b_1 = 1, \quad b_{1+i} = n_i \ \text{ for } i \in \{1, \dots, \nu\},\]
+% % \[ b_{1 + \nu+i} = a_i \ \text{ for } i \in \{1, \dots, r\},\]
+% % and
+% % \[\alpha_1 = \log_{p_l} \delta_1, \quad \alpha_{1+i} = \log_{p_l}\left( \frac{\gamma_i^{(k)}}{\gamma_i^{(l)}}\right)  \ \text{ for } i \in \{1, \dots, \nu\},\]
+% % \[\alpha_{1+ \nu+i} = \log_{p_l}\left( \frac{\varepsilon_i^{(k)}}{\varepsilon_i^{(l)}}\right)
+% % \ \text{ for } i \in \{1, \dots, r\}.\]
+
+% % We apply Lemma~\ref{lem:Delta1} by which $\sum_{j = 1}^{\nu} n_ja_{vj}$ can be computed directly provided ${\ord_{p_v}(\delta_1) \neq 0}$. In doing so, we assume for the remainder of this chapter that $\ord_{p_v}(\delta_1) = 0$. Furthermore, we apply Lemma~\ref{Lem:specialcase} to obtain a small bound on $\sum_{j = 1}^{\nu} n_ja_{vj}$ when $\ord_{p_v}(\alpha_1) < \displaystyle \min_{2 \leq i \leq 1+\nu+r} \ord_{p_v}(\alpha_i)$. Again, in doing so, we assume
+% % \[\ord_{p_v}(\alpha_1) \geq \displaystyle \min_{2 \leq i \leq 1+\nu+r} \ord_{p_v}(\alpha_i)\]
 % for the remainder of this chapter.
 
 % We now set some notation and give some preliminaries for the $p_l$-adic reduction procedures. Let $I$ be the set of all indices $i' \in \{2, \dots, 1+ \nu + r\}$ for which
@@ -3375,85 +3615,85 @@ In the remainder of this section, we prove this lemma.
 % \[\mathbf{w} = (0, \dots 0, \beta_1^{\{\mu\}},0, \dots, 0)^T \in \mathbb{Z}^{\nu + r}.\]
 
 %Of course, we must compute the $\beta_i$ to $p_l$-adic precision at least $\mu$ in order to avoid errors here.
-Let $\mathbf{y} = (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{\nu + r}$ denote a solution to \eqref{eq:EfficientSunit}.
+% Let $\mathbf{y} = (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{\nu + r}$ denote a solution to \eqref{eq:EfficientSunit}.
 
-\begin{lemma}
-Suppose $\ord_{p_v}(\delta_1) = 0$ and
-\[\sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2).\]
-Then the following equivalence holds:
-\begin{align*}
-\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})
-	& \quad \text{ if and only if } \quad \ord_{p_v}(\Lambda_v') \geq \mu \\
-	& \quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v.
-\end{align*}
-\end{lemma}
+% \begin{lemma}
+% Suppose $\ord_{p_v}(\delta_1) = 0$ and
+% \[\sum_{i = 1}^{\nu} n_{i}a_{vi} > \frac{1}{p_v-1} - \ord_{p_v}(\delta_2).\]
+% Then the following equivalence holds:
+% \begin{align*}
+% \sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})
+% 	& \quad \text{ if and only if } \quad \ord_{p_v}(\Lambda_v') \geq \mu \\
+% 	& \quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v.
+% \end{align*}
+% \end{lemma}
 
-\begin{proof}
-By Lemma \ref{Lem:19.1}, the assumption means that
-\[\ord_{p_v}(\Lambda_v') = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}}).\]
+% \begin{proof}
+% By Lemma \ref{Lem:19.1}, the assumption means that
+% \[\ord_{p_v}(\Lambda_v') = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}}).\]
 
-Now, suppose
-\[\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
-We thus have
-\begin{align*}
-\ord_{p_v}(\Lambda_v')
-	& = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}})\\
-	& \geq  \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}})\\
-	& = \mu.
-\end{align*}
-Conversely, suppose $\ord_{p_v}(\Lambda_v') \geq \mu$. Then
-\[\mu \leq \ord_{p_v}(\Lambda_v') = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}}).\]
-That is,
-\[\sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
-Hence, it follows that $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})$ if and only if $\ord_{p_v}(\Lambda_v') \geq \mu$.
+% Now, suppose
+% \[\sum_{i = 1}^{\nu} n_{i}a_{vi}  \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
+% We thus have
+% \begin{align*}
+% \ord_{p_v}(\Lambda_v')
+% 	& = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}})\\
+% 	& \geq  \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}})\\
+% 	& = \mu.
+% \end{align*}
+% Conversely, suppose $\ord_{p_v}(\Lambda_v') \geq \mu$. Then
+% \[\mu \leq \ord_{p_v}(\Lambda_v') = \sum_{i = 1}^{\nu} n_{i}a_{vi} + \ord_{p_v}(\delta_2) - \ord_{p_v}(\alpha_{\hat{i}}).\]
+% That is,
+% \[\sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}}).\]
+% Hence, it follows that $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})$ if and only if $\ord_{p_v}(\Lambda_v') \geq \mu$.
 
-Now, suppose $\mathbf{y}= (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{\nu + r}$ is a solution to \eqref{eq:EfficientSunit}. Suppose further that $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})$ so that $\ord_{p_v}(\Lambda_v') \geq \mu$. Let
-\[\lambda = \frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\]
-and consider the $(\nu + r)$-dimensional vector
-\[\mathbf{x}= (n_1, \dots, n_{\hat{i} -1}, \lambda, n_{\hat{i} +1}, \dots, n_{\nu}, a_1, \dots, a_r).\]
-We claim $\mathbf{x} \in \mathbb{Z}^{\nu + r}$. That is, $\lambda \in \mathbb{Z}$, meaning that $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$ is divisible by $p_v^{\mu}$, or equivalently,
-\[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu.\]
-Indeed, since
-\[\ord_{p_{v}}\left(\beta_{i}^{\{\mu\}}-\beta_{i}\right) \geq \mu \quad \text { for } i=1, \dots, 1+\nu+r,\]
-by definition, it follows that $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms and thus $\ord_{p_v}(\beta_i) = \ord_{p_v}(\beta_i^{\{\mu\}})$.
-Now, to compute this order, we only need to concern ourselves with the first non-zero term in the series expansion of $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$. Since $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms, it follows that showing
-\[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu\]
-is equivalent to showing that
-\[\ord_{p_l}(\Lambda_l') \geq \mu.\]
-Of course, this latter inequality is true by assumption. Thus $\lambda \in \mathbb{Z}$.
+% Now, suppose $\mathbf{y}= (n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{\nu + r}$ is a solution to \eqref{eq:EfficientSunit}. Suppose further that $\displaystyle \sum_{i = 1}^{\nu} n_{i}a_{vi} \geq \mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})$ so that $\ord_{p_v}(\Lambda_v') \geq \mu$. Let
+% \[\lambda = \frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\]
+% and consider the $(\nu + r)$-dimensional vector
+% \[\mathbf{x}= (n_1, \dots, n_{\hat{i} -1}, \lambda, n_{\hat{i} +1}, \dots, n_{\nu}, a_1, \dots, a_r).\]
+% We claim $\mathbf{x} \in \mathbb{Z}^{\nu + r}$. That is, $\lambda \in \mathbb{Z}$, meaning that $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$ is divisible by $p_v^{\mu}$, or equivalently,
+% \[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu.\]
+% Indeed, since
+% \[\ord_{p_{v}}\left(\beta_{i}^{\{\mu\}}-\beta_{i}\right) \geq \mu \quad \text { for } i=1, \dots, 1+\nu+r,\]
+% by definition, it follows that $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms and thus $\ord_{p_v}(\beta_i) = \ord_{p_v}(\beta_i^{\{\mu\}})$.
+% Now, to compute this order, we only need to concern ourselves with the first non-zero term in the series expansion of $\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})$. Since $\beta_{i}^{\{\mu\}}$ and $\beta_{i}$ share the first $\mu - 1$ terms, it follows that showing
+% \[\ord_{p_v}\left(\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}})\right) \geq \mu\]
+% is equivalent to showing that
+% \[\ord_{p_l}(\Lambda_l') \geq \mu.\]
+% Of course, this latter inequality is true by assumption. Thus $\lambda \in \mathbb{Z}$.
 
-Then, computing $A_{v}\mathbf{x} + \mathbf{w}$ yields
-\begin{align*}
- A_{v}\mathbf{x} + \mathbf{w} &
-& = \begin{pmatrix}
-b_2 \\ \vdots \\ b_{\hat{i} -1} \\
- b^* \\
-b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1} \\
-\end{pmatrix},
-\end{align*}
-where
-\[b^* =b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} + \lambda p_l^{\mu} + b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots + b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}} + \beta_1^{\{\mu\}}.\]
-Now,
-\[ \lambda p_v^{\mu} = p_v^{\mu}\frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}) = \sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}),\]
-hence
-\begin{align*}
-& b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} + b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots + b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}} + \lambda p_l^{\mu} + \beta_1^{\{\mu\}}\\
-& = b_{\hat{i}}(-\beta_{\hat{i}}^{\{\mu\}})\\
-& = b_{\hat{i}}
-\end{align*}
-where the last equality follows from the fact that
-\[-\beta_i = \frac{\alpha_{\hat{i}}}{\alpha_{\hat{i}}} =1.\]
-Thus,
-\[A_{v}\mathbf{x} + \mathbf{w} = \begin{pmatrix}
-b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b_{\hat{i}} \\ b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1}
-\end{pmatrix} =
-\begin{pmatrix}
-n_1 \\ \vdots \\ n_{\nu} \\ a_1 \\ \vdots \\ a_r \end{pmatrix} = \mathbf{y}.\]
-and $\mathbf{y} \in \Gamma_v$.
+% Then, computing $A_{v}\mathbf{x} + \mathbf{w}$ yields
+% \begin{align*}
+%  A_{v}\mathbf{x} + \mathbf{w} &
+% & = \begin{pmatrix}
+% b_2 \\ \vdots \\ b_{\hat{i} -1} \\
+%  b^* \\
+% b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1} \\
+% \end{pmatrix},
+% \end{align*}
+% where
+% \[b^* =b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} + \lambda p_l^{\mu} + b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots + b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}} + \beta_1^{\{\mu\}}.\]
+% Now,
+% \[ \lambda p_v^{\mu} = p_v^{\mu}\frac{1}{p_v^{\mu}}\sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}) = \sum_{i = 1}^{\nu + r + 1}b_i(-\beta_i^{\{\mu\}}),\]
+% hence
+% \begin{align*}
+% & b_2\beta_2^{\{\mu\}} + \cdots + b_{\hat{i} - 1}\beta_{\hat{i} - 1}^{\{\mu\}} + b_{\hat{i} + 1}\beta_{\hat{i} + 1}^{\{\mu\}} + \cdots + b_{\nu+r+ 1}\beta_{1+\nu+r}^{\{\mu\}} + \lambda p_l^{\mu} + \beta_1^{\{\mu\}}\\
+% & = b_{\hat{i}}(-\beta_{\hat{i}}^{\{\mu\}})\\
+% & = b_{\hat{i}}
+% \end{align*}
+% where the last equality follows from the fact that
+% \[-\beta_i = \frac{\alpha_{\hat{i}}}{\alpha_{\hat{i}}} =1.\]
+% Thus,
+% \[A_{v}\mathbf{x} + \mathbf{w} = \begin{pmatrix}
+% b_2 \\ \vdots \\ b_{\hat{i} -1} \\ b_{\hat{i}} \\ b_{\hat{i} +1} \\ \vdots \\ b_{\nu+r+1}
+% \end{pmatrix} =
+% \begin{pmatrix}
+% n_1 \\ \vdots \\ n_{\nu} \\ a_1 \\ \vdots \\ a_r \end{pmatrix} = \mathbf{y}.\]
+% and $\mathbf{y} \in \Gamma_v$.
 
 %Our assumption gives $n_p-a_p\geq \max(0,\ord_p(\mu_0))-\ord_p(\lambda_0)$ and then Lemma~\ref{lem:padiccomp} implies that $\ord_p(\mu_0)=0$. Therefore, on using again our assumption which assures that $n_p-a_p> \tfrac{1}{p-1}-\ord_p(\lambda_0)$, we see that an application of Lemma~\ref{lem:padiccomp}  gives  $$(n_p-a_p)+\ord_p(\lambda_0)=\ord_p(\Lambda_p)=\ord_p(\Lambda'_p)+\ord_p(\xi_p).$$
 %Thus $n_p-a_p\geq l_v'-\ord_p(\xi_p/\lambda_0)$ if and only if $\ord_p(\Lambda'_p)\geq l_v'$. Further, the TdW arguments show that $\ord_p(\Lambda'_p)\geq l_v'$ if and only if $m'\in\Gamma_v$. On combining we deduce the lemma.
-\end{proof}
+%\end{proof}
 
 
 %
@@ -3521,100 +3761,100 @@ and $\mathbf{y} \in \Gamma_v$.
 %\leq ||A^{-1}||_{\infty} \max_{1 \leq i\leq v}(N_i) = B_{l+1}.\]
 %we update the $B_i$ and repeat the above procedure until $M < 3000$ or until no further improvement can be made on the $B_i$, in which case we move onto the next $l \in \{1, \dots, v\}$.
 
-Define
-\[c_{p_v}=\log p_v\left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right).\]
+% Define
+% \[c_{p_v}=\log p_v\left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right).\]
 
-\begin{corollary} \label{lem:cpequiv}
-Assume that $h_{p_v}(z)>\max(0,c_{p_v})$. Then the following equivalence holds:
-\[h_{p_v}(z)\geq \log{p_v}\left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right) \quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v.\]
-\end{corollary}
-\begin{proof}
-Recall from Proposition~\ref{prop:heightdecomp} that
-\[h_{p_v}(z) =
-\begin{cases}
-\log(p_v)|u_v - r_v| \\
-0
-\end{cases}.\]
-Since $h_{p_v}(z) > 0$, it follows that $h_{p_v}(z) = \log(p_v)|u_v - r_v|$. Hence the assumption becomes
-\[\log(p_v)|u_v - r_v| = h_{p_v}(z) > \log p_v\left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right),\]
-or equivalently,
-\[\sum_{j = 1}^{\nu}n_ja_{vj} > \left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right).\]
-Moreover, the conclusion is equivalent to
-\[\log(p_v)|u_v - r_v| \geq \log{p_v}\left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right)
-	\quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v,\]
-or,
-\[\sum_{j = 1}^{\nu}n_ja_{vj} \geq \left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right)
-	\quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v,\]
-which is the previous lemma.
+% \begin{corollary} \label{lem:cpequiv}
+% Assume that $h_{p_v}(z)>\max(0,c_{p_v})$. Then the following equivalence holds:
+% \[h_{p_v}(z)\geq \log{p_v}\left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right) \quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v.\]
+% \end{corollary}
+% \begin{proof}
+% Recall from Proposition~\ref{prop:heightdecomp} that
+% \[h_{p_v}(z) =
+% \begin{cases}
+% \log(p_v)|u_v - r_v| \\
+% 0
+% \end{cases}.\]
+% Since $h_{p_v}(z) > 0$, it follows that $h_{p_v}(z) = \log(p_v)|u_v - r_v|$. Hence the assumption becomes
+% \[\log(p_v)|u_v - r_v| = h_{p_v}(z) > \log p_v\left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right),\]
+% or equivalently,
+% \[\sum_{j = 1}^{\nu}n_ja_{vj} > \left(\max\left(\tfrac{1}{p_v-1},\ord_{p_v}(\delta_1)\right)-\ord_{p_v}(\delta_2)\right).\]
+% Moreover, the conclusion is equivalent to
+% \[\log(p_v)|u_v - r_v| \geq \log{p_v}\left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right)
+% 	\quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v,\]
+% or,
+% \[\sum_{j = 1}^{\nu}n_ja_{vj} \geq \left(\mu - \ord_{p_v}(\delta_2) + \ord_{p_v}(\alpha_{\hat{i}})\right)
+% 	\quad \text{ if and only if } \quad \mathbf{y} \in\Gamma_v,\]
+% which is the previous lemma.
 
-%This follows from the above lemma, since Proposition~\ref{prop:heightdecomp} together with $h_p(z)>0$ implies that $h_p(z)=\log p(n_p-a_p)$.
-\end{proof}
+% %This follows from the above lemma, since Proposition~\ref{prop:heightdecomp} together with $h_p(z)>0$ implies that $h_p(z)=\log p(n_p-a_p)$.
+% \end{proof}
 
-We now prove Lemma~\ref{lem:mainnonarch}.
+% We now prove Lemma~\ref{lem:mainnonarch}.
 
-\begin{proof}[Proof of Lemma~\ref{lem:mainnonarch}]
-If $(n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{r+\nu}$ is a solution of \eqref{eq:EfficientSunit}, then, by definition, it corresponds to a solution $(\tilde{x},\tilde{y}) \in \Sigma_v(\mathbf{l},\mathbf{h})$.
-Hence $h_v(z)>l_v$, where $l_v$ is a constant such that
-\[\frac{l_v}{\log(p_v)} \geq \max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2).\]
-That is,
-\[h_v(z) > l_v \geq \log(p_v)\left(\max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2)\right) = c_p.\]
-Now, recall that $\mathbf{l} \geq \mathbf{0}$ so that $l_v \geq 0$. It thus follows that
-\[h_v(z) > l_v \geq
-\begin{cases}
-0\\
-c_p
-\end{cases}
-\implies h_v(z) >\max(0,c_p).\]
-In other words, the conditions of Corollary~\ref{lem:cpequiv} are satisfied.
+% \begin{proof}[Proof of Lemma~\ref{lem:mainnonarch}]
+% If $(n_1, \dots, n_{\nu}, a_1, \dots, a_r) \in \mathbb{R}^{r+\nu}$ is a solution of \eqref{eq:EfficientSunit}, then, by definition, it corresponds to a solution $(\tilde{x},\tilde{y}) \in \Sigma_v(\mathbf{l},\mathbf{h})$.
+% Hence $h_v(z)>l_v$, where $l_v$ is a constant such that
+% \[\frac{l_v}{\log(p_v)} \geq \max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2).\]
+% That is,
+% \[h_v(z) > l_v \geq \log(p_v)\left(\max\left( \frac{1}{p_v-1}, \ord_{p_v}(\delta_1)\right) - \ord_{p_v}(\delta_2)\right) = c_p.\]
+% Now, recall that $\mathbf{l} \geq \mathbf{0}$ so that $l_v \geq 0$. It thus follows that
+% \[h_v(z) > l_v \geq
+% \begin{cases}
+% 0\\
+% c_p
+% \end{cases}
+% \implies h_v(z) >\max(0,c_p).\]
+% In other words, the conditions of Corollary~\ref{lem:cpequiv} are satisfied.
 
-Now, recall that $\mu$ is the largest element of $\mathbb{Z}_{\geq 0}$ at most
-\[\mu \leq \frac{l_v}{\log(p_v)} - \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2).\]
-That is
-\[\frac{l_v}{\log(p_v)} \geq \mu + \ord_{p_v}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\]
-so that
-\[h_v(z) > l_v \geq \log(p_v)\left(\mu + \ord_{p_l}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\right).\]
-Now, by Corollary~\ref{lem:cpequiv}, we must have $\mathbf{y} \in \Gamma_v$. This shows that $(\tilde{x},\tilde{y})$ is determined by $\mathbf{y}=\mathbf{m}'\in\Gamma_v$, which proves Lemma~\ref{lem:mainnonarch}.
-%
+% Now, recall that $\mu$ is the largest element of $\mathbb{Z}_{\geq 0}$ at most
+% \[\mu \leq \frac{l_v}{\log(p_v)} - \ord_{p_v}(\alpha_{\hat{i}}) + \ord_{p_v}(\delta_2).\]
+% That is
+% \[\frac{l_v}{\log(p_v)} \geq \mu + \ord_{p_v}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\]
+% so that
+% \[h_v(z) > l_v \geq \log(p_v)\left(\mu + \ord_{p_l}(\alpha_{\hat{i}}) - \ord_{p_v}(\delta_2)\right).\]
+% Now, by Corollary~\ref{lem:cpequiv}, we must have $\mathbf{y} \in \Gamma_v$. This shows that $(\tilde{x},\tilde{y})$ is determined by $\mathbf{y}=\mathbf{m}'\in\Gamma_v$, which proves Lemma~\ref{lem:mainnonarch}.
+% %
 %If $h_v(z)>l_v$ then $h_v(z)>\max(0,c_p)$ since $l\geq 0$ and $l_v\geq c_p$ by assumption. Further, it holds that $l_v/\log p\geq l_v'-v(\xi_p/\lambda_0)$ by the definition of $l_v'$. Hence $h_v(z)\geq \log p(l_v'-v(\xi_p/\lambda_0))$ and then the above corollary implies that $m'\in\Gamma_v$. This shows that $(x,y)$ is determined by $\gamma=m'\in\Gamma_v$, which proves Lemma~\ref{lem:nonarchsieve}.
-\end{proof}
+%\end{proof}
 
-Finally, suppose that $\mathbf{y}\in \Gamma_v\cap \mathcal E_v$. Let $M=M_v$ be the matrix defining the ellipsoid $\mathcal{E}_v$. That is
-\begin{align*}
-M &=\sqrt{b_{\varepsilon_1}\cdots b_{\varepsilon_r}}\begin{pmatrix}
-	DA & 0 & \dots & 0 & 0\\
-	0 & \sqrt{\frac{b}{b_{\varepsilon 1}}} & \dots & 0 & 0\\
-	0 & 0  & \sqrt{\frac{b}{b_{\varepsilon 2}}} & \dots & 0\\
-	\vdots & \vdots &0 &  \ddots & \vdots\\
-	0 & 0 & \dots & \dots & \sqrt{\frac{b}{b_{\varepsilon}}} \\
-	\end{pmatrix}.
-\end{align*}
-Recall that $A_{v}\mathbf{x} + \mathbf{w}$ defines the lattice $\Gamma_v$. In particular, since $\mathbf{y}\in \Gamma_v\cap \mathcal E_v$, there exists $\mathbf{x}\in \mathbb{R}^{r + \nu}$ such that $\mathbf{y}=A_v \mathbf{x}+\mathbf{w}$ and ${\mathbf{y}^TM^TM\mathbf{y}\leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r})}$. We thus have
-\[(A_v \mathbf{x}+\mathbf{w})^TM^TM(A_v \mathbf{x}+\mathbf{w}) \leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r}).\]
-As $A_{v}$ is clearly invertible, with matrix inverse
-\[A_{v}^{-1} = \begin{pmatrix}
-1	& 		&		&		&		&		&	\\
-	& \ddots	& 		&		& 0		& 		&	\\
-	&		& 1		&		&		&		&	\\
-	-\frac{\beta_2^{\{\mu\}}}{p_l^{\mu}} & \cdots & -\frac{\beta_{\hat{i} - 1}^{\{\mu\}}}{p_l^{\mu}} & \frac{1}{p_l^{\mu}} & -\frac{\beta_{\hat{i} + 1}^{\{\mu\}}}{p_l^{\mu}}& \cdots &-\frac{\beta_{1+ \nu+ r}^{\{\mu\}}}{p_l^{\mu}}\\
-	& 		& 		& 		& 1		&		&	\\
-	& 0		& 		& 		&		& \ddots	&	\\
-	& 		& 		& 		&		& 		& 1	\\
-	\end{pmatrix},\]
-we can find a vector $\mathbf{c}$ such that $A_{v}\mathbf{c} = -\mathbf{w}$. Indeed, this vector is $\mathbf{c} = A_{v}^{-1}(-\mathbf{w})$, where
-\[\mathbf{c}=\begin{pmatrix}
-	0 \\ \vdots \\ 0 \\-\frac{\beta_1^{\{\mu\}}}{p^{\{\mu\}}} \\ 0 \\ \vdots \\ 0
-\end{pmatrix}.\]
-Now,
-\begin{align*}
-(1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r})
-	& \geq (A_v \mathbf{x}+\mathbf{w})^TM^TM(A_v \mathbf{x}+\mathbf{w}) \\
-	& = (A_v \mathbf{x}-A_v\mathbf{c})^TM^TM(A_v \mathbf{x}-A_v\mathbf{c})\\
-	& = (\mathbf{x}-\mathbf{c})^T(MA_v)^TMA_v(\mathbf{x}-\mathbf{c})\\
-	& = (\mathbf{x}-\mathbf{c})^TB^TB(\mathbf{x}-\mathbf{c})
-\end{align*}
-where $B = MA_v$. That is, we are left to solve
-\[(\mathbf{x}-\mathbf{c})^TB^TB(\mathbf{x}-\mathbf{c}) \leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r}).\]
-As in \autoref{sec:archsieve} finding all vectors satisfying this inequality amounts to computing all solutions to \eqref{eq:EfficientSunit} contained in $\Sigma_{v}(\mathbf{l}, \mathbf{h})$. The set of vectors $\mathbf{x}$ can be found using the Fincke-Pohst algorithm outlined in \autoref{subsec:FinckePohst}.
+% Finally, suppose that $\mathbf{y}\in \Gamma_v\cap \mathcal E_v$. Let $M=M_v$ be the matrix defining the ellipsoid $\mathcal{E}_v$. That is
+% \begin{align*}
+% M &=\sqrt{b_{\varepsilon_1}\cdots b_{\varepsilon_r}}\begin{pmatrix}
+% 	DA & 0 & \dots & 0 & 0\\
+% 	0 & \sqrt{\frac{b}{b_{\varepsilon 1}}} & \dots & 0 & 0\\
+% 	0 & 0  & \sqrt{\frac{b}{b_{\varepsilon 2}}} & \dots & 0\\
+% 	\vdots & \vdots &0 &  \ddots & \vdots\\
+% 	0 & 0 & \dots & \dots & \sqrt{\frac{b}{b_{\varepsilon}}} \\
+% 	\end{pmatrix}.
+% \end{align*}
+% Recall that $A_{v}\mathbf{x} + \mathbf{w}$ defines the lattice $\Gamma_v$. In particular, since $\mathbf{y}\in \Gamma_v\cap \mathcal E_v$, there exists $\mathbf{x}\in \mathbb{R}^{r + \nu}$ such that $\mathbf{y}=A_v \mathbf{x}+\mathbf{w}$ and ${\mathbf{y}^TM^TM\mathbf{y}\leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r})}$. We thus have
+% \[(A_v \mathbf{x}+\mathbf{w})^TM^TM(A_v \mathbf{x}+\mathbf{w}) \leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r}).\]
+% As $A_{v}$ is clearly invertible, with matrix inverse
+% \[A_{v}^{-1} = \begin{pmatrix}
+% 1	& 		&		&		&		&		&	\\
+% 	& \ddots	& 		&		& 0		& 		&	\\
+% 	&		& 1		&		&		&		&	\\
+% 	-\frac{\beta_2^{\{\mu\}}}{p_l^{\mu}} & \cdots & -\frac{\beta_{\hat{i} - 1}^{\{\mu\}}}{p_l^{\mu}} & \frac{1}{p_l^{\mu}} & -\frac{\beta_{\hat{i} + 1}^{\{\mu\}}}{p_l^{\mu}}& \cdots &-\frac{\beta_{1+ \nu+ r}^{\{\mu\}}}{p_l^{\mu}}\\
+% 	& 		& 		& 		& 1		&		&	\\
+% 	& 0		& 		& 		&		& \ddots	&	\\
+% 	& 		& 		& 		&		& 		& 1	\\
+% 	\end{pmatrix},\]
+% we can find a vector $\mathbf{c}$ such that $A_{v}\mathbf{c} = -\mathbf{w}$. Indeed, this vector is $\mathbf{c} = A_{v}^{-1}(-\mathbf{w})$, where
+% \[\mathbf{c}=\begin{pmatrix}
+% 	0 \\ \vdots \\ 0 \\-\frac{\beta_1^{\{\mu\}}}{p^{\{\mu\}}} \\ 0 \\ \vdots \\ 0
+% \end{pmatrix}.\]
+% Now,
+% \begin{align*}
+% (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r})
+% 	& \geq (A_v \mathbf{x}+\mathbf{w})^TM^TM(A_v \mathbf{x}+\mathbf{w}) \\
+% 	& = (A_v \mathbf{x}-A_v\mathbf{c})^TM^TM(A_v \mathbf{x}-A_v\mathbf{c})\\
+% 	& = (\mathbf{x}-\mathbf{c})^T(MA_v)^TMA_v(\mathbf{x}-\mathbf{c})\\
+% 	& = (\mathbf{x}-\mathbf{c})^TB^TB(\mathbf{x}-\mathbf{c})
+% \end{align*}
+% where $B = MA_v$. That is, we are left to solve
+% \[(\mathbf{x}-\mathbf{c})^TB^TB(\mathbf{x}-\mathbf{c}) \leq (1 + r)(bb_{\varepsilon_1}\cdots b_{\varepsilon_r}).\]
+% As in \autoref{sec:archsieve} finding all vectors satisfying this inequality amounts to computing all solutions to \eqref{eq:EfficientSunit} contained in $\Sigma_{v}(\mathbf{l}, \mathbf{h})$. The set of vectors $\mathbf{x}$ can be found using the Fincke-Pohst algorithm outlined in \autoref{subsec:FinckePohst}.
 
 %---------------------------------------------------------------------------------------------%
 

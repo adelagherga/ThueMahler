@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  26 AUG 2020 10:47
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  28 AUG 2020 14:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1368,12 +1368,17 @@ n $[][] \OML/cmm/m/it/10.95 n[]a[]$ \OT1/cmr/m/n/10.95 when
 
 LaTeX Warning: Citation `Ham' on page 100 undefined on input line 3213.
 
-[100] [101] [102] [103] [104] [105] [106] [107] [108] [109]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3623.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3623.
+[100] [101] [102] [103] [104] [105] [106] [107] [108] [109] [110]
+
+LaTeX Warning: Reference `lem:mainnonarch' on page 111 undefined on input line 
+3514.
+
+[111] [112]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3863.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3863.
  (./TM.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3623.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3623.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3863.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3863.
 
 Package rerunfilecheck Info: File `TM.out' has not changed.
 (rerunfilecheck)             Checksum: 2FA951AC29C1FCA21CE6DCC1A625C67B;3724.
@@ -1381,17 +1386,17 @@ Package rerunfilecheck Info: File `TM.out' has not changed.
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3623.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3863.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 1061 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 22714 strings out of 492995
- 392132 string characters out of 6132704
+ 22719 strings out of 492995
+ 392183 string characters out of 6132704
  563214 words of memory out of 5000000
- 25451 multiletter control sequences out of 15000+600000
+ 25453 multiletter control sequences out of 15000+600000
  30747 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,22n,54p,3240b,2901s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1421,10 +1426,10 @@ ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive
 2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm7.pfb></usr/local/texli
 ve/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on TM.pdf (110 pages, 619963 bytes).
+Output written on TM.pdf (113 pages, 622937 bytes).
 PDF statistics:
- 1456 PDF objects out of 1728 (max. 8388607)
- 1304 compressed objects within 14 object streams
- 363 named destinations out of 1000 (max. 500000)
+ 1461 PDF objects out of 1728 (max. 8388607)
+ 1306 compressed objects within 14 object streams
+ 366 named destinations out of 1000 (max. 500000)
  421 words of extra memory for PDF output out of 10000 (max. 10000000)
 

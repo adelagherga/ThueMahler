@@ -1175,6 +1175,7 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		      ((thetaL[pk[1],pk[2]]-thetaL[pi0,1])*(tauL[pj[1],pj[2]]));
 	    ord_delta1L:= Ordp(Lp,mapLLp(delta1L));
 	    ord_delta2L:= Ordp(Lp,mapLLp(delta2L));
+	    print "ordpdelta2", ord_delta2L;
 
 	    // verify whether Lemma 3.5.2 of Gh holds
 	    if (ord_delta1L ne 0) then
