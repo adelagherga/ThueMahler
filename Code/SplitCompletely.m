@@ -1005,143 +1005,143 @@ assert hash eq &cat[set[i] : i in [1..#hash]];
 
 // print out hash in LogFile in the event of errors
 //printf hash cat "\n";
+if r eq 2 then
+    t1:= Cputime();
+    f,remainingCase,ThueToSolve:= prep0(N,clist,fclist,partialObstruction);
+    Append(~timings,<Cputime(t1),"setup">);
 
-t1:= Cputime();
-f,remainingCase,ThueToSolve:= prep0(N,clist,fclist,partialObstruction);
-Append(~timings,<Cputime(t1),"setup">);
+    // generate a record to store relevant info of the field K = Q(th)
+    FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
+    K<th>:=NumberField(f);
+    OK:=MaximalOrder(K);
+    th:=OK!th;
+    fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
-// generate a record to store relevant info of the field K = Q(th)
-FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
-K<th>:=NumberField(f);
-OK:=MaximalOrder(K);
-th:=OK!th;
-fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
+    t2:= Cputime();
+    // generate a record to store relevant info of the splitting field L of K = Q(th)
+    L, tl:= SplittingField(f);
+    OL:= MaximalOrder(L);
+    tf,mapKL:= IsSubfield(K,L);
+    assert tf;
+    assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
+    fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+    Append(~timings,<Cputime(t2),"splitting field">);
 
-t2:= Cputime();
-// generate a record to store relevant info of the splitting field L of K = Q(th)
-L, tl:= SplittingField(f);
-OL:= MaximalOrder(L);
-tf,mapKL:= IsSubfield(K,L);
-assert tf;
-assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
-Append(~timings,<Cputime(t2),"splitting field">);
+    // generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
+    ijkL,AutL:= ijkAutL(fieldLinfo);
+    assert ijkL[3](th) eq L!th; // this is the identity automorphism
 
-// generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
-ijkL,AutL:= ijkAutL(fieldLinfo);
-assert ijkL[3](th) eq L!th; // this is the identity automorphism
+    t3:= Cputime();
+    // generate a record to store relevant class group info
+    ClassGroupInfo:= recformat<classgroup,classnumber,map>;
+    ClK:= rec< ClassGroupInfo | >;
+    ClK`classgroup, ClK`map:= ClassGroup(K);
+    Append(~timings,<Cputime(t3),"class group">);
+    assert classnumber eq Integers()! ClassNumber(K);
+    ClK`classnumber:= classnumber;
 
-t3:= Cputime();
-// generate a record to store relevant class group info
-ClassGroupInfo:= recformat<classgroup,classnumber,map>;
-ClK:= rec< ClassGroupInfo | >;
-ClK`classgroup, ClK`map:= ClassGroup(K);
-Append(~timings,<Cputime(t3),"class group">);
-assert classnumber eq Integers()! ClassNumber(K);
-ClK`classnumber:= classnumber;
+    n:= Degree(f);
+    assert (n eq #clist-1);
+    s,t:= Signature(K);
+    assert r eq (s+t-1);
+    assert (s+2*t) eq n;
+    assert (r eq 2);
 
-n:= Degree(f);
-assert (n eq #clist-1);
-s,t:= Signature(K);
-assert r eq (s+t-1);
-assert (s+2*t) eq n;
-assert (r eq 1) or (r eq 2);
+    t4:= Cputime();
+    U,psi:= UnitGroup(OK); // generate fundamental units
+    Append(~timings,<Cputime(t4),"unit group">);
 
-t4:= Cputime();
-U,psi:= UnitGroup(OK); // generate fundamental units
-Append(~timings,<Cputime(t4),"unit group">);
+    // express the fundamental units as elts in OK in terms of the integral basis
+    epslist:=[psi(U.(i+1)) : i in [1..r]];
+    assert (#epslist eq 1) or (#epslist eq 2);
+    zetalist:= [psi(U.1)]; // generator for units of finite order
+    zeta:= (psi(U.1))^2;
+    while (zeta ne psi(U.1)) and (zeta notin zetalist) and (-zeta notin zetalist) do
+	Append(~zetalist, zeta);
+	zeta:= zeta*psi(U.1);
+    end while;
+    // assert torsion subgroup of K is {1,-1}, as K has at least 1 real embedding {1,-1}
+    assert #zetalist eq 1;
+    zeta:= zetalist[1];
+    fieldKinfo`zeta:= zeta;
+    fieldKinfo`fundamentalunits:= epslist;
 
-// express the fundamental units as elts in OK in terms of the integral basis
-epslist:=[psi(U.(i+1)) : i in [1..r]];
-assert (#epslist eq 1) or (#epslist eq 2);
-zetalist:= [psi(U.1)]; // generator for units of finite order
-zeta:= (psi(U.1))^2;
-while (zeta ne psi(U.1)) and (zeta notin zetalist) and (-zeta notin zetalist) do
-    Append(~zetalist, zeta);
-    zeta:= zeta*psi(U.1);
-end while;
-// assert torsion subgroup of K is {1,-1}, as K has at least 1 real embedding {1,-1}
-assert #zetalist eq 1;
-zeta:= zetalist[1];
-fieldKinfo`zeta:= zeta;
-fieldKinfo`fundamentalunits:= epslist;
+    t5:= Cputime();
+    afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
+    Append(~timings,<Cputime(t5),"ideal equations">);
 
-t5:= Cputime();
-afplist:= prep1(fieldKinfo,clist,remainingCase); // generate all ideal equations
-Append(~timings,<Cputime(t5),"ideal equations">);
+    // general setup and assertions
+    Qx<x>:= PolynomialRing(Rationals());
+    QUV<U,V>:=PolynomialRing(Rationals(),2);
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n eq 3;
+    assert fclist eq ([1] cat [clist[i+1]*c0^(i-1) : i in [1..n]]);
+    assert f eq &+[fclist[i+1]*x^(n-i) : i in [0..n]];
 
-// general setup and assertions
-Qx<x>:= PolynomialRing(Rationals());
-QUV<U,V>:=PolynomialRing(Rationals(),2);
-c0:=Integers()!clist[1];
-assert c0 ne 0;
-n:=#clist-1;
-assert n eq 3;
-assert fclist eq ([1] cat [clist[i+1]*c0^(i-1) : i in [1..n]]);
-assert f eq &+[fclist[i+1]*x^(n-i) : i in [0..n]];
-
-t6:= Cputime();
-// remove ideal equations which have exponent 0 on all prime ideals by generating
-// corresponding Thue equations to be solved
-toRemove:= [];
-for i in [1..#afplist] do
-    fplist:= afplist[i][4];
-    if IsEmpty(fplist) then
-	a:= afplist[i][1]`newa;
-	aduset:= afplist[i][1]`adu;
-	primelist:= afplist[i][2];
-	ideal_a:= afplist[i][3];
-	v:= #primelist;
-	tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
-	assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
-	tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
-	if tf then
-	    for adu in aduset do
-		zz:= [tt[i] - Valuation(adu[3]*adu[1],primelist[i]) : i in [1..v]];
-		rhs:= Integers()! adu[1]*&*[primelist[i]^zz[i] : i in [1..v]];
-		assert adu[3]*rhs eq Integers()!a*&*[primelist[i]^tt[i] : i in [1..v]];
-		// store Thue equations to be solved
-		if (rhs in Integers()) and (rhs notin ThueToSolve) then
-		    Append(~ThueToSolve, rhs);
-		end if;
-	    end for;
-	end if;
-	Append(~toRemove,i);
-    end if;
-end for;
-Sort(~ThueToSolve);
-
-// remove cases covered by Thue solver
-afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemove];
-afplist:= afplistNew;
-assert #afplist eq NoIdealEq;
-assert IsEmpty(afplist) eq false;
-Append(~timings,<Cputime(t6),"thue equations">);
-
-if #ThueToSolve eq 0 then
-    assert NoThueEq eq 0;
-end if;
-
-t7:= Cputime();
-alphgamlist:= prep2(fieldKinfo,ClK,afplist);
-Append(~timings,<Cputime(t7),"S-unit equations">);
-assert #alphgamlist ne 0;
-
-allprimes:= [];
-for i in [1..#alphgamlist] do
-    fplist:= alphgamlist[i]`ideallist;
-    primelist:= alphgamlist[i]`primelist;
-    caseprimes:= [Norm(fp) : fp in fplist];
-    assert &and[p in primelist : p in caseprimes];
-    for p in caseprimes do
-	if p notin allprimes then
-	    Append(~allprimes, p);
+    t6:= Cputime();
+    // remove ideal equations which have exponent 0 on all prime ideals by generating
+    // corresponding Thue equations to be solved
+    toRemove:= [];
+    for i in [1..#afplist] do
+	fplist:= afplist[i][4];
+	if IsEmpty(fplist) then
+	    a:= afplist[i][1]`newa;
+	    aduset:= afplist[i][1]`adu;
+	    primelist:= afplist[i][2];
+	    ideal_a:= afplist[i][3];
+	    v:= #primelist;
+	    tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+	    assert Norm(ideal_a) eq Abs(a)*&*[primelist[i]^tt[i] : i in [1..v]];
+	    tf,alpha:=IsPrincipal(ideal_a); // verify ideal_a is principal
+	    if tf then
+		for adu in aduset do
+		    zz:= [tt[i] - Valuation(adu[3]*adu[1],primelist[i]) : i in [1..v]];
+		    rhs:= Integers()! adu[1]*&*[primelist[i]^zz[i] : i in [1..v]];
+		    assert adu[3]*rhs eq Integers()!a*&*[primelist[i]^tt[i] : i in [1..v]];
+		    // store Thue equations to be solved
+		    if (rhs in Integers()) and (rhs notin ThueToSolve) then
+			Append(~ThueToSolve, rhs);
+		    end if;
+		end for;
+	    end if;
+	    Append(~toRemove,i);
 	end if;
     end for;
-end for;
-Sort(~allprimes);
+    Sort(~ThueToSolve);
 
-if r eq 2 then
+    // remove cases covered by Thue solver
+    afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemove];
+    afplist:= afplistNew;
+    assert #afplist eq NoIdealEq;
+    assert IsEmpty(afplist) eq false;
+    Append(~timings,<Cputime(t6),"thue equations">);
+
+    if #ThueToSolve eq 0 then
+	assert NoThueEq eq 0;
+    end if;
+
+    t7:= Cputime();
+    alphgamlist:= prep2(fieldKinfo,ClK,afplist);
+    Append(~timings,<Cputime(t7),"S-unit equations">);
+    assert #alphgamlist ne 0;
+
+    allprimes:= [];
+    for i in [1..#alphgamlist] do
+	fplist:= alphgamlist[i]`ideallist;
+	primelist:= alphgamlist[i]`primelist;
+	caseprimes:= [Norm(fp) : fp in fplist];
+	assert &and[p in primelist : p in caseprimes];
+	for p in caseprimes do
+	    if p notin allprimes then
+		Append(~allprimes, p);
+	    end if;
+	end for;
+    end for;
+    Sort(~allprimes);
+
+
     for l in [1..#allprimes] do
 	p:= allprimes[l];
 	fprs:= Factorization(p*OK);
