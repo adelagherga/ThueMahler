@@ -5,7 +5,7 @@ Understainding Kyle's reduction procedure, implemented after the PIRL.
 Pre-PIRL
 --------
 
-1. Splitting field, roots of g in splitting field, OL
++1. Splitting field, roots of g in splitting field, OL
 2. Precision loop; initiate
    a. real precision multiplier
    b. p adic precision multiplier
@@ -28,7 +28,7 @@ PIRL
 2. Build list of cases, discard those without principal ideal a
 
 Per Case
--------
+--------
 
 1. Image of zeta, alpha in Qp
 2. Image of zeta, alpha in C

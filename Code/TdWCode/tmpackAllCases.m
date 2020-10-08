@@ -880,7 +880,8 @@ gp[i][j] = g_j(t) from Section 3 with p=p_i
 
 //////////////////////////////////////////////////////////////////////
 /*
-For each p[i], compute the completion FFFppF of FFF at a prime ideal ppF of OF.  Also compute the embedding of FFF into FFFppF (mFFFppF).
+For each p[i], compute the completion FFFppF of FFF at a prime ideal ppF of OF.  Also compute
+the embedding of FFF into FFFppF (mFFFppF).
 
 Note FFFppF contains the splitting field of g over Q_{p[i]}.
 
@@ -967,22 +968,22 @@ d2:=[];
 d3:=[];
 u:=[RationalField() | ];
 for l:=1 to v do
-FFFppFType[l]:=5;           //initialize
-generator[l]:=FFFppF[l].1;   //initialize, only used in case FFFppFType[l]=4
-Ainverse[l]:=1;                    //initialize
-d1[l]:=Degree(FFFppF[l],CoefficientField(FFFppF[l]));
-d2[l]:=Degree(CoefficientField(FFFppF[l]),PrimeField(FFFppF[l]));
-d3[l]:=Degree(FFFppF[l],PrimeField(FFFppF[l]));
-u[l]:=1;
+    FFFppFType[l]:=5;           //initialize
+    generator[l]:=FFFppF[l].1;   //initialize, only used in case FFFppFType[l]=4
+    Ainverse[l]:=1;                    //initialize
+    d1[l]:=Degree(FFFppF[l],CoefficientField(FFFppF[l]));
+    d2[l]:=Degree(CoefficientField(FFFppF[l]),PrimeField(FFFppF[l]));
+    d3[l]:=Degree(FFFppF[l],PrimeField(FFFppF[l]));
+    u[l]:=1;
 
-if AbsoluteRamificationIndex(FFFppF[l]) eq 1 then
-FFFppFType[l]:=1;
-u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));
-if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
-end if;
+    if AbsoluteRamificationIndex(FFFppF[l]) eq 1 then
+	FFFppFType[l]:=1;
+	u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));
+	if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
+    end if;
 
-if AbsoluteInertiaDegree(FFFppF[l]) eq 1 then
-FFFppFType[l]:=2;
+    if AbsoluteInertiaDegree(FFFppF[l]) eq 1 then
+	FFFppFType[l]:=2;
 /*FFFppF[l];
 DefiningPolynomial(FFFppF[l]);
 Discriminant(DefiningPolynomial(FFFppF[l]));
@@ -990,49 +991,49 @@ Parent((1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l]))));
 (1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));*/
 u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(FFFppF[l])));
 if Valuation(FFFppF[l].1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
-end if;
+    end if;
 
-if AbsoluteInertiaDegree(FFFppF[l]) gt 1 and d1[l] eq 1 then
-FFFppFType[l]:=3;
-u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(CoefficientField(FFFppF[l]))));
-if Valuation(CoefficientField(FFFppF[l]).1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
-end if;
+    if AbsoluteInertiaDegree(FFFppF[l]) gt 1 and d1[l] eq 1 then
+	FFFppFType[l]:=3;
+	u[l]:=(1/2)*Valuation(Discriminant(DefiningPolynomial(CoefficientField(FFFppF[l]))));
+	if Valuation(CoefficientField(FFFppF[l]).1) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
+    end if;
 
-if d1[l] gt 1 and d2[l] gt 1 then
+    if d1[l] gt 1 and d2[l] gt 1 then
 
-FFFppFType[l]:=4;
+	FFFppFType[l]:=4;
 
-k:=1;
-while true do
-generator[l] := k*FFFppF[l].1 + (FFFppF[l] ! CoefficientField(FFFppF[l]).1);
-if Degree(MinimalPolynomial(generator[l],PrimeField(FFFppF[l]))) eq d3[l] then
-break;
-end if;
-k +:= 1;
-end while;
+	k:=1;
+	while true do
+	    generator[l] := k*FFFppF[l].1 + (FFFppF[l] ! CoefficientField(FFFppF[l]).1);
+	    if Degree(MinimalPolynomial(generator[l],PrimeField(FFFppF[l]))) eq d3[l] then
+		break;
+	    end if;
+	    k +:= 1;
+	end while;
 
-u[l]:=(1/2)*Valuation(Discriminant(MinimalPolynomial(generator[l],PrimeField(FFFppF[l]))));
+	u[l]:=(1/2)*Valuation(Discriminant(MinimalPolynomial(generator[l],PrimeField(FFFppF[l]))));
 
-if Valuation(generator[l]) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
+	if Valuation(generator[l]) lt 0 then print("Error. Generator has negative valuation.  Results invalid. l="); l; end if;
 
-//Note: d3[l]:=d1[l]*d2[l];
-A:=ZeroMatrix( PrimeField(FFFppF[l]), d3[l], d3[l]); //initialize
-temp1:=Coefficients(generator[l]); //initialize
-temp2:=Coefficients(temp1[1]); //initialize
-for k:=1 to d3[l] do
-temp1:=Coefficients(generator[l]^(k-1));
-for i:=1 to d1[l] do
-temp2:=Coefficients(temp1[i]);
-for j:=1 to d2[l] do
-A[(i-1)*d2[l] + j,k]:=temp2[j];
-end for;
-end for;
-end for;
-Ainverse[l]:=A^(-1);
+	//Note: d3[l]:=d1[l]*d2[l];
+	A:=ZeroMatrix( PrimeField(FFFppF[l]), d3[l], d3[l]); //initialize
+	temp1:=Coefficients(generator[l]); //initialize
+	temp2:=Coefficients(temp1[1]); //initialize
+	for k:=1 to d3[l] do
+	    temp1:=Coefficients(generator[l]^(k-1));
+	    for i:=1 to d1[l] do
+		temp2:=Coefficients(temp1[i]);
+		for j:=1 to d2[l] do
+		    A[(i-1)*d2[l] + j,k]:=temp2[j];
+		end for;
+	    end for;
+	end for;
+	Ainverse[l]:=A^(-1);
 
-end if;
+    end if;
 
-if FFFppFType[l] eq 5 then print("Error in FFFppFType. l:"); l; end if;
+    if FFFppFType[l] eq 5 then print("Error in FFFppFType. l:"); l; end if;
 end for; //end l loop
 
 /*
@@ -1054,25 +1055,25 @@ function GetCoefficients(x,l)
 Input: l in {1,...,v}, x = an element of FFFppF[l]
 Output:  The coefficients of x on the basis power basis for FFFppF[l] over Q_{p_l}.
 */
-output:=Coefficients(x);
-if FFFppFType[l] eq 3 then output:=Coefficients(Coefficient(x,1)); end if;
-if FFFppFType[l] eq 4 then
-B:=ZeroMatrix( PrimeField(FFFppF[l]), d3[l], 1);
-temp1:=Coefficients(x);
-temp2:=Coefficients(temp1[1]); //initialize
-for i:=1 to d1[l] do
-temp2:=Coefficients(temp1[i]);
-for j:=1 to d2[l] do
-B[(i-1)*d2[l] + j,1]:=temp2[j];
-end for;
-end for;
-C:=Ainverse[l]*B;
-output:=[];
-for i:=1 to d3[l] do
-output[i]:=C[i][1];
-end for;
-end if;
-return output;
+    output:=Coefficients(x);
+    if FFFppFType[l] eq 3 then output:=Coefficients(Coefficient(x,1)); end if;
+    if FFFppFType[l] eq 4 then
+	B:=ZeroMatrix( PrimeField(FFFppF[l]), d3[l], 1);
+	temp1:=Coefficients(x);
+	temp2:=Coefficients(temp1[1]); //initialize
+	for i:=1 to d1[l] do
+	    temp2:=Coefficients(temp1[i]);
+	    for j:=1 to d2[l] do
+		B[(i-1)*d2[l] + j,1]:=temp2[j];
+	    end for;
+	end for;
+	C:=Ainverse[l]*B;
+	output:=[];
+	for i:=1 to d3[l] do
+	    output[i]:=C[i][1];
+	end for;
+    end if;
+    return output;
 end function;
 
 
@@ -2503,15 +2504,16 @@ delta2[l]:= ((thetap[l][jjj[l][1]][jjj[l][2]] - thetap[l][kkk[l][1]][kkk[l][2]])
 //define alpha_i's for i in JJJ
 LogarithmicAlphap[l][1]:=pAdicLog(delta1[l],p[l],padicprecision[l]);
 if IsZeroLocal(pAdicLog(delta1[l],p[l],padicprecision[l]),SS[l]) then
+// do nothing
 else
-for iii in J do
-LogarithmicAlphap[l][1+iii]:=pAdicLog(ImageOfpip[iii][kk[iii]][l][kkk[l][1]][kkk[l][2]]/ImageOfpip[iii][kk[iii]][l][jjj[l][1]][jjj[l][2]],p[l],padicprecision[l]);
-end for;
-for iii:=1 to r do
-LogarithmicAlphap[l][1+v+iii]:=pAdicLog(ImageOfepsp[iii][l][kkk[l][1]][kkk[l][2]]/ImageOfepsp[iii][l][jjj[l][1]][jjj[l][2]],p[l],padicprecision[l]);
-end for;
+    for iii in J do
+	LogarithmicAlphap[l][1+iii]:=pAdicLog(ImageOfpip[iii][kk[iii]][l][kkk[l][1]][kkk[l][2]]/ImageOfpip[iii][kk[iii]][l][jjj[l][1]][jjj[l][2]],p[l],padicprecision[l]);
+    end for;
+    for iii:=1 to r do
+	LogarithmicAlphap[l][1+v+iii]:=pAdicLog(ImageOfepsp[iii][l][kkk[l][1]][kkk[l][2]]/ImageOfepsp[iii][l][jjj[l][1]][jjj[l][2]],p[l],padicprecision[l]);
+    end for;
 
-/*
+    /*
 function TestpAdicLog(x,p)
 e:=AbsoluteRamificationIndex(Parent(x));
 fprintf LogFile, "e = %o\n", e;
@@ -2564,16 +2566,17 @@ end if;
 
 
 for hhh:=1 to SS[l] do
-if IsZeroLocal(CoefficientsLogarithmicAlphap[l][1][hhh],SS[l]) then continue hhh;
-else
+    if IsZeroLocal(CoefficientsLogarithmicAlphap[l][1][hhh],SS[l]) then
+	continue hhh;
+    else
 
-min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[2]][hhh]);
-for iii:=2 to nJJJ do
-//fprintf LogFile, "Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) = %o\n", Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
-if Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) lt min then
-min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
-end if;
-end for; //end iii loop
+	min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[2]][hhh]);
+	for iii:=2 to nJJJ do
+	    //fprintf LogFile, "Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) = %o\n", Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
+	    if Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]) lt min then
+		min:=Valuation(CoefficientsLogarithmicAlphap[l][JJJ[iii]][hhh]);
+	    end if;
+	end for; //end iii loop
 if Valuation(CoefficientsLogarithmicAlphap[l][1][hhh]) lt min then
 temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
 Ceiling((1/hh[l])*(u[l] + min - Valuation(delta2[l])))-1   ]);
@@ -2783,23 +2786,26 @@ end for;
 /* For all candidates for ihat, check whether alpha_i /  alpha_{ihat} in Q_{p_l} for all i in JJJ */
 temp:=[];
 for istarstar in candidatesforistar do
-ihathat:=JJJ[istarstar];
-for iii in JJJ do
-temp[iii]:=GetCoefficients(LogarithmicAlphap[l][iii]/LogarithmicAlphap[l][ihathat],l);
-end for;
-flag:=true;
-for iii in JJJ do
-for hhh:=2 to SS[l] do
-if not IsZero(temp[iii][hhh]) then flag:=false; break iii; end if;
-end for;
-end for;
-if flag eq true then
-/* we've found a choice of j,k with the desired properties */
-SpecialCase[l]:=true;
-ihat[l]:=ihathat;
-istar[l]:=istarstar;
-continue l;
-end if;
+    ihathat:=JJJ[istarstar];
+    for iii in JJJ do
+	temp[iii]:=GetCoefficients(LogarithmicAlphap[l][iii]/LogarithmicAlphap[l][ihathat],l);
+    end for;
+    flag:=true;
+    for iii in JJJ do
+	for hhh:=2 to SS[l] do
+	    if not IsZero(temp[iii][hhh]) then
+		flag:=false;
+		break iii;
+	    end if;
+	end for;
+    end for;
+    if flag eq true then
+	/* we've found a choice of j,k with the desired properties */
+	SpecialCase[l]:=true;
+	ihat[l]:=ihathat;
+	istar[l]:=istarstar;
+	continue l;
+    end if;
 end for;
 
 
@@ -2891,38 +2897,38 @@ end for;
 
 if SpecialCase[l] eq true then
 
-if ihat[l] eq 0 then
-min:=Valuation(LogarithmicAlphap[l][JJJ[2]]);
-ihat[l]:=JJJ[2];
-istar[l]:=2;
-for i:=3 to #JJJ do
-iii:=JJJ[i];
-if Valuation(LogarithmicAlphap[l][iii]) lt min then
-min:=Valuation(LogarithmicAlphap[l][iii]);
-ihat[l]:=iii;
-istar[l]:=i;
-end if;
-end for;
-end if;
+    if ihat[l] eq 0 then
+	min:=Valuation(LogarithmicAlphap[l][JJJ[2]]);
+	ihat[l]:=JJJ[2];
+	istar[l]:=2;
+	for i:=3 to #JJJ do
+	    iii:=JJJ[i];
+	    if Valuation(LogarithmicAlphap[l][iii]) lt min then
+		min:=Valuation(LogarithmicAlphap[l][iii]);
+		ihat[l]:=iii;
+		istar[l]:=i;
+	    end if;
+	end for;
+    end if;
 
-for iii:=1 to 1+v+r do
-beta[l][iii] := -LogarithmicAlphap[l][iii]/LogarithmicAlphap[l][ihat[l]];
-/*
+    for iii:=1 to 1+v+r do
+	beta[l][iii] := -LogarithmicAlphap[l][iii]/LogarithmicAlphap[l][ihat[l]];
+	/*
 For l in I, we know that the beat_i's live in Z_{p_l}.  So their
 coefficients on the power basis for FFFppF[l] are all zero, except for the
 first.  We can use this to save on computations with the beta_i's:
-*/
-beta[l][iii] := GetCoefficients(beta[l][iii],l)[1];
-end for;
+       */
+	beta[l][iii] := GetCoefficients(beta[l][iii],l)[1];
+    end for;
 
-dd[l]:=Valuation(delta2[l]) - Valuation(LogarithmicAlphap[l][ihat[l]]);
+    dd[l]:=Valuation(delta2[l]) - Valuation(LogarithmicAlphap[l][ihat[l]]);
 
 else //SpecialCase[l] eq false //general case
 
-//get the coefficients of the alpha_i's: the alpha_{ih}'s
-for iii:=1 to 1+v+r do
-CoefficientsLogarithmicAlphap[l][iii]:=GetCoefficients(LogarithmicAlphap[l][iii],l);
-end for;
+    //get the coefficients of the alpha_i's: the alpha_{ih}'s
+    for iii:=1 to 1+v+r do
+	CoefficientsLogarithmicAlphap[l][iii]:=GetCoefficients(LogarithmicAlphap[l][iii],l);
+    end for;
 
 // Choose an index h in {1,...,S[l]} such that alpha_{ih} nonzero for at least one i>1.
 temphhh:=1;
@@ -8262,9 +8268,9 @@ else
 return false;
 end if;*/
 if Valuation(x) ge Valuation(Zero(Parent(x))) - 2*(S-1) then
-return true;
+    return true;
 else
-return false;
+    return false;
 end if;
 end intrinsic;
 

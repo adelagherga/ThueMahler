@@ -128,6 +128,16 @@ All to do items for the Thue-Mahler code background, Magma code, and subsequent 
 \item probably don't need to use Ficnke-Pohst on translated lattices
 \end{enumerate}
 
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - %
+
+\subsection{Rafael}
+\label{subsec:rafael}
+
+\begin{enumerate}[\hspace{0.5cm}1.]
+\itemsep0em
+\item $p$-adic step precision
+\end{enumerate}
+
 %---------------------------------------------------------------------------------------------%
 
 \section{Code}
@@ -2945,7 +2955,7 @@ Similar to the Archimedean case, we let $M=M_v$ be the matrix defining the ellip
     0 & \sqrt{\frac{1}{b_{\varepsilon 1}}} & \dots & 0 & 0\\
     0 & 0  & \sqrt{\frac{1}{b_{\varepsilon 2}}} & \dots & 0\\
     \vdots & \vdots &0 &  \ddots & \vdots\\
-    0 & 0 & \dots & \dots & \sqrt{\frac{1}{b_{\varepsilon}}} \\
+    0 & 0 & \dots & \dots & \sqrt{\frac{1}{b_{\varepsilon_r}}} \\
   \end{pmatrix}
   = \begin{pmatrix}
     bDA & 0 & \dots & 0 & 0\\
@@ -2956,6 +2966,9 @@ Similar to the Archimedean case, we let $M=M_v$ be the matrix defining the ellip
   \end{pmatrix}.
 \end{align*}
 By definition of $b$, it follows that $M$ is an integral matrix.
+
+
+
 % As before, we never need to compute $M$, but rather $M^TM$ so that we only ever work with integral matrices. In this case,
 % \begin{align*}
 % M^TM &= b_{\varepsilon_1}\cdots b_{\varepsilon_r}\begin{pmatrix}
@@ -3541,6 +3554,7 @@ Each $\mathbf{u}$ is a candidate for $\mathbf{u} = \mathbf{x} - \mathbf{z}$. Thi
 \[(b_1,\dots, b_{1+\nu+r})^T = M^{-1}(\mathbf{x} - \mathbf{w}) = M^{-1}(\mathbf{u} + \mathbf{z} - \mathbf{w}).\]
 
 \edit{Add p67-68}.
+\edit{It seems to be that $|sum n_i a_{il}|$ being negative mihgt only be a problem when $r = 1$. Did a preliminary test where it seemed that, removing cases where the previous lemmas held, where $\mathbf{r} \neq \mathbf{0}$, and $r = 1$, there doesn't seem to be any output...yet? Nope, there's cases here, maybe they're somehow special?}
 
 
 

@@ -47,6 +47,7 @@
    (LaTeX-add-labels
     "cha:do-list"
     "sec:theory"
+    "subsec:rafael"
     "sec:code"
     "sec:paper"
     "cha:preliminaries"

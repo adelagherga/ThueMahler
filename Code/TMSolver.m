@@ -145,97 +145,107 @@ prep0:= function(N,clist,fclist,partialObstruction)
 
     // generate a record to store relevant prime bounds
     // determine any bounds as per Theorem 1 of BeGhRe correspondence
-    primeInfo:= recformat<prime,alpha1,unbounded>;
+    PrimeRec:= recformat<prime,alpha1,unbounded>;
     primeBounds:= [[],[]];
 
     // verify behaviour at p = 2
     if (alpha eq 0) then
 	if alpha0 eq 2 then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 3>);
 	end if;
     elif (alpha eq 1) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 4, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 4,
+						       unbounded:= "yes">);
 	elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 3, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 3,
+						       unbounded:= "yes">);
 	end if;
     elif (alpha eq 2) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     elif (alpha eq 3) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 2>);
         elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 2>);
         elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     elif (alpha eq 4) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0,
+						       unbounded:= "yes">);
 	elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 2, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 2,
+						       unbounded:= "yes">);
         elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     elif (alpha eq 5) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
         elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     elif (alpha eq 6) then
         if (alpha0 eq 2) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0,
+						       unbounded:= "yes">);
         elif (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1, unbounded:= "yes">);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1,
+						       unbounded:= "yes">);
         elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     elif (alpha eq 7) then
         if (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
         elif (alpha0 eq 4) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 0>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 0>);
         end if;
     elif (alpha eq 8) then
         if (alpha0 eq 3) then
-	    Append(~primeBounds[1], rec<primeInfo | prime:= 2, alpha1:= 1>);
+	    Append(~primeBounds[1], rec<PrimeRec | prime:= 2, alpha1:= 1>);
         end if;
     end if;
 
     // verify behaviour at p = 3
     if (beta eq 0) then
         if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0>);
         end if;
     elif (beta eq 1) then
         if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1, unbounded:= "yes">);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 1,
+						       unbounded:= "yes">);
         elif (beta0 eq 1) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0,
+						       unbounded:= "yes">);
 	end if;
     elif (beta eq 2) then
         if (beta0 eq 0) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0,
+						       unbounded:= "yes">);
 	elif (beta0 eq 1) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0, unbounded:= "yes">);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0,
+						       unbounded:= "yes">);
 	elif (beta0 eq 3) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0>);
 	end if;
     elif (beta ge 3) then
         if (beta0 eq beta) then
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 1>);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0>);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 1>);
         else
 	    // when all coefficients of the form F_1 are  divisible by 3,
 	    // since also beta1 = {0,1} and 3|LHS we must have that 3|RHS,  hence beta1 = 1
@@ -243,7 +253,7 @@ prep0:= function(N,clist,fclist,partialObstruction)
 	    // this yields the form F = F_1/3, whose discriminant has
 	    // Valuation(DiscF,3) != beta0 = beta
 	    // thus since beta1=1 is divided out, so beta1=0
-	    Append(~primeBounds[2], rec<primeInfo | prime:= 3, alpha1:= 0>);
+	    Append(~primeBounds[2], rec<PrimeRec | prime:= 3, alpha1:= 0>);
         end if;
     end if;
 
@@ -252,8 +262,8 @@ prep0:= function(N,clist,fclist,partialObstruction)
 	if IsDivisibleBy(N1,p^2) then
 	    assert p in PrimeDivisors(N0);
 	    primeBounds[#primeBounds+1]:= [];
-	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 0>);
-	    Append(~primeBounds[#primeBounds],rec<primeInfo | prime:= p, alpha1:= 1>);
+	    Append(~primeBounds[#primeBounds],rec<PrimeRec | prime:= p, alpha1:= 0>);
+	    Append(~primeBounds[#primeBounds],rec<PrimeRec | prime:= p, alpha1:= 1>);
 	end if;
     end for;
 
@@ -374,7 +384,7 @@ prep0:= function(N,clist,fclist,partialObstruction)
     // if there are Thue-Mahler equations yet to be solved, not resolvable via Thue equations
     // generate the corresponding S-unit equations
     // remove redundancy so that each primeset has all corresponding a values
-    CaseInfoAllAs:= recformat<avalues,primelist>;
+    CaseRec:= recformat<avalues,primelist>;
     RemainingCasesCopy:= RemainingCases;
     for pset in RemainingCases do
 	if pset in RemainingCasesCopy then
@@ -391,7 +401,7 @@ prep0:= function(N,clist,fclist,partialObstruction)
 		end if;
 	    end for;
 	    Sort(~avalues);
-	    apset:=rec<CaseInfoAllAs | avalues:=avalues, primelist:= primelist>;
+	    apset:=rec< CaseRec | avalues:=avalues, primelist:= primelist>;
 	    Append(~RemainingCasesAllAs, apset);
 	end if;
     end for;
@@ -475,7 +485,7 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
     f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
     assert f eq fieldKinfo`minpoly;
 
-    aInfo:= recformat<newa,adu>;
+    aRec:= recformat<newa,adu>;
     alist:= [];
     for a in avalues do
 	// generate the prime factors of a
@@ -536,7 +546,7 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
 	for dset in duc do
 	    if dset in ducCopy then
 		c:= dset[3];
-		temp:= rec<aInfo |newa:= c, adu:=[]>;
+		temp:= rec< aRec |newa:= c, adu:=[]>;
 		for dset2 in ducCopy do
 		    c2:= dset2[3];
 		    if (c eq c2) then
@@ -556,7 +566,7 @@ monic:= function(fieldKinfo,clist,primelist,avalues)
     for i in [1..#alist] do
 	if i in alistIndex then
 	    c:= alist[i]`newa;
-	    temp:= rec< aInfo | newa:=c, adu:=[] >;
+	    temp:= rec< aRec | newa:=c, adu:=[] >;
 	    for j in alistIndex do
 		c2:= alist[j]`newa;
 		if (c eq c2) then
@@ -900,8 +910,8 @@ prep2:=function(fieldKinfo,ClK,afplist)
     OK:=fieldKinfo`ringofintegers;
 
     // generate a record to store relevant S-unit equation info
-    SUnitInfo:= recformat< primelist,newa,adu,alpha,gammalist,matA,
-			   vecR,ideallist,caseprimes,bound,pi0jk >;
+    SUnitRec:= recformat< primelist,newa,adu,alpha,gammalist,matA,
+			   vecR,ideallist,caseprimes,bound>;
 
     alphgamlist:=[ ];
     for pr in afplist do
@@ -937,7 +947,7 @@ prep2:=function(fieldKinfo,ClK,afplist)
             end for;
 	    caseprimes:= [Norm(fp) : fp in fplist];
 	    assert &and[p in primelist : p in caseprimes];
-	    temp:=rec<SUnitInfo|primelist:=primelist,newa:=pr[1]`newa,adu:=pr[1]`adu,
+	    temp:=rec<SUnitRec|primelist:=primelist,newa:=pr[1]`newa,adu:=pr[1]`adu,
 				alpha:=alpha,gammalist:=gammalist,matA:=matA,vecR:=rr,
 				ideallist:=fplist,caseprimes:=caseprimes>;
             Append(~alphgamlist,temp);
@@ -946,29 +956,167 @@ prep2:=function(fieldKinfo,ClK,afplist)
     return alphgamlist;
 end function;
 
-ImageInL:= function(mapsLL,x)
-
+imagesInL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist)
+// edit description
     /*
-     Description: Apply the automorphisms i0,j,k: L -> L to the element x in K or L,
-     		  corresponding to th -> thetaL[i][j]
-     Input: mapsLL:= automorphishs i0,j,k: L -> L
-            x: an element of K or L
-     Output: xImage:= all images of x in L under the automorphisms i0,j,k: L -> L,
-                      where Image[i][j]:= x_i^(j), corresponding to th -> thetaL[i][j]
-     Example:
+     Description: generate the generic images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
+                  across all cases
+     Input: fieldKinfo:= record of the field K = Q(th)
+            fieldLinfo:= record of the splitting field L of K = Q(th)
+	    ijkL:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
+	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
+            pAdicPrec:= precision on all p-adic fields
+     Output: allprimeInfo:= record of relevant rational prime data across all cases
+             lemmattaInfo:= <alphgamlist index,p, bound 3.5.2, bound 5.5.5> where lemma 3.5.2
+	     		    or lemma 3.5.5 of Gh hold, if at all
+     Example: TO DO: this could be before prep1, before PIRL like in Kyle's
    */
 
-    xImage:= [];
-    for i in [1..#mapsLL] do
-	xImage[i]:= [];
-	for j in [1..#mapsLL[i]] do
-	    xImage[i][j]:= mapsLL[i][j](x);
+    K:= fieldKinfo`field;
+    L:= fieldLinfo`field;
+    OK:= fieldKinfo`ringofintegers;
+    th:=fieldKinfo`gen;
+    epslist:= fieldKinfo`fundamentalunits;
+    zeta:= fieldKinfo`zeta;
+
+    L:= fieldLinfo`field;
+    OL:= fieldLinfo`ringofintegers;
+
+    // generate a record to store relevant images in L and corresponding info
+    ImageInLRec:= recformat< ijkLgeneric,thetaL,allgammasL,epslistL,zetaL >;
+
+    // determine and store all gammas in the S-unit equation across all cases
+    // store as <gamma, caseprimes> so as to compute p-adic logs of required gammas only
+    allgammas:= [];
+    for C in [1..#alphgamlist] do
+	for i in [1..#alphgamlist[C]`gammalist] do
+	    if alphgamlist[C]`gammalist[i] notin allgammas then
+		Append(~allgammas,alphgamlist[C]`gammalist[i]);
+	    end if;
 	end for;
     end for;
-    return xImage;
 
+    // generate images under the generic maps i0,j,k: L -> L, th -> thetaL[i][j]
+    thetaL:= [ijkL[i](L!th) : i in [1..#ijkL]];
+    allgammasL:= [];
+    for i in [1..#allgammas] do
+	allgammasL[i]:= [ijkL[j](L!allgammas[i]) : j in [1..#ijkL]];
+    end for;
+    epslistL:= [];
+    for i in [1..#epslist] do
+	epslistL[i]:= [ijkL[j](L!epslist[i]) : j in [1..#ijkL]];
+    end for;
+    zetaL:= [ijkL[i](L!zeta) : i in [1..#ijkL]];
+
+    imagesL:= rec< ImageInLRec | ijkLgeneric:= ijkL, thetaL:= thetaL, allgammasL:= allgammasL,
+				 epslistL:= epslistL, zetaL:= zetaL>;
+
+    for i in [1..#allgammasL] do
+	// ensure the prime ideals in L above gamma do not cancel
+	faci0:= Factorization(ideal<OL|allgammasL[i][1]>);
+	facj:= Factorization(ideal<OL|allgammasL[i][2]>);
+	fack:= Factorization(ideal<OL|allgammasL[i][3]>);
+	assert (#faci0 eq #facj) and (#facj eq #fack);
+	assert &and[facj[j][1] ne fack[j][1] : j in [1..#faci0]];
+	assert &and[faci0[j][1] ne facj[j][1] : j in [1..#faci0]];
+	assert &and[faci0[j][1] ne fack[j][1] : j in [1..#faci0]];
+    end for;
+
+    // determine all rational primes yielding unbounded prime ideals across all cases
+    // determine corresponding rational prime combinations, along with associated
+    // gammalist, matrix A, across all cases
+    allprimes:= [];
+    allcaseInfo:= [];
+    alphgamIndex:= [];
+    for i in [1..#alphgamlist] do
+	primelist:= alphgamlist[i]`primelist;
+	caseprimes:= alphgamlist[i]`caseprimes;
+	matA:= Eltseq(alphgamlist[i]`matA);
+	gammalist:= alphgamlist[i]`gammalist;
+	assert &and[p in primelist : p in caseprimes];
+	for p in caseprimes do
+	    if p notin allprimes then
+		Append(~allprimes, p);
+	    end if;
+	end for;
+	matDdiag:= [RationalField()!0 : i in [1..#caseprimes]];
+	temp:= <caseprimes,gammalist,matA,matDdiag>;
+	if temp notin allcaseInfo then
+	    Append(~allcaseInfo,temp);
+	end if;
+	index:= Index(allcaseInfo,temp);
+	alphgamIndex[i]:= index;
+    end for;
+    Sort(~allprimes);
+    assert #allcaseInfo le #alphgamlist;
+    assert #alphgamIndex eq #alphgamlist;
+
+    allinfo:= <allprimes,allgammas,allcaseInfo,alphgamIndex>;
+
+    return allinfo,imagesL;
 end function;
 
+UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,AutL)
+
+    /*
+     Description: appends upper bound on all S-unit equations as per Section 6.2 of Gh
+     Input: fieldKinfo:= record of the field K = Q(th)
+            clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
+	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
+     Output: alphgamlist[i]`bound:= upper bound on ith S-unit equation as per Section 6.2 of Gh
+     Example: TODO: CONSIDER FIXING/CHECKING PRECISION; IE THAT THINGS DON"T GET MAPPED TO 0
+     	      	    IN C
+   */
+
+    c0:=Integers()!clist[1];
+    assert c0 ne 0;
+    n:=#clist-1;
+    assert n ge 3;
+    assert &and[c in Integers() : c in clist];
+    Qx<x>:=PolynomialRing(Rationals());
+
+    F:=&+[clist[i+1]*x^(n-i) : i in [0..n]];
+    DiscF:= Discriminant(F);
+
+    K:=fieldKinfo`field;
+    OK:=fieldKinfo`ringofintegers;
+    th:=fieldKinfo`gen;
+    f:=fieldKinfo`minpoly;
+
+    assert &and[ c in Integers() : c in Coefficients(f) ];
+    assert IsMonic(f);
+    assert (n eq Degree(f)) and (n eq Degree(NumberField(OK)));
+
+    thetaC:= Conjugates(th);
+    assert n eq #thetaC;
+    // set default precision to be 100
+    // errors arising from mapping nonzero elements to 0 will yield a Magma error... hmmm but I could prevent this.... TO DO
+    CField<i>:= ComplexField(400);
+    taus:=[hom< K -> CField | thetaC[j] > : j in [1..n]];
+    assert &and[taus[j](th) eq thetaC[j] : j in [1..n]];
+    // compute the Weil height of theta
+    hth:= (1/n)*&+[Max((Log(Abs(thetaC[j]))), 0) : j in [1..n]];
+
+    for C in [1..#alphgamlist] do
+	a:= alphgamlist[C]`newa;
+	primelist:=alphgamlist[C]`primelist;
+        alpha:= alphgamlist[C]`alpha;
+	NS:= &*[p : p in primelist];
+	caseprimes:= alphgamlist[C]`caseprimes;
+	hpoly:= Max([Log(Abs(c)) : c in clist | c ne 0] cat [Log(Abs(a))]);
+	m:= Integers()! (432*DiscF*a^2);
+	if IsEmpty([p : p in PrimeDivisors(m) | p notin primelist]) then
+	    mS:= 1728*NS^2;
+	else
+	    mS:= 1728*NS^2*(&*[p^(Min(2,Valuation(m,p))) :
+			       p in PrimeDivisors(m) | p notin primelist]);
+	end if;
+	gam:= 2*hth + 2*Log(2) + 4*(2*mS*Log(mS) + 172*hpoly);
+	halpha:= (1/n)*&+[Max((Log(Abs(taus[j](alpha)))), 0) : j in [1..n]];
+	bound:= Ceiling(gam + 2*halpha);
+	alphgamlist[C]`bound:= [[bound : j in [1..#caseprimes]],[bound : j in [1..#AutL]]];
+    end for;
+end procedure;
 
 Ordp:= function(Fp,x)
 
@@ -1013,7 +1161,24 @@ pAdicLog:= function(primeInfo,x)
     return log_px;
 end function;
 
-thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
+ContFrac:= function(realPrecision,p)
+    // add description
+
+    R:= RealField(realPrecision+20);
+    terms:= ContinuedFraction(R!Log(R!p));
+    matC:= Convergents(terms);
+    if IsOdd(#terms) then
+	PnQn:= matC[1,1]/matC[2,1];
+    else
+	PnQn:= matC[1,2]/matC[2,2];
+    end if;
+    assert R!PnQn le R!Log(R!p);
+    return PnQn;
+
+end function;
+
+ReductionPrep:= function(fieldKinfo,fieldLinfo,imagesL,AutL,allinfo,
+			 pAdicPrecision,realPrecision)
 
     /*
      Description:
@@ -1025,48 +1190,82 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
      Output: allprimeInfo:= record of relevant rational prime data across all cases
              lemmattaInfo:= <alphgamlist index,p, bound 3.5.2, bound 5.5.5> where lemma 3.5.2
 	     		    or lemma 3.5.5 of Gh hold, if at all
-     Example:
+     Example: TO DO: this could be before prep1, before PIRL like in Kyle's
    */
 
     K:= fieldKinfo`field;
     OK:= fieldKinfo`ringofintegers;
     th:=fieldKinfo`gen;
     epslist:= fieldKinfo`fundamentalunits;
+    zeta:= fieldKinfo`zeta;
+
     f:= fieldKinfo`minpoly;
     n:= Degree(f);
     L:= fieldLinfo`field;
     OL:= fieldLinfo`ringofintegers;
 
-    // determine all rational primes yielding unbounded prime ideals across all cases
-    allprimes:= [];
-    for i in [1..#alphgamlist] do
-	fplist:= alphgamlist[i]`ideallist;
-	primelist:= alphgamlist[i]`primelist;
-	caseprimes:= alphgamlist[i]`caseprimes;
-	assert &and[p in primelist : p in caseprimes];
-	for p in caseprimes do
-	    if p notin allprimes then
-		Append(~allprimes, p);
-	    end if;
+    CField<i_>:= ComplexField(realPrecision);
+    mapLC:= hom< L -> CField | Conjugates(L.1)[1] >;
+
+    ijkLgeneric:= imagesL`ijkLgeneric;
+    thetaL:= imagesL`thetaL;
+    allgammasL:= imagesL`allgammasL;
+    epslistL:= imagesL`epslistL;
+    zetaL:= imagesL`zetaL;
+
+    allprimes:= allinfo[1];
+    allgammas:= allinfo[2];
+    allcaseInfo:= allinfo[3];
+
+    allprimesIndex:= [];
+    allgammasNew:= [];
+    for i in [1..#allprimes] do
+	allprimesIndex[i]:= [];
+	for j in [1..#allcaseInfo] do
+	    for k in [1..#allcaseInfo[j][1]] do
+		if allprimes[i] eq allcaseInfo[j][1][k] then
+		    Append(~allprimesIndex[i],[j,k]);
+		end if;
+	    end for;
 	end for;
     end for;
-    Sort(~allprimes);
+    for i in [1..#allgammas] do
+	temp:= [];
+	for j in [1..#allcaseInfo] do
+	    if allgammas[i] in allcaseInfo[j][2] then
+		for l in [1..#allcaseInfo[j][1]] do
+		    if allcaseInfo[j][1][l] notin temp then
+			Append(~temp,allcaseInfo[j][1][l]);
+		    end if;
+		end for;
+	    end if;
+	end for;
+	Sort(~temp);
+	Append(~allgammasNew,<allgammas[i],temp>);
+    end for;
+    assert IsEmpty(allprimesIndex) eq false;
+    allgammas:= allgammasNew;
 
-    allprimeInfo:= [];
-    // store < C,p,3.5.2 bound,3.5.5 bound >,
-    // where lemma 3.5.2 or 3.5.5 hold, respectively
-    lemmattaInfo:= [];
-
+    // generate a record to store relevant generic S-unit equation info
+    GenericSUnitRec:= recformat< caseprimes,gammalist,matA,matDdiag,matDA,
+				 w_gamma1,w_gamma2,pData >;
     // generate a record to store relevant rational prime data across all cases
-    pInfo:= recformat<prime,ideals,Lp,logk,logdivs,mapLLp,Kp,mapKKp,mapsLL,thetaL>;
+    GenericpInfoRec:= recformat<prime,logP,ideals,efp,ffp,Lp,logk,logdivs,mapLLp,Kp,
+				mapKKp,thetaLind,pi0jk,log_pgammalist,
+				log_pepslist,delta1L0,delta2L0>;
+    // generate a record to store relevant rational prime data for generic S-unit equation
+    pAdicRec:= recformat<prime,pi0jk,minord,ihat,alpha_ihat,pbetalist>;
+
+    allcaseInfoNew:= [];
+    allprimeInfo:= [];
 
     for l in [1..#allprimes] do
 	p:= allprimes[l];
+	pIndex:= allprimesIndex[l];
 	pL:= Factorization(p*OL)[1][1]; // the chosen prime ideal above p in L
-	Lp, mapLLp:= Completion(L, pL : Precision:= pAdicPrec);
+	Lp, mapLLp:= Completion(L, pL : Precision:= pAdicPrecision[l]);
 	fprs:= [f[1] : f in Factorization(p*OK)]; // prime ideals in K over p
-	// at least one prime ideal above p must have e(P|p)*f(P|p) = 1 to be unbounded
-	assert &or([RamificationDegree(fp)*InertiaDegree(fp) eq 1 : fp in fprs]);
+
 	eLp:= AbsoluteRamificationIndex(Lp);
 	fLp:= AbsoluteInertiaDegree(Lp);
 	// determine k, divisors of p^fLp - 1 for faster convergence of p-adic log, as in Ha
@@ -1075,39 +1274,461 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	while (p^k)*(p-1) le eLp do
 	    k:= k+1;
 	end while;
-	thetaL:= []; // roots of th in L, grouped according to prime factorization of p in K
-	mapsLL:= []; // automorphism of L such that mapsLL[i][j](th) = thetaL[i][j]
 
+	// store index of generic embeddings i0,j,k, grouped according to prime
+	// factorization of p in K
+	// that is, theta[i][j]:= thetaL[i0jk[i][j]];
+	thetaLind:= [];
+
+	efp:= []; // ramification index of each prime ideal above p
+	ffp:= []; // inertia degree of each prime ideal above p
 	for i in [1..#fprs] do
+	    // determine the ramification index and inertia degree of each prime ideal
+	    efp[i]:=RamificationDegree(fprs[i]);
+	    ffp[i]:= InertiaDegree(fprs[i]);
+
 	    // roots of g(t) in L, corresponding to prime ideal fprs[i] above p in K
-	    thetaL[i]:= [];
-	    mapsLL[i]:= [];
-	    Kp, mapKKp:= Completion(K, fprs[i] : Precision:= pAdicPrec);
+	    thetaLind[i]:= [];
+	    Kp, mapKKp:= Completion(K, fprs[i] : Precision:= pAdicPrecision[l]);
 	    gp:= MinimalPolynomial(mapKKp(th), PrimeField(Kp));
 	    allroots:= Roots(gp, Lp);
-	    assert RamificationDegree(fprs[i])*InertiaDegree(fprs[i]) eq #allroots;
+	    assert efp[i]*ffp[i] eq #allroots;
 	    // verify multiplicity of all roots of g(t) is 1
 	    assert &and[allroots[j][2] eq 1 : j in [1..#allroots]];
 	    allroots:= [allroots[j][1] : j in [1..#allroots]];
 
             for j in [1..#allroots] do
 		// determine the automorphism of L sending th to the listed root of g(t) in Lp
-		vals:= [Ordp(Lp,mapLLp(ijkL[k](L!th)) - allroots[j]) : k in [1..n]];
+		vals:= [Ordp(Lp,mapLLp(ijkLgeneric[k](L!th)) - allroots[j]) : k in [1..n]];
 		maxval, ind:= Max(vals);
 		assert &and[vals[i] ne maxval : i in [1..n] | i ne ind];
-
-		mapsLL[i][j]:= ijkL[ind];
-		thetaL[i][j]:= ijkL[ind](L!th);
+		thetaLind[i][j]:= ind;
 	    end for;
-	    assert (IsEmpty(thetaL[i]) eq false);
+	    assert (IsEmpty(thetaLind[i]) eq false);
 	end for;
-	assert &or([#thetaL[i] eq 1 : i in [1..#fprs]]);
-	assert (#thetaL eq 2) or (#thetaL eq 3);
+	assert &or([#thetaLind[i] eq 1 : i in [1..#fprs]]);
+	assert (#thetaLind eq 2) or (#thetaLind eq 3);
+	// at least one prime ideal above p must have e(P|p)*f(P|p) = 1 to be unbounded
+	assert &or([efp[i]*ffp[i] eq 1 : i in [1..#fprs]]);
 
-	allprimeInfo[l]:= rec<pInfo | prime:= p,ideals:= fprs,Lp:=Lp,logk:=k,logdivs:=divs,
-				      mapLLp:=mapLLp,Kp:=Kp,mapKKp:=mapKKp,mapsLL:=mapsLL,
-				      thetaL:=thetaL>;
+	allprimeInfo[l]:= rec<GenericpInfoRec | prime:=p,ideals:=fprs,efp:=efp,ffp:=ffp,
+						Lp:=Lp,logk:=k,logdivs:=divs,mapLLp:=mapLLp,
+						Kp:=Kp,mapKKp:=mapKKp,thetaLind:= thetaLind>;
+
+	// determine embeddings i0,j,k where possible
+	// this occurs when there is exactly one prime ideal above p with e(P|p)*f(P|p) = 1
+	// determine corresponding betalist to be used in p-adic reduction lattice
+	// NB. i0,j,k, betalist will be computed per S-unit equation otherwise
+	// ie. when p splits completely, yielding mutiple possibilities for i0
+	pi0jk:= [];
+	if (#thetaLind eq 2) then
+	    // at most one prime ideal above p is unbounded
+	    // determine and store index i0 of unbounded prime ideal fp above p
+	    // thus thetaL[pi0][1] and mapsLL[pi0][1] correspond to fp
+	    // where fp corresponds to f_1(t) such that f(t) = f_1(t)f_2(t) and deg(f_1(t)) = 1
+	    i0Index:= [i : i in [1..#fprs] | efp[i]*ffp[i] eq 1 ];
+	    assert (#i0Index eq 1) and (#thetaLind[i0Index[1]] eq 1);
+	    pi0:= thetaLind[i0Index[1]][1];
+
+	    // choose indices j,k; these correspond to bounded prime ideals above p
+	    jkIndex:= [i : i in [1..#fprs] | efp[i]*ffp[i] ne 1];
+	    assert (#jkIndex eq 1) and (#thetaLind[jkIndex[1]] eq 2);
+	    assert (thetaLind[jkIndex[1]][1] ne pi0) and (thetaLind[jkIndex[1]][2] ne pi0);
+
+	    // select j,k corresponding to roots of f_2(t)
+	    // here f(t) = f_1(t)f_2(t) where deg(f_2(t)) = 2
+	    pj:= thetaLind[jkIndex[1]][1];
+	    pk:= thetaLind[jkIndex[1]][2];
+	    assert Ordp(Lp,mapLLp(thetaL[pj])) eq Ordp(Lp,mapLLp(thetaL[pk]));
+	    assert thetaL[pj] ne thetaL[pk];
+	    discf:= Integers()!Discriminant(f);
+	    disctest:= ((thetaL[pi0] - thetaL[pj])*
+			(thetaL[pi0] - thetaL[pk])*
+			(thetaL[pj] - thetaL[pk]))^2;
+	    assert Ordp(Lp,mapLLp(discf)) eq Ordp(Lp,mapLLp(disctest));
+	    assert Ordp(Lp,mapLLp(discf)) eq Valuation(discf,p);
+	    pi0jk:= [pi0,pj,pk];
+
+	    pgammalistL:= [];
+	    for i in [1..#allgammas] do
+		pgammalistL[i]:= [];
+		if p in allgammas[i][2] then
+		    pgammalistL[i]:= allgammasL[i];
+		end if;
+	    end for;
+
+	    log_pgammalist:= [];
+	    log_pepslist:= [];
+
+	    for i in [1..#pgammalistL] do
+		if pgammalistL[i] ne [] then
+		    // ensure the prime ideals in L above gamma do not cancel
+		    faci0:= Factorization(ideal<OL|pgammalistL[i][pi0]>);
+		    facj:= Factorization(ideal<OL|pgammalistL[i][pj]>);
+		    fack:= Factorization(ideal<OL|pgammalistL[i][pk]>);
+		    assert (#faci0 eq #facj) and (#facj eq #fack);
+		    assert &and[facj[j][1] ne fack[j][1] : j in [1..#faci0]];
+		    assert &and[faci0[j][1] ne facj[j][1] : j in [1..#faci0]];
+		    assert &and[faci0[j][1] ne fack[j][1] : j in [1..#faci0]];
+		    gamLkj:= pgammalistL[i][pk]/pgammalistL[i][pj];
+		    gamLij:= pgammalistL[i][pi0]/pgammalistL[i][pj];
+		    assert (Ordp(Lp,mapLLp(gamLkj)) eq 0);
+		    log_pgammalist[i]:= pAdicLog(allprimeInfo[l],mapLLp(gamLkj));
+		end if;
+	    end for;
+
+	    // compute p-adic log of epslistL in Lp
+	    for i in [1..#epslist] do
+		epsLkj:= epslistL[i][pk]/epslistL[i][pj];
+		assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
+		log_pepslist[i]:= pAdicLog(allprimeInfo[l],mapLLp(epsLkj));
+	    end for;
+
+	    // setup generic delta1, delta2 in L, not multiplied by specific alpha
+	    delta1L0:= ((thetaL[pi0]-thetaL[pj])*(zetaL[pk]))/
+		       ((thetaL[pi0]-thetaL[pk])*(zetaL[pj]));
+	    delta2L0:= ((thetaL[pj]-thetaL[pk])*(zetaL[pi0]))/
+		       ((thetaL[pk]-thetaL[pi0])*(zetaL[pj]));
+	    allprimeInfo[l]`log_pgammalist:= log_pgammalist;
+	    allprimeInfo[l]`log_pepslist:= log_pepslist;
+	    allprimeInfo[l]`delta1L0:= delta1L0;
+	    allprimeInfo[l]`delta2L0:= delta2L0;
+	end if;
+	allprimeInfo[l]`pi0jk:= pi0jk;
+
+	// generate diagonal entries for matrix D
+	logP:= ContFrac(realPrecision,p);
+	for i in [1..#pIndex] do
+	    j:= pIndex[i][1];
+	    k:= pIndex[i][2];
+	    assert allcaseInfo[j][4][k] eq 0;
+	    assert allcaseInfo[j][1][k] eq p;
+	    allcaseInfo[j][4][k]:= logP;
+	end for;
+	allprimeInfo[l]`logP:= logP;
     end for;
+
+    allgammas:= [allgammas[i][1] : i in [1..#allgammas]];
+
+    // compute i1, i2: L -> C to generate matrix R
+    for i1 in [1..#AutL] do
+        for i2 in [1..#AutL] do
+	    if i1 ne i2 then
+		a:= (AutL[i1])(epslistL[1][2]/epslistL[1][1]);
+		a:= (Log(Abs(mapLC(a))));
+
+		b:= (AutL[i1])(epslistL[2][2]/epslistL[2][1]);
+		b:= Log(Abs(mapLC(b)));
+
+		c:= (AutL[i2])(epslistL[1][2]/epslistL[1][1]);
+		c:= Log(Abs(mapLC(c)));
+
+		d:= (AutL[i2])(epslistL[2][2]/epslistL[2][1]);
+		d:= Log(Abs(mapLC(d)));
+		if ((a*d - b*c) lt -10^(-10)) or (a*d-b*c gt 10^(-10)) then
+		    iotas:= [i1,i2];
+		    break i1;
+		end if;
+	    end if;
+        end for;
+    end for;
+
+    i1:= iotas[1];
+    i2:= iotas[2];
+    matR:= Matrix(ComplexField(realPrecision),2,2,[a,b,c,d]);
+    tR, matRinv:= IsInvertible(matR);
+    assert tR;
+
+    allbeta_gamma1:= [];
+    allbeta_gamma2:= [];
+    for i in [1..#allgammas] do
+	gamLji:= allgammasL[i][2]/allgammas[i][1];
+	i1gamLji:= mapLC(AutL[i1](gamLji));
+	i2gamLji:= mapLC(AutL[i2](gamLji));
+	allbeta_gamma1[i]:= matRinv[1,1]*Log(Abs(i1gamLji))+matRinv[1,2]*Log(Abs(i2gamLji));
+	allbeta_gamma2[i]:= matRinv[2,1]*Log(Abs(i1gamLji))+matRinv[2,2]*Log(Abs(i2gamLji));
+    end for;
+
+    w_eps1:= 3*Max(Abs(matRinv[1,1]), Abs(matRinv[1,2]));
+    w_eps2:= 3*Max(Abs(matRinv[2,1]), Abs(matRinv[2,2]));
+
+    for l in [1..#allcaseInfo] do
+	caseprimes:= allcaseInfo[l][1];
+	gammalist:= allcaseInfo[l][2];
+	matA:= Matrix(Rationals(),#caseprimes,#caseprimes,allcaseInfo[l][3]);
+	matDdiag:= allcaseInfo[l][4];
+	tA, matAinv:= IsInvertible(matA);
+	assert tA;
+	assert &and[matDdiag[i] ne 0 : i in [1..#matDdiag]];
+	matDA:= DiagonalMatrix(Rationals(),matDdiag)*matA;
+	allcaseInfoNew[l]:= rec<GenericSUnitRec| caseprimes:=caseprimes,gammalist:=gammalist,
+						 matA:=matA,matDdiag:=matDdiag,matDA:=matDA>;
+	alpha_gamma1:= [];
+	alpha_gamma2:= [];
+	beta_gamma1:= [];
+	beta_gamma2:= [];
+	for i in [1..#gammalist] do
+	    g:= Index(allgammas, gammalist[i]);
+	    beta_gamma1[i]:= allbeta_gamma1[g];
+	    beta_gamma2[i]:= allbeta_gamma2[g];
+	end for;
+	for i in [1..#gammalist] do
+	    alpha_gamma1[i]:= &+[matAinv[j,i]*beta_gamma1[j] : j in [1..#gammalist]];
+	    alpha_gamma2[i]:= &+[matAinv[j,i]*beta_gamma2[j] : j in [1..#gammalist]];
+	end for;
+	w_gamma1:= [];
+	w_gamma2:= [];
+	for i in [1..#gammalist] do
+	    w_gamma1[i]:= Abs(alpha_gamma1[i])/matDdiag[i];
+	    w_gamma2[i]:= Abs(alpha_gamma2[i])/matDdiag[i];
+	end for;
+	allcaseInfoNew[l]`w_gamma1:= w_gamma1;
+	allcaseInfoNew[l]`w_gamma2:= w_gamma2;
+
+	// now need to collect p-adic in
+	// this assumes that we know i0,j,k so that we have log_pgammalist
+	pData:= [];
+	for i in [1..#caseprimes] do
+	    p:= caseprimes[i];
+	    pIndex:= Index(allprimes, p);
+	    pInfo:= allprimeInfo[pIndex];
+	    assert pInfo`prime eq p;
+	    Lp:= pInfo`Lp;
+	    log_gammalist:= [];
+	    log_epslist:= pInfo`log_pepslist;
+
+	    // if i0,j,k has been determined for p;
+	    // ie. if there is only 1 unbounded prime ideal above p in K
+	    if pInfo`pi0jk ne [] then
+		i0jk:= pInfo`pi0jk;
+		assert #pInfo`ideals eq 2;
+		for j in [1..#gammalist] do
+		    k:= Index(allgammas, gammalist[j]);
+		    log_gammalist[j]:= pInfo`log_pgammalist[k];
+		end for;
+	    else
+		print "yes! splits completely!";
+		// if p splits completely in K
+		/* TO DO
+		assert #pInfo`ideals eq 3;
+		fp:= [fplist[i] : i in [1..#fplist] | Norm(fplist[i]) eq p];
+		assert (#fp eq 1) and (fp[1] in fprs);
+		fp:= fp[1];
+		assert fp eq fplist[l];
+		// determine and store index i0 of unbounded prime ideal fp above p
+		// thus thetaL[pi0][1] and mapsLL[pi0][1] correspond to fp
+		// where fp corresponds to f_1(t) such that f(t) = f_1(t)g(t) and deg(f_1(t)) = 1
+		pi0:= [i : i in [1..#fprs] | fprs[i] eq fp];
+		assert (#pi0 eq 1) and (#thetaL[pi0[1]] eq 1);
+		pi0:= pi0[1];
+		// choose indices j,k; these correspond to bounded prime ideals above p
+		indjk:= [i : i in [1..#thetaL] | i ne pi0];
+		if #thetaL eq 2 then
+		    // select j,k corresponding to roots of f_2(t)
+		    // here f(t) = f_1(t)f_2(t) where deg(f_2(t)) = 2
+		    assert #indjk eq 1;
+		    assert #thetaL[indjk[1]] eq 2;
+		    pj:= [indjk[1],1];
+		    pk:= [indjk[1],2];
+		    assert Ordp(Lp,mapLLp(thetaL[pj[1],pj[2]]))
+			   eq Ordp(Lp,mapLLp(thetaL[pk[1],pk[2]]));
+		elif #thetaL eq 3 then
+		    // select j,k corresponding to root of f_2(t),f_3(t) respectively
+		    // here f(t) = f_1(t)f_2(t)f_3(t) where deg(f_2(t)) = deg(f_3(t)) = 1
+		    assert #indjk eq 2;
+		    assert (#thetaL[indjk[1]] eq 1) and (#thetaL[indjk[2]] eq 1);
+		    pj:= [indjk[1],1];
+		    pk:= [indjk[2],1];
+		end if;
+		assert thetaL[pj[1],pj[2]] ne thetaL[pk[1],pk[2]];
+		discf:= Integers()!Discriminant(f);
+		disctest:= ((thetaL[pi0,1] - thetaL[pj[1],pj[2]])*
+			    (thetaL[pi0,1] - thetaL[pk[1],pk[2]])*
+			    (thetaL[pj[1],pj[2]] - thetaL[pk[1],pk[2]]))^2;
+		assert Ordp(Lp,mapLLp(discf)) eq Ordp(Lp,mapLLp(disctest));
+		assert Ordp(Lp,mapLLp(discf)) eq Valuation(discf,p);
+
+*/
+
+	    end if;
+
+	    loglist:= log_gammalist cat log_epslist;
+	    ord_loglist:= [Ordp(Lp,loglist[j]) : j in [1..#loglist]];
+	    minord, ihat:= Min(ord_loglist);
+	    alpha_ihat:= loglist[ihat];
+	    pbetalist:= [-loglist[j]/alpha_ihat : j in [1..#loglist]];
+	    assert &and[beta in pAdicRing(p) : beta in pbetalist];
+	    assert pAdicQuotientRing(p,100)!pAdicRing(p)!pbetalist[ihat] eq (-1);
+	    pData[i]:= rec<pAdicRec | prime:=p,pi0jk:=i0jk,minord:=minord,ihat:=ihat,
+				      alpha_ihat:=alpha_ihat,pbetalist:=pbetalist>;
+	end for;
+	allcaseInfoNew[l]`pData:= pData;
+
+
+    end for;
+    allcaseInfo:= allcaseInfoNew;
+
+    return w_eps1,w_eps2,allcaseInfo,allprimeInfo;
+end function;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// up to here
+boundCoefficients:= function()
+
+
+
+
+    CField<i>:= ComplexField(complexPrec);
+    RField:= RealField(realPrec);
+    SetDefaultRealField(RField);
+    mapLC:= hom< L -> CField | Conjugates(L.1)[1] >;
+    assert IsSubfield(K,L);
+
+
+	    tau:= alphgamlist[ij[1]]`alpha*fieldKinfo`zeta;
+	    gammalist:= alphgamlist[ij[1]]`gammalist;
+
+	    // generate images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
+	    tauL:= ImageInL(mapsLL,L!tau);
+	    gammalistL:= [ImageInL(mapsLL,L!gamma) : gamma in gammalist];
+
+
+
+
+	    // all new from here
+	    logGammalistL:= [];
+	    logGammalistC:= [[],[]]; // needed for ellipsoid
+	    logEpslistL:= [];
+
+	    // compute alpha_i, p-adic log of epslistL in Lp
+	    epsLji0list:=[];
+	    for i in [1..#epslist] do
+		epsLkj:= epslistL[i][pk[1],pk[2]]/epslistL[i][pj[1],pj[2]];
+		epsLji0:= epslistL[i][pj[1],pj[2]]/epslistL[i][pi0,1];
+		assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
+		assert (Ordp(Lp,mapLLp(epsLji0)) eq 0);
+		Append(~epsLji0list,epsLji0);
+		LogEpslistL[i]:= pAdicLog(mapLLp(epsLkj),p);
+	    end for;
+
+	    // compute i1, i2: L- > C to generate matrix R required in the ellipsoid
+	    // SPECIFIC TO R=2 HERE
+	    for i1 in [1..#AutL] do
+		for i2 in [i1 + 1..#AutL] do
+		    a:= RField!(Log(Abs(mapLC(AutL[i1](epsLji0list[1])))));
+		    b:= RField!(Log(Abs(mapLC(AutL[i1](epsLji0list[2])))));
+		    c:= RField!(Log(Abs(mapLC(AutL[i2](epsLji0list[1])))));
+		    d:= RField!(Log(Abs(mapLC(AutL[i2](epsLji0list[2])))));
+		    if (a*d - b*c) ne 0 then
+			break i1,i2;
+		    end if;
+		end for;
+	    end for;
+	    matR:= Matrix(ComplexField(100),2,2,[a,b,c,d]);
+	    tR, matRinv:= IsInvertible(matR);
+	    tA, matAinv:= IsInvertible(matA);
+	    assert tR and tA;
+
+	    // assertions on gammalistL
+	    // compute alpha_i, p-adic log of gammalistL in Lp
+	    for i in [1..#gammalist] do
+		// ensure valuations of gammalistL quotients align with Lemma 3.5.1 of Gh
+		gamLij:= gammalistL[i][pi0,1]/gammalistL[i][pj[1],pj[2]];
+		gamLkj:= gammalistL[i][pk[1],pk[2]]/gammalistL[i][pj[1],pj[2]];
+		assert (Ordp(Lp,mapLLp(gamLij)) eq matA[ij[2],i]);
+		assert (Ordp(Lp,mapLLp(gamLkj)) eq 0);
+		// ensure the prime ideals in L above gamma do not cancel
+		faci0:= Factorization(ideal<OL|gammalistL[i][pi0]>);
+		facj:= Factorization(ideal<OL|gammalistL[i][pj[1],pj[2]]>);
+		fack:= Factorization(ideal<OL|gammalistL[i][pk[1],pk[2]]>);
+		assert (#faci0 eq #facj) and (#facj eq #fack);
+		assert &and[facj[j][1] ne fack[j][1] : j in [1..#faci0]];
+		assert &and[faci0[j][1] ne facj[j][1] : j in [1..#faci0]];
+		assert &and[faci0[j][1] ne fack[j][1] : j in [1..#faci0]];
+		LogGammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
+		LogGammalistC[1][i]:= Log(Abs(mapLC(AutL[i1](1/gamij))));
+		LogGammalistC[2][i]:= Log(Abs(mapLC(AutL[i2](1/gamij))));
+	    end for;
+
+
+	    delta1L:= ((thetaL[pi0,1] - thetaL[pj[1],pj[2]])/(thetaL[pi0,1] - thetaL[pk[1],pk[2]]))*
+		      (tauL[pk[1],pk[2]]/tauL[pj[1],pj[2]]);
+
+	    // check if Lemma 3.5.2 of Gh applies
+	    if (Ordp(Lp,mapLLp(delta1L)) ne 0) then
+		print "yes!!"; // maybe this never happens? Or maybe we need a case where the primes split completely in order for it to happen
+	    end if;
+
+	    // compute alpha_1, p-adic log of delta1L in Lp
+	    alpha_1:= pAdicLog(mapLLp(delta1L),p);
+
+	    alphalist:= LogGammalistL cat LogEpslistL;
+	    assert #alphalist eq (#gammalist + #epslist);
+	    OrdpAlphalist:= [Ordp(Lp,alphalist[i]) : i in [1..#alphalist]];
+	    minOrdpAlpha, ind:= Min(OrdpAlphalist);
+
+	    // check if Lemma 3.5.5 of Gh applies
+	    if Ordp(Lp,alpha_1) lt minOrdpAlpha then
+		print "yes2!"; // maybe this one also doesn't apply?
+	    end if;
+
+	    alpha_ihat:= alphalist[ind];
+	    betalist:= [-alpha_1/alpha_ihat] cat [-alphalist[i]/alpha_ihat : i in [1..#alphalist]];
+	    // assert beta_i are in Zp
+	    assert &and[beta in pAdicRing(p) : beta in betalist] and (beta1 in pAdicRing(p));
+
+	    // compute the coefficients w_{gam,l,k},w_{eps,l,k} in the bound for B_eps
+	    wgamlklist:= [];
+	    wepslklist:= [];
+	    for x in [1..#epslist] do
+		wgamlklist[x]:= [];
+		wepslklist[x]:= [];
+
+		m:= Max(Abs(matRinv[x,1]), Abs(matRinv[x,2]));
+		for y in [1..#alphgamlist] do
+		    alphagamlk:= matRinv[x,1]*(&+[matAinv[i,y]*LogGammalistC[1][i]
+						  : i in [1..#gammalist]]) +
+				 matRinv[x,2]*(&+[matAinv[i,y]*LogGammalistC[2][i]
+						  : i in [1..#gammalist]]);
+		    Logp:= alphgamlist[ij[1]]`pi0jk[y]`prime;
+		    wgamlklist[x][y]:= Abs(alphagamlk)*Degree(K,Rationals())/Logp;
+		end for;
+
+		for y in [1..#AutL] do
+		    if y eq i1 then
+			wepslklist[x][y]:= (m+Abs(matRinv[x,1]))*(Degree(L, Rationals()));
+		    elif y eq i2 then
+			wepslklist[x][y]:= (m+Abs(matRinv[x,2]))*(Degree(L, Rationals()));
+		    else
+			wepslklist[x][y]:= m*(Degree(L, Rationals()));
+		    end if;
+		end for;
+	    end for;
+
+
+
+
+
+
+
+
+    // store < C,p,3.5.2 bound,3.5.5 bound >,
+    // where lemma 3.5.2 or 3.5.5 hold, respectively
+    lemmattaInfo:= [];
+
+
 
     for C in [1..#alphgamlist] do // iterate through each S-unit equation
 	pi0jk:= [];
@@ -1166,6 +1787,19 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 	    assert Ordp(Lp,mapLLp(discf)) eq Ordp(Lp,mapLLp(disctest));
 	    assert Ordp(Lp,mapLLp(discf)) eq Valuation(discf,p);
 
+	    Append(~pi0jk,<p,[[pi0,1],pj,pk]>);
+	    pi0jk;
+
+	end for;
+	alphgamlist[C]`pi0jk:= pi0jk;
+    end for;
+
+
+
+
+
+
+
 	    // generate images under the maps i0,j,k: L -> L, th -> thetaL[i][j]
 	    epslistL:= [ImageInL(mapsLL,L!eps) : eps in epslist];
 	    tauL:= ImageInL(mapsLL,tau);
@@ -1198,24 +1832,24 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
 		end for;
 
 		log_delta1L:= pAdicLog(allprimeInfo[pindex],mapLLp(delta1L));
-		log_gammalistL:= [];
-		log_epslistL:= [];
+		log_pgammalistL:= [];
+		log_pepslist:= [];
 
 		// compute p-adic log of epslistL in Lp
 		for i in [1..#epslist] do
 		    epsLkj:= epslistL[i][pk[1],pk[2]]/epslistL[i][pj[1],pj[2]];
 		    assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
-		    log_epslistL[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(epsLkj));
+		    log_pepslist[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(epsLkj));
 		end for;
 
 		// compute p-adic log of gammalistL in Lp
 		for i in [1..#gammalist] do
 		    gamLkj:= gammalistL[i][pk[1],pk[2]]/gammalistL[i][pj[1],pj[2]];
 		    assert (Ordp(Lp,mapLLp(gamLkj)) eq 0);
-		    log_gammalistL[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(gamLkj));
+		    log_pgammalistL[i]:= pAdicLog(allprimeInfo[pindex],mapLLp(gamLkj));
 		end for;
 
-		loglist:= log_gammalistL cat log_epslistL;
+		loglist:= log_pgammalistL cat log_pepslist;
 		assert #loglist eq (#gammalist + #epslist);
 		ord_loglist:= [Ordp(Lp,loglist[i]) : i in [1..#loglist]];
 		minord, ihat:= Min(ord_loglist);
@@ -1236,16 +1870,46 @@ thetasL:= function(fieldKinfo,fieldLinfo,ijkL,alphgamlist,pAdicPrec)
     return allprimeInfo,lemmattaInfo;
 end function;
 
-UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,AutL,complexPrec)
+
+// do we need this anymore?
+OLDImageInL:= function(mapsLL,x) // do we still need this?
+
+    /*
+     Description: Apply the automorphisms i0,j,k: L -> L to the element x in K or L,
+     		  corresponding to th -> thetaL[i][j]
+     Input: mapsLL:= automorphishs i0,j,k: L -> L
+            x: an element of K or L
+     Output: xImage:= all images of x in L under the automorphisms i0,j,k: L -> L,
+                      where Image[i][j]:= x_i^(j), corresponding to th -> thetaL[i][j]
+     Example:
+   */
+
+    xImage:= [];
+    for i in [1..#mapsLL] do
+	xImage[i]:= [];
+	for j in [1..#mapsLL[i]] do
+	    xImage[i][j]:= mapsLL[i][j](x);
+	end for;
+    end for;
+    return xImage;
+
+end function;
+
+
+
+
+
+
+OLDUpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,AutL)
 
     /*
      Description: appends upper bound on all S-unit equations as per Section 6.2 of Gh
      Input: fieldKinfo:= record of the field K = Q(th)
             clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
 	    alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
-            complexPrec:= precision on complex field, C
      Output: alphgamlist[i]`bound:= upper bound on ith S-unit equation as per Section 6.2 of Gh
-     Example:
+     Example: TODO: CONSIDER FIXING/CHECKING PRECISION; IE THAT THINGS DON"T GET MAPPED TO 0
+     	      	    IN C
    */
 
     c0:=Integers()!clist[1];
@@ -1269,18 +1933,20 @@ UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,AutL,complexPrec)
 
     thetaC:= Conjugates(th);
     assert n eq #thetaC;
-    CField<i>:= ComplexField(complexPrec);
-
-    taus:=[hom< K -> CField | thetaC[i] > : i in [1..n]];
+    // set default precision to be 100
+    // errors arising from mapping nonzero elements to 0 will yield a Magma error... hmmm but I could prevent this.... TO DO
+    CField<i>:= ComplexField(400);
+    taus:=[hom< K -> CField | thetaC[j] > : j in [1..n]];
+    assert &and[taus[j](th) eq thetaC[j] : j in [1..n]];
     // compute the Weil height of theta
-    hth:= (1/n)*&+[Max((Log(Abs(taus[i](th)))), 0) : i in [1..n]];
+    hth:= (1/n)*&+[Max((Log(Abs(thetaC[j]))), 0) : j in [1..n]];
 
-    for i in [1..#alphgamlist] do
-	a:= alphgamlist[i]`newa;
-	primelist:=alphgamlist[i]`primelist;
-        alpha:= alphgamlist[i]`alpha;
+    for C in [1..#alphgamlist] do
+	a:= alphgamlist[C]`newa;
+	primelist:=alphgamlist[C]`primelist;
+        alpha:= alphgamlist[C]`alpha;
 	NS:= &*[p : p in primelist];
-	caseprimes:= alphgamlist[i]`caseprimes;
+	caseprimes:= alphgamlist[C]`caseprimes;
 	hpoly:= Max([Log(Abs(c)) : c in clist | c ne 0] cat [Log(Abs(a))]);
 	m:= Integers()! (432*DiscF*a^2);
 	if IsEmpty([p : p in PrimeDivisors(m) | p notin primelist]) then
@@ -1292,21 +1958,24 @@ UpperBounds:=procedure(fieldKinfo,clist,~alphgamlist,AutL,complexPrec)
 	gam:= 2*hth + 2*Log(2) + 4*(2*mS*Log(mS) + 172*hpoly);
 	halpha:= (1/n)*&+[Max((Log(Abs(taus[j](alpha)))), 0) : j in [1..n]];
 	bound:= Ceiling(gam + 2*halpha);
-	alphgamlist[i]`bound:= [[bound : j in [1..#caseprimes]],[bound : j in [1..#AutL]]];
+	alphgamlist[C]`bound:= [[bound : j in [1..#caseprimes]],[bound : j in [1..#AutL]]];
     end for;
 end procedure;
 
-// NEW FUNCTIONS
-ContFrac:= function(elt)
 
-    terms:= ContinuedFraction(elt);
-    sum:= terms[#terms];
-    for i in [#terms-1..1 by -1] do
-	sum:= terms[i] + 1/sum;
-    end for;
+ContFrac:= function(realPrecision,p)
+    // add description
 
-    assert RealField()!sum eq elt;
-    return sum;
+    R:= RealField(realPrecision+20);
+    terms:= ContinuedFraction(R!Log(R!p));
+    matC:= Convergents(terms);
+    if IsOdd(#terms) then
+	PnQn:= matC[1,1]/matC[2,1];
+    else
+	PnQn:= matC[1,2]/matC[2,2];
+    end if;
+    assert R!PnQn le R!Log(R!p);
+    return PnQn;
 
 end function;
 
@@ -1494,11 +2163,11 @@ f,remainingCase,ThueToSolve:= prep0(N,clist,fclist,partialObstruction);
 Append(~timings,<Cputime(t1),"setup">);
 
 // generate a record to store relevant info of the field K = Q(th)
-FieldInfo:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
+FieldRec:= recformat<field,gen,ringofintegers,minpoly,zeta,fundamentalunits>;
 K<th>:=NumberField(f);
 OK:=MaximalOrder(K);
 th:=OK!th;
-fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
+fieldKinfo:= rec<FieldRec | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
 t2:= Cputime();
 // generate a record to store relevant info of the splitting field L of K = Q(th)
@@ -1507,7 +2176,7 @@ OL:= MaximalOrder(L);
 tf,mapKL:= IsSubfield(K,L);
 assert tf;
 assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
+fieldLinfo:= rec<FieldRec | field:= L, gen:=tl,ringofintegers:= OL>;
 Append(~timings,<Cputime(t2),"splitting field">);
 
 // generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
@@ -1516,8 +2185,8 @@ assert ijkL[3](th) eq L!th; // this is the identity automorphism
 
 t3:= Cputime();
 // generate a record to store relevant class group info
-ClassGroupInfo:= recformat<classgroup,classnumber,map>;
-ClK:= rec< ClassGroupInfo | >;
+ClassGroupRec:= recformat<classgroup,classnumber,map>;
+ClK:= rec< ClassGroupRec | >;
 ClK`classgroup, ClK`map:= ClassGroup(K);
 Append(~timings,<Cputime(t3),"class group">);
 assert classnumber eq Integers()! ClassNumber(K);
@@ -1610,71 +2279,123 @@ alphgamlist:= prep2(fieldKinfo,ClK,afplist);
 Append(~timings,<Cputime(t7),"S-unit equations">);
 assert #alphgamlist ne 0;
 
-UpperBounds(fieldKinfo,clist,~alphgamlist,AutL,400);
-MaxBound:= Max[Max(alphgamlist[C]`bound) : C in [1..#alphgamlist]];
+allinfo,imagesL:= imagesInL(fieldKinfo,fieldLinfo,ijkL,alphgamlist);
 
+UpperBounds(fieldKinfo,clist,~alphgamlist,AutL);
+maxBound:= Max([Max(alphgamlist[C]`bound[1] cat alphgamlist[C]`bound[2]) :
+		C in [1..#alphgamlist]]);
 
-We want to choose the precision for p_i-adic computations (padicprecision[i]) is about three times as large as the largest value of m that we expect will occur in the p_i-adic reduction step (Section 18).  m will be of a size that makes p_i^m \approx H_0^(v+r), so we want to take
-padicprecision[i] \approx 2*(v+r)*Log(H_0)/Log(p[i]).  (We would be fine if instead of "four times as large" it was just "larger" than.  We go four times as large as a safety factor to avoid having to back up and do all the calculations again with an increased precision.)
+allprimes:= allinfo[1];
+alphgamIndex:= allinfo[4];
+/*  ――――――――――――――――――――――――――― Precision ――――――――――――――――――――――――――  */
+// TO DO
 
-We cannot calculate H_0 a priori.  But we know H_0 will be essentially of the size of that largest of the constants coming from using Yu's and Matveev's theorems to bound the relevant linear forms in logarithms.
+pAdicPrecMultiplier:= [1 : i in [1..#allprimes]];
+realPrecMultiplier:= 1;
 
-The constant c_2 \cdot \min{ c_3^{\prime}, c_3^{prime}  } from Yu's theorem will be bounded by something of the size
+// start precision loop: everything below is now technically in this loop
+//for PrecisionLoopVariable:=1 to 5 do
 
-(16*Exp(1)*Degree(F))^(2*(2+v+r)) * (1+v+r)^3 * Log(Degree(F)*(1+v+r)) * Max(p[1],...,p[v])^(Degree(F)) * (10)^(1+v+r)
+//    if PrecisionLoopVariable eq 5 then
+//	print("Something is wrong. The required precision for the computation is very large.");
+//	break PrecisionLoopVariable;
+//    end if;
 
-(see [Yu2] p.190, first consequence.  We have assummed the modified heights are are < 10.  This is okay because if the precision is not high enough, we back up and start again with more precision).
-
-The constant c_17 from Matveev's Theorem will be bounded by something of the size
-
-2^(6*(1+v+r)+20) * Degree(F)^(3+v+r) * Log(Degree(F)) * 10^(1+v+r)
-
-Here we are assuming that the absolute logarithmic heights involved are <= 10.
-
-We set the up a loop so that, if the precisions are not high enough,
-we back up and start again with more precision.
-
-
-////////////////////////////////////////////////////////////////////////////
-*/
-
-RealPrecisionMultiplier:= 1;
-PadicPrecisionMultiplier:=[];
-for i:=1 to v do
-    PadicPrecisionMultiplier[i]:=1;
+pAdicPrecision:= [];
+for i in [1..#allprimes] do
+    pAdicPrecision[i]:= pAdicPrecMultiplier[i]*3*Ceiling((#allprimes+r)*Log(maxBound)
+						       /Log(allprimes[i]));
 end for;
-for PrecisionLoopVariable:=1 to 5 do
+realPrecision:= realPrecMultiplier*3*Ceiling((#allprimes+r)*Log(maxBound)/Log(10));
 
-    if PrecisionLoopVariable eq 5 then
-	print("Something is wrong.
-The required precision for the computation seems to be very large.");
-	break PrecisionLoopVariable;
-    end if;
+SetDefaultRealField(RealField(realPrecision));
 
-    H0estimate:=Max([(16*Exp(1)*Degree(FFF))^(2*(2+v+r)) * (1+v+r)^3 * Log(Degree(FFF)*(1+v+r))
-		     * Max(p)^(Degree(FFF)) * (10)^(1+v+r),
-		     2^(6*(1+v+r)+20) * Degree(FFF)^(3+v+r) * Log(Degree(FFF)) * 10^(1+v+r) ]);
+/*  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――  */
 
-    realprecision:=4*Ceiling((v+r)*Log(H0estimate)/Log(10));
-    realprecision:=realprecision*RealPrecisionMultiplier;
+w_eps1,w_eps2,allcaseInfo,allprimeInfo:=
+    ReductionPrep(fieldKinfo,fieldLinfo,imagesL,AutL,allinfo,pAdicPrecision,realPrecision);
 
-    padicprecision:=[];
-    for i:=1 to v do
-	padicprecision[i]:=4*Ceiling((v+r)*Log(H0estimate)/Log(p[i]));
-	padicprecision[i]:=padicprecision[i]*PadicPrecisionMultiplier[i];
+for c in [1..#alphgamlist] do
+    index:= alphgamIndex[c];
+    alpha:= alphgamlist[c]`alpha;
+    gammalist:= alphgamlist[c]`gammalist;
+    matA:= alphgamlist[c]`matA;
+    caseprimes:= alphgamlist[c]`caseprimes;
+    bound:= alphgamlist[c]`bound;
+
+    assert allcaseInfo[index]`caseprimes eq caseprimes;
+    assert allcaseInfo[index]`gammalist eq gammalist;
+    assert allcaseInfo[index]`matA eq matA;
+    pData:= allcaseInfo[index]`pData;
+    alphaL:= [ijkL[i](L!alpha) : i in [1..#ijkL]];
+
+    for l in [1..#caseprimes] do
+	p:= caseprimes[l];
+	pindex:= Index(allprimes,p);
+	assert (p eq pData[l]`prime) and (p eq allprimeInfo[pindex]`prime);
+	assert (pData[l]`pi0jk eq allprimeInfo[pindex]`pi0jk);
+	pi0jk:= pData[l]`pi0jk;
+	Lp:= allprimeInfo[pindex]`Lp;
+	mapLLp:= allprimeInfo[pindex]`mapLLp;
+	delta1L:= (allprimeInfo[pindex]`delta1L0)*(alphaL[pi0jk[3]]/alphaL[pi0jk[2]]);
+	delta2L:= (allprimeInfo[pindex]`delta2L0)*(alphaL[pi0jk[1]]/alphaL[pi0jk[2]]);
+
+	// verify Lemma 3.5.2 of Gh
+	// this should always be false, but we don't know for sure yet...
+	assert Ordp(Lp,mapLLp(delta1L)) eq 0;
+
+	// compute alpha_1, p-adic log of delta1L in Lp
+	log_delta1:= pAdicLog(allprimeInfo[pindex],mapLLp(delta1L));
+	if Ordp(Lp,log_delta1) lt pData[l]`minord then
+	    print "yes2!"; // maybe this one also doesn't apply?
+	end if;
     end for;
-
-    realprecision:=realprecision;
-    SetDefaultRealField(RealField(realprecision));
-    PI:=Pi(RealField());
+end for;
 
 
+	    // left off here!! Should add this case :-)
 
 
+
+
+
+    SUnitRec:= recformat< primelist,newa,adu,alpha,gammalist,matA,
+			  vecR,ideallist,caseprimes,bound>;
+
+    GenericSUnitRec:= recformat< caseprimes,gammalist,matA,matDdiag,matDA,
+				 w_gamma1,w_gamma2,pData >;
+    // generate a record to store relevant rational prime data across all cases
+    GenericpInfoRec:= recformat<prime,logP,ideals,efp,ffp,Lp,logk,logdivs,mapLLp,Kp,
+				mapKKp,thetaLind,pi0jk,log_pgammalist,
+				log_pepslist,delta1L0,delta2L0>;
+    // generate a record to store relevant rational prime data for generic S-unit equation
+    pAdicRec:= recformat<prime,pi0jk,minord,ihat,alpha_ihat,pbetalist>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Splitting of primes, generate theta
+4. Image of integral basis for K in Qp under theta -> theta[L][i][j]; image of gammas, eps under
+   this map
 
 
 t8:= Cputime();
-allprimeInfo,lemmattaInfo:= thetasL(fieldKinfo,fieldLinfo,ijkL,alphgamlist,100);
+allprimeInfo,lemmattaInfo:= thetasL(fieldKinfo,fieldLinfo,ijkL,alphgamlist,allprimes,100);
 Append(~timings,<Cputime(t8),"thetasL">);
 
 
@@ -1763,13 +2484,13 @@ for C in [1..#alphgamlist] do
 		  (tauL[pk[1],pk[2]]/tauL[pj[1],pj[2]]);
 	log_delta1L:= pAdicLog(mapLLp(delta1L),p);
 
-	log_gammalistL:= [];
-	log_epslistL:= [];
+	log_pgammalistL:= [];
+	log_pepslist:= [];
 	// compute p-adic log of epslistL in Lp
 	for i in [1..#epslist] do
 	    epsLkj:= epslistL[i][pk[1],pk[2]]/epslistL[i][pj[1],pj[2]];
 	    assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
-	    log_epslistL[i]:= pAdicLog(mapLLp(epsLkj),p);
+	    log_pepslist[i]:= pAdicLog(mapLLp(epsLkj),p);
 	end for;
 
 	// compute p-adic log of gammalistL in Lp
@@ -1786,10 +2507,10 @@ for C in [1..#alphgamlist] do
 	    // ensure valuations of gammalistL quotients align with Lemma 3.5.1 of Gh
 	    gamLkj:= gammalistL[i][pk[1],pk[2]]/gammalistL[i][pj[1],pj[2]];
 	    assert (Ordp(Lp,mapLLp(gamLkj)) eq 0);
-	    log_gammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
+	    log_pgammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
 	end for;
 
-	loglist:= log_gammalistL cat log_epslistL;
+	loglist:= log_pgammalistL cat log_pepslist;
 	assert #loglist eq (#gammalist + #epslist);
 	Ordalphalist:= [Ordp(Lp,loglist[i]) : i in [1..#loglist]];
 	minOrdpAlpha, ihat:= Min(Ordalphalist);
@@ -1802,7 +2523,7 @@ for C in [1..#alphgamlist] do
 	// To DO: we seem to generate the same set of thetaL and mapsLL over and over again.
 	// generate ellipsoid for r = 2 case
 
-	log_gammalistC:= [[],[]]; // needed for ellipsoid
+	log_pgammalistC:= [[],[]]; // needed for ellipsoid
 
 	// compute alpha_i, p-adic log of epslistL in Lp
 	epsLji0list:=[];
@@ -1812,7 +2533,7 @@ for C in [1..#alphgamlist] do
 	    assert (Ordp(Lp,mapLLp(epsLkj)) eq 0);
 	    assert (Ordp(Lp,mapLLp(epsLji0)) eq 0);
 	    Append(~epsLji0list,epsLji0);
-	    log_epslistL[i]:= pAdicLog(mapLLp(epsLkj),p);
+	    log_pepslist[i]:= pAdicLog(mapLLp(epsLkj),p);
 	end for;
 
 	// compute i1, i2: L- > C to generate matrix R required in the ellipsoid
@@ -1854,9 +2575,9 @@ for C in [1..#alphgamlist] do
 	    assert &and[facj[j][1] ne fack[j][1] : j in [1..#faci0]];
             assert &and[faci0[j][1] ne facj[j][1] : j in [1..#faci0]];
             assert &and[faci0[j][1] ne fack[j][1] : j in [1..#faci0]];
-	    log_gammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
-	    log_gammalistC[1][i]:= Log(Abs(mapLC(AutL[i1](1/gamLij))));
-	    log_gammalistC[2][i]:= Log(Abs(mapLC(AutL[i2](1/gamLij))));
+	    log_pgammalistL[i]:= pAdicLog(mapLLp(gamLkj),p);
+	    log_pgammalistC[1][i]:= Log(Abs(mapLC(AutL[i1](1/gamLij))));
+	    log_pgammalistC[2][i]:= Log(Abs(mapLC(AutL[i2](1/gamLij))));
 	end for;
 
 	alpha_ihat:= loglist[ihat];
@@ -1874,9 +2595,9 @@ for C in [1..#alphgamlist] do
 	    m:= Max(Abs(matRinv[x,1]), Abs(matRinv[x,2]));
 
             for y in [1..#gammalist] do
-		alphagamlk:= matRinv[x,1]*(&+[matAinv[i,y]*log_gammalistC[1][i]
+		alphagamlk:= matRinv[x,1]*(&+[matAinv[i,y]*log_pgammalistC[1][i]
 					      : i in [1..#gammalist]]) +
-			     matRinv[x,2]*(&+[matAinv[i,y]*log_gammalistC[2][i]
+			     matRinv[x,2]*(&+[matAinv[i,y]*log_pgammalistC[2][i]
 					      : i in [1..#gammalist]]);
 		Logp:= Log(alphgamlist[C]`pi0jk[y]`prime);
 		wgamlklist[x][y]:= Abs(alphagamlk)*Degree(K,Rationals())/Logp;
