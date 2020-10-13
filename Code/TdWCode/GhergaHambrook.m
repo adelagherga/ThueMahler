@@ -4382,8 +4382,8 @@ end for;
 Start the while loop where C will be increased until a new conditional upper for A is found that improves on the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=5;
-RunThroughNumber2:=5;
+RunThroughNumber1:=1;
+RunThroughNumber2:=1;
 flag:=true;
 while flag do
 
@@ -4915,8 +4915,8 @@ end for;
 Start the while loop where C will be increased until a new conditional upper for A is found that improves on the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=5;
-RunThroughNumber2:=5;
+RunThroughNumber1:=1;
+RunThroughNumber2:=1;
 flag:=true;
 while flag do
 
@@ -5944,8 +5944,8 @@ end for;
 Start the while loop where C will be increased until we find a new conditional upper for A that is smaller than the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=5;
-RunThroughNumber2:=5;
+RunThroughNumber1:=1;
+RunThroughNumber2:=1;
 flag:=true;
 while flag do
 
@@ -6531,8 +6531,8 @@ end for;
 Start the while loop where C will be increased until we find a new conditional upper for A that is smaller than the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=5;
-RunThroughNumber2:=5;
+RunThroughNumber1:=1;
+RunThroughNumber2:=1;
 flag:=true;
 while flag do
 
