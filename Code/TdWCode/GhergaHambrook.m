@@ -5466,7 +5466,7 @@ success
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
-RunThroughNumber:=5;
+RunThroughNumber:=1;
 while flag do
 
 /////////////////////////////////////////////////////////////////////////////
@@ -5475,7 +5475,7 @@ Increase mmmm = m (if this is not the first attempt with the basic p_l-reduction
 Calculuate betam[i] = beta_i^(m).
 */
 //////////////////////////////////////////////////////////////////////////
-mmmm:=Ceiling( mmmm0 + RunThroughNumber*(5/100)*mmmm0 );
+mmmm:=Ceiling( mmmm0 + (RunThroughNumber+2)*(5/100)*mmmm0 );
 for i in JJJ do
 betam[i]:= SmallestNonnegativeRemainderModpLToThem(beta[l][i],p[l],mmmm,padicprecision[l]);
 end for;
@@ -5956,7 +5956,7 @@ Increase CCCCCC = C (if this is not the first attempt the basic real reduction p
 */
 //////////////////////////////////////////////////////////////////////////////
 
-CCCCCC:=Ceiling(Exp(LogC + RunThroughNumber1*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC  ));
+CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+5)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC  ));
 /*
 print("RunThroughNumber1=");
 RunThroughNumber1;
