@@ -4004,7 +4004,7 @@ Start while loop that will increase m until the p_l-adic reduction yeilds a new 
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
-RunThroughNumber:=0;
+RunThroughNumber:=5;
 while flag do
 
 /////////////////////////////////////////////////////////////////////////////
@@ -4382,8 +4382,8 @@ end for;
 Start the while loop where C will be increased until a new conditional upper for A is found that improves on the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=0;
-RunThroughNumber2:=0;
+RunThroughNumber1:=5;
+RunThroughNumber2:=5;
 flag:=true;
 while flag do
 
@@ -4915,8 +4915,8 @@ end for;
 Start the while loop where C will be increased until a new conditional upper for A is found that improves on the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=0;
-RunThroughNumber2:=0;
+RunThroughNumber1:=5;
+RunThroughNumber2:=5;
 flag:=true;
 while flag do
 
@@ -5466,7 +5466,7 @@ success
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
-RunThroughNumber:=0;
+RunThroughNumber:=5;
 while flag do
 
 /////////////////////////////////////////////////////////////////////////////
@@ -5944,8 +5944,8 @@ end for;
 Start the while loop where C will be increased until we find a new conditional upper for A that is smaller than the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=0;
-RunThroughNumber2:=0;
+RunThroughNumber1:=5;
+RunThroughNumber2:=5;
 flag:=true;
 while flag do
 
@@ -6531,8 +6531,8 @@ end for;
 Start the while loop where C will be increased until we find a new conditional upper for A that is smaller than the uncondtional upper bound for A or until a number of increases of C have been made with no success.
 */
 ////////////////////////////////////////////////////////////////////////////
-RunThroughNumber1:=0;
-RunThroughNumber2:=0;
+RunThroughNumber1:=5;
+RunThroughNumber2:=5;
 flag:=true;
 while flag do
 
