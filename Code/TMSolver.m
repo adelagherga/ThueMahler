@@ -1494,20 +1494,20 @@ ReductionPrep:= function(fieldKinfo,fieldLinfo,imagesL,AutL,allinfo,
 	    pInfo:= allprimeInfo[pIndex];
 	    assert pInfo`prime eq p;
 	    Lp:= pInfo`Lp;
-	    log_gammalist:= [];
-	    log_epslist:= pInfo`log_pepslist;
 
 	    // if i0,j,k has been determined for p;
 	    // ie. if there is only 1 unbounded prime ideal above p in K
 	    if pInfo`pi0jk ne [] then
 		i0jk:= pInfo`pi0jk;
 		assert #pInfo`ideals eq 2;
+		log_gammalist:= [];
 		for j in [1..#gammalist] do
 		    k:= Index(allgammas, gammalist[j]);
 		    log_gammalist[j]:= pInfo`log_pgammalist[k];
+		    log_epslist:= pInfo`log_pepslist;
 		end for;
 	    else
-		print "yes! splits completely!";
+
 		// if p splits completely in K
 		/* TO DO
 		assert #pInfo`ideals eq 3;
