@@ -4396,7 +4396,7 @@ Calculate the phi_i for i in JJJ.
 Calculate R.
 */
 ////////////////////////////////////////////////////////////////////////////
-CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+5)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC));
+CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+8)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC));
 
 if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
@@ -5956,7 +5956,7 @@ Increase CCCCCC = C (if this is not the first attempt the basic real reduction p
 */
 //////////////////////////////////////////////////////////////////////////////
 
-CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+5)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC  ));
+CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+10)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC  ));
 /*
 print("RunThroughNumber1=");
 RunThroughNumber1;
