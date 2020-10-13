@@ -2395,13 +2395,13 @@ end if;
 end for;
 
 if Valuation(LogarithmicAlphap[l][1]) lt min then
-temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
-Ceiling((1/hh[l])*(min - Valuation(delta2[l])))-1  ]);
-if temp lt 0 then
-fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
-continue iiii;
-end if; //no solutions in the current case
-if temp lt Nstar[l] then Nstar[l]:=temp; end if;
+    temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
+		 Ceiling((1/hh[l])*(min - Valuation(delta2[l])))-1  ]);
+    if temp lt 0 then
+	fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
+	continue iiii;
+    end if; //no solutions in the current case
+    if temp lt Nstar[l] then Nstar[l]:=temp; end if;
 end if;
 
 
@@ -2421,8 +2421,8 @@ if Valuation(CoefficientsLogarithmicAlphap[l][1][hhh]) lt min then
 temp:=Max([  Floor((1/hh[l])*(1/(p[l]-1) - Valuation(delta2[l]))),
 Ceiling((1/hh[l])*(u[l] + min - Valuation(delta2[l])))-1   ]);
 if temp lt 0 then
-fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
-continue iiii;
+    fprintf LogFile, "No solutions possible in case iiii = %o because Nstar[l] < 0, l = %o\n", iiii, l;
+    continue iiii;
 end if; //no solutions in the current case
 if temp lt Nstar[l] then Nstar[l]:=temp; end if;
 end if;
@@ -4004,7 +4004,7 @@ Start while loop that will increase m until the p_l-adic reduction yeilds a new 
 */
 ///////////////////////////////////////////////////////////////////////////
 flag:=true;
-RunThroughNumber:=5;
+RunThroughNumber:=1;
 while flag do
 
 /////////////////////////////////////////////////////////////////////////////
@@ -4396,7 +4396,7 @@ Calculate the phi_i for i in JJJ.
 Calculate R.
 */
 ////////////////////////////////////////////////////////////////////////////
-CCCCCC:=Ceiling(Exp(LogC + RunThroughNumber1*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC));
+CCCCCC:=Ceiling(Exp(LogC + (RunThroughNumber1+5)*(5/100)*LogC + RunThroughNumber2*(-25/100)*LogC));
 
 if RunThroughNumber1 eq 21 and UpperBoundForA gt 100000 then
 CCCCCC:=Ceiling(Exp(LogC + 9*LogC));
@@ -6215,6 +6215,7 @@ zzz:=BC*ttt;
 /*Now zzz is likely the closest vector in the lattice Gamma_C to yyy and
 min = |zzz-yyy|*/
 
+// LEFT OFF HERE; TAKING TOO LONG ON THE REDUCTION, NEED TO LOOK INTO
 
 ////////////////////////////////////////////////////////////////////////
 /*
