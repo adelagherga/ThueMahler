@@ -7,11 +7,13 @@
 #
 # Description: Finds all killed jobs in GNU parallel joblog generated from GenerateSUnitEq.m
 #
-# Commentary:
+# Commentary:  This program only needs to be executed once. Run with
+#              chmod +x GatherKilledForms.sh
+#              nohup ./GatherKilledForms.sh &
 #
-# To do list:
+# To do list:  N/A
 #
-# Example:
+# Example:     N/A
 #
 
 cd /home/adela/ThueMahler/Data/SUnitEqData
@@ -22,7 +24,9 @@ cd /home/adela/ThueMahler/Data/SUnitEqData
     set=${set//"set:="/}
     signal=$(echo $line | awk '{print $8 }')
     if [[ "$signal" != 0 ]]; then
-	echo $set"t"$signal >> tmpKilledJobs
+	echo $set | tr -d \' >> tmpKilledJobs # remove symbol ' and print set in temp file
     fi
 done
-column -t -s't' tmpKilledJobs > KilledJobs
+
+sed '/^[[:space:]]*$/d' tmpKilledJobs >> KilledJobs # remove whitespace lines
+rm tmpKilledJobs
