@@ -17,7 +17,7 @@
 cd /home/adela/ThueMahler/Data/SUnitEqData
 
 #Organize TMFiles JobLogTime files
-{ cat myfile.txt; echo; } | while read line; do
+{ cat tmplog; echo; } | while read line; do
     set=$(echo $line | awk '{print $10 }')
     set=${set//"set:="/}
     signal=$(echo $line | awk '{print $8 }')
