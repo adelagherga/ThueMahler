@@ -2225,6 +2225,33 @@ $$
 $$
 the quadratic twist of $E_{\mathcal{D}}$ by $-1$, yields a curve of the desired conductor\index{conductor}.
 
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - %
+
+\subsection{Pseudocode for finding representative forms}
+\label{sec:pseud-find-repr}
+
+We use the following pseudocode to generate all representative forms and remove redundancy, beginning with a conductor $N = 2^{\alpha}3^{\beta}N_0$ and a corresponding form
+\[F(u,v) = 2^{\alpha_1}3^{\beta_1}\prod_{p|N_0}p^{\kappa_p}\]
+of discriminant $D_F = \text{sign}(\Delta_E)2^{\alpha_0}3^{\beta_0}N_1$.
+
+\begin{enumerate}[1.]
+\item Test $F(u,v) = \prod_{p|N \cup \{2\} \cup \{3\}}p^{n_p} \mod{q}$ for $q \in \{p : p|N\} \cup \{2\} \cup \{3\}$. Note that this should hold regardless of the exponents on $p = 2,3$.
+  \begin{enumerate}[a.]
+  \item By \eqref{term3}, if $\nu_q(N) = 1$ for $q \geq 3$, then $q|D_FF(u,v)$. Thus if $\nu_q(D_F) = 0$, then $F(u,v) \equiv 0 \mod q$. If $F(u,v) \equiv 0 \mod q$ has only the trivial solution, then $\gcd(u,v) \neq 1$, and thus no solutions to this Thue-Mahler equation are possible. Note that when $q = 3$, the above statement means that $\beta = 1$, $\beta_0 = 0$, and thus $\beta_1 \geq 1$.
+  \item If $u \equiv v \equiv 0 \mod q$ is the only solution to both $F(u,v) \equiv 0 \mod q$ and $F(u,v) \equiv \prod_{p|N \cup \{2\} \cup \{3\}\backslash q}p^{n_p} \mod{q}$ when the exponent on $q$ is 0, we may discard this Thue-Mahler equation as no relatively prime solution $(u,v)$ is possible.
+  \item If $u \equiv v \equiv 0 \mod q$ is the only solution to $F(u,v) \equiv 0 \mod q$ but $F(u,v) \equiv \prod_{p|N \cup \{2\} \cup \{3\}/q}p^{n_p} \mod{q}$ has a non-trivial solution when the exponent on $q$ is 0, we say that there is a \textit{partial obstruction} at $q$.
+  \end{enumerate}
+\item All possibilities for $\beta_1$, $\alpha_1$, and $\kappa_p$, when $p^2 | N_1$, are determined as per Theorem~\ref{fisk}. The resulting (potentially multiple) Thue-Mahler equations are now of the form $F(u,v) = ap_1^{n_1}\cdots p_v^{n_v}$ for some constant $a$.
+\item Remove superfluous cases where a partial obstruction exists at $q$.
+  \begin{enumerate}[a.]
+  \item If a partial obstruction exists at $q$ and the exponent $n_q$ on the prime $q$ is known to be unbounded and $n_q \geq 1$, discard the Thue-Mahler equation.
+  \item If a partial obstruction exists at $q$ and the exponent on the prime $q$ is known to be unbounded and $n_q \geq 0$, set $n_q = 0$.
+  \item If a partial obstruction exists at $q$ and the exponent on the prime $q$ is known to a fixed integer $n_q \geq 1$, discard the Thue-Mahler equation.
+  \end{enumerate}
+\item Remove Thue equations covered by any Thue-Mahler equations. That is, if $F(u,v) = ap_1^{n_1}\cdots p_v^{n_v}$ and $F(u,v) = a$ are both potential Thue-Mahler equations, we may discard the latter equation.
+\item Remove Thue-Mahler equations covered by other Thue-Mahler equations. That is, if $F_1(u,v) = ap_1^{n_1}\cdots p_v^{n_v}$ and $F_2(u,v) = ap_1^{n_1}\cdots p_v^{n_v}p_{v+1}^{n_{v+1}}\cdots p_w^{n_w}$ are two Thue-Mahler equations having $w > v$, we may discard $F_1(u,v)$.
+\end{enumerate}
+
 %---------------------------------------------------------------------------------------------%
 %---------------------------------------------------------------------------------------------%
 

@@ -26,6 +26,7 @@ import sys
 N = 1000 * 1000
 Nf = N * 1.0
 
+# determine largest exponent twos[k] such that k = (2^(twos[k]))*b, where (2,b) = 1
 twos = {}
 for k in range(1, 3 * N + 1):
     if k % 2 == 0:

@@ -38,15 +38,16 @@
 \BOOKMARK [2][-]{subsection.4.4.2}{Reducible forms}{section.4.4}% 38
 \BOOKMARK [2][-]{subsection.4.4.3}{Computing forms of fixed discriminant}{section.4.4}% 39
 \BOOKMARK [2][-]{subsection.4.4.4}{GL2\(Z\) vs SL2\(Z\)}{section.4.4}% 40
-\BOOKMARK [0][-]{chapter.5}{Towards Efficient Resolution of Thue-Mahler Equations}{}% 41
-\BOOKMARK [1][-]{section.5.1}{Decomposition of the Weil height}{chapter.5}% 42
-\BOOKMARK [1][-]{section.5.2}{Initial height bounds}{chapter.5}% 43
-\BOOKMARK [1][-]{section.5.3}{Coverings of }{chapter.5}% 44
-\BOOKMARK [1][-]{section.5.4}{Construction of the ellipsoids}{chapter.5}% 45
-\BOOKMARK [2][-]{subsection.5.4.1}{The Archimedean ellipsoid: the real case}{section.5.4}% 46
-\BOOKMARK [2][-]{subsection.5.4.2}{The non-Archimedean ellipsoid}{section.5.4}% 47
-\BOOKMARK [1][-]{section.5.5}{The Archimedean sieve: the real case}{chapter.5}% 48
-\BOOKMARK [1][-]{section.5.6}{The non-Archimedean Sieve}{chapter.5}% 49
-\BOOKMARK [2][-]{subsection.5.6.1}{Applying Lemma 3.5.2}{section.5.6}% 50
-\BOOKMARK [2][-]{subsection.5.6.2}{Applying Lemma 3.5.5}{section.5.6}% 51
-\BOOKMARK [2][-]{subsection.5.6.3}{The reduction procedure}{section.5.6}% 52
+\BOOKMARK [2][-]{subsection.4.4.5}{Pseudocode for finding representative forms}{section.4.4}% 41
+\BOOKMARK [0][-]{chapter.5}{Towards Efficient Resolution of Thue-Mahler Equations}{}% 42
+\BOOKMARK [1][-]{section.5.1}{Decomposition of the Weil height}{chapter.5}% 43
+\BOOKMARK [1][-]{section.5.2}{Initial height bounds}{chapter.5}% 44
+\BOOKMARK [1][-]{section.5.3}{Coverings of }{chapter.5}% 45
+\BOOKMARK [1][-]{section.5.4}{Construction of the ellipsoids}{chapter.5}% 46
+\BOOKMARK [2][-]{subsection.5.4.1}{The Archimedean ellipsoid: the real case}{section.5.4}% 47
+\BOOKMARK [2][-]{subsection.5.4.2}{The non-Archimedean ellipsoid}{section.5.4}% 48
+\BOOKMARK [1][-]{section.5.5}{The Archimedean sieve: the real case}{chapter.5}% 49
+\BOOKMARK [1][-]{section.5.6}{The non-Archimedean Sieve}{chapter.5}% 50
+\BOOKMARK [2][-]{subsection.5.6.1}{Applying Lemma 3.5.2}{section.5.6}% 51
+\BOOKMARK [2][-]{subsection.5.6.2}{Applying Lemma 3.5.5}{section.5.6}% 52
+\BOOKMARK [2][-]{subsection.5.6.3}{The reduction procedure}{section.5.6}% 53

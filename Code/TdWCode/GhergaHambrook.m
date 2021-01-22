@@ -4610,6 +4610,46 @@ Choose c11 to find an optimal i0-conditional upper bound for A from Lemma 19.2
 //////////
 MIN:=UpperBoundForA;
 
+
+c11:= c10*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R))/
+(c8prime + c9prime*UpperBoundForN + (n-1)*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R)));
+while c11 eq c10/(n-1) do
+    c11:= c11 - 0.00000000001;
+end while;
+
+max:=Max([
+Floor((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((lowerbound^2 - S)^(1/2) - R) )),
+Ceiling((c8prime + c9prime*UpperBoundForN)/(c10 - (n-1)*c11))-1,
+Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10 - c11))-1,
+Ceiling(Log(2*c16[i0])/c11)-1,0]);
+if max lt MIN and  (c11 lt c10/(n-1)) then
+    MIN:=max;
+end if;
+while c11 eq c10 do
+    c11:= c11 - 0.00000000001;
+end while;
+
+
+c11:=c10*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R))/
+(c8primeprime + c9primeprime*UpperBoundForN + (Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R)));
+while c11 eq c10/(n-1) do
+    c11:= c11 - 0.00000000001;
+end while;
+while c11 eq c10 do
+    c11:= c11 - 0.00000000001;
+end while;
+
+max:=Max([
+Floor((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((lowerbound^2 - S)^(1/2) - R) )),
+Ceiling((c8prime + c9prime*UpperBoundForN)/(c10 - (n-1)*c11))-1,
+Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10 - c11))-1,
+Ceiling(Log(2*c16[i0])/c11)-1,
+0
+]);
+if max lt MIN and (c11 lt c10/(n-1)) then
+    MIN:=max;
+end if;
+
 c11:=(1/1000000)*c10/(n-1);
 max:=Max([
 Floor((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((lowerbound^2 - S)^(1/2) - R) )),
@@ -4630,6 +4670,7 @@ Ceiling(Log(2*c16[i0])/c11)-1,
 ]);
 if max lt MIN then MIN:=max; end if;
 
+/*
 for i:=1 to 999 do
 c11:=(i/1000)*c10/(n-1);
 max:=Max([
@@ -4641,6 +4682,7 @@ Ceiling(Log(2*c16[i0])/c11)-1,
 ]);
 if max lt MIN then MIN:=max; end if;
 end for; //end i loop
+*/
 ////
 
 
@@ -6024,6 +6066,49 @@ If it is better than the old unconditional upper bound, then we do the enumerati
 //////////////////////////////////////////////////////////////////////////////
 MIN:=UpperBoundForA;
 
+
+c11:= c10*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R))/
+(c8prime + c9prime*UpperBoundForN + (n-1)*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R)));
+while c11 eq c10/(n-1) do
+    c11:= c11 - 0.00000000001;
+end while;
+while c11 eq c10 do
+    c11:= c11 - 0.00000000001;
+end while;
+
+max:=Max([
+Floor((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((lowerbound^2 - S)^(1/2) - R) )),
+Ceiling((c8prime + c9prime*UpperBoundForN)/(c10 - (n-1)*c11))-1,
+Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10 - c11))-1,
+Ceiling(Log(2*c16[i0])/c11)-1,0]);
+if max lt MIN and (c11 lt c10/(n-1)) then
+    MIN:=max;
+end if;
+
+
+c11:=c10*(Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R))/
+(c8primeprime + c9primeprime*UpperBoundForN + (Log(2*Log(2)*c16[i0])+Log(CCCCCC)-Log((lowerbound^2-S)^(1/2)-R)));
+while c11 eq c10/(n-1) do
+    c11:= c11 - 0.00000000001;
+end while;
+while c11 eq c10 do
+    c11:= c11 - 0.00000000001;
+end while;
+
+max:=Max([
+Floor((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((lowerbound^2 - S)^(1/2) - R) )),
+Ceiling((c8prime + c9prime*UpperBoundForN)/(c10 - (n-1)*c11))-1,
+Ceiling((c8primeprime + c9primeprime*UpperBoundForN)/(c10 - c11))-1,
+Ceiling(Log(2*c16[i0])/c11)-1,
+0
+]);
+if max lt MIN and (c11 lt c10/(n-1)) then
+    MIN:=max;
+end if;
+
+
+
+
 c11:=(1/1000000)*c10/(n-1);
 //maxseq:=[
 //Ceiling((1/c11)*( Log(2*Log(2)*c16[i0]) + Log(CCCCCC) - Log((DDD^2 - S)^(1/2) - R) ))-1,
@@ -6066,6 +6151,7 @@ Ceiling(Log(2*c16[i0])/c11)-1,
 //end for;
 if max lt MIN then MIN:=max; end if;
 
+/*
 for i:=1 to 999 do
 c11:=(i/1000)*c10/(n-1);
 //maxseq:=[
@@ -6089,6 +6175,7 @@ Ceiling(Log(2*c16[i0])/c11)-1,
 //end for;
 if max lt MIN then MIN:=max; end if;
 end for; //end i loop
+*/
 
 NewConditionalUpperBoundForAi0:=MIN;
 OldUnconditionalUpperBoundForA:=UpperBoundForA;
