@@ -16,20 +16,17 @@
 # Example:     N/A
 #
 
-#FORMS=/home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt
+FORMS=/home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt
 cd /home/adela/ThueMahler/Data/SUnitEqData
 
-{ cat /home/adela/ThueMahler/Data/FormsCond10To6/FormsCond10To6.txt; echo } | while read line; do
+{ cat $FORMS; echo; } | while read line; do
     # rewrite [N,[discF,c_1,c_2,c_3,c_4]] into N,"(c_1,c_2,c_3,c_4)" format
     set=$(echo $line | sed 's/^.\(.*\).$/\1/' | sed 's/[\[][^,]*,/\"(/' | sed 's/\]/)\"/')
-    echo $set
-done
 
-
-#    if [ ! grep -q ^$set NoSUnitEqNeeded.csv] &&
-#	   [ ! grep -q ^$set NoSUnitEqPossible.csv ] &&
-#	   [ ! grep -q ^$set TMFormData.csv ]; then
+    if [ ! grep -q ^$set NoSUnitEqNeeded.csv] &&
+	   [ ! grep -q ^$set NoSUnitEqPossible.csv ] &&
+	   [ ! grep -q ^$set TMFormData.csv ]; then
 	# print line in new file
-#	echo $line >> KilledJobs2
-#    fi
-#done
+	echo $line >> KilledJobs2
+    fi
+done
