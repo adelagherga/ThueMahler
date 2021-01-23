@@ -22,11 +22,13 @@ cd /home/adela/ThueMahler/Data/SUnitEqData
 { cat $FORMS; echo } | while read line; do
     # rewrite [N,[discF,c_1,c_2,c_3,c_4]] into N,"(c_1,c_2,c_3,c_4)" format
     set=$(echo $line | sed 's/^.\(.*\).$/\1/' | sed 's/[\[][^,]*,/\"(/' | sed 's/\]/)\"/')
-
-    if [ ! grep -q ^$set NoSUnitEqNeeded.csv] &&
-	   [ ! grep -q ^$set NoSUnitEqPossible.csv ] &&
-	   [ ! grep -q ^$set TMFormData.csv ]; then
-	# print line in new file
-	echo $line >> KilledJobs2
-    fi
 done
+
+
+#    if [ ! grep -q ^$set NoSUnitEqNeeded.csv] &&
+#	   [ ! grep -q ^$set NoSUnitEqPossible.csv ] &&
+#	   [ ! grep -q ^$set TMFormData.csv ]; then
+	# print line in new file
+#	echo $line >> KilledJobs2
+#    fi
+#done
