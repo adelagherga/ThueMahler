@@ -37,40 +37,28 @@
 # Example: N/A
 #
 
-import re
+import pandas as pd
 
 class Form:
     def __init__(self,line):
-        self.N = int(line.split(',')[0]) # convert bash input N into an integer
-        clist, optimal_clist, fclist, partial_obstruction = self.parse_line(line)
-        self.clist = clist
-        self.optimal_clist = optimal_clist
-        self.fclist = fclist
 
+        self.N = int(line.split(',')[0]) # convert bash input N into an integer
+        results = self.parse_line(line)
+        (
+            self.clist,
+            self.optimal_clist,
+            self.fclist,
+            self.partial_obstruction
+        ) = results
     def parse_line(self,line):
-        bracket_split = re.split('[\[\]]', line)
-        r_bracket_split = re.split('[\(\)]', line)
-        assert (len(bracket_split) == 3) or (len(bracket_split) == 5)
-        assert (len(r_bracket_split) == 7)
-        if len(bracket_split) == 3:
-            assert comma_split[13] == 'None'
-            partial_obstruction = []
-        else:
-            partial_obstruction = [int(i) for i in bracket_split[1].split(',')]
-        clist = [int(i) for i in r_bracket_split[1].split(',')]
         optimal_clist = [int(i) for i in r_bracket_split[3].split(',')]
         fclist = [int(i) for i in r_bracket_split[5].split(',')]
         return clist, optimal_clist, fclist, partial_obstruction
 
 
-
-
-
-
-
-
-
-
+fname = "/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/SUnitEqData/TMFormData.csv"
+df = pd.read_csv(fname, nrows=10000)
+(df.groupby(['form','optimal form','min poly'])['N']).count().max()
 
 
 for line in open("/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/SUnitEqData/TMFormData.csv"):
