@@ -1,15 +1,16 @@
 #!/bin/bash
-# GatherKilledFormsCheck.sh
+# GatherIncompleteForms.sh
 
 # Author: Adela Gherga <adelagherga@gmail.com>
 # Copyright © 2021, Adela Gherga, all rights reserved.
 # Created: 22 January 2021
 #
-# Description: Verify all killed jobs in GNU parallel generated from GenerateSUnitEq.m output
+# Description: Finds all incomplete jobs in FormsCond10To6.txt generated from GenerateSUnitEq.m
+#              output
 #
 # Commentary:  This program onle needs to be executed once. Run with
-#              chmod +x GatherKilledFormsCheck.sh
-#              nohup ./GatherKilledFormsCheck.sh &
+#              chmod +x GatherIncompleteForms.sh
+#              nohup ./GatherIncompleteForms.sh &
 #
 # To do list:  N/A
 #
@@ -27,6 +28,6 @@ cd /home/adela/ThueMahler/Data/SUnitEqData
 	    ! grep -q ^"$set" NoSUnitEqPossible.csv &&
 	    ! grep -q ^"$set" TMFormData.csv; then
 	# print line in new file
-	echo $line >> KilledJobs2
+	echo $line >> IncompleteJobs
     fi
 done
