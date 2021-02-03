@@ -22,6 +22,7 @@ Example:     N/A
 LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/MagmaInternalErrors.txt";
 SetLogFile(LogFile);
 
+print set;
 BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
 #BracketSplit;
 
