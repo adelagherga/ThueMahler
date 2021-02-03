@@ -23,7 +23,7 @@ LogFile:= "/home/adela/ThueMahler/Data/SUnitEqData/MagmaInternalErrors.txt";
 SetLogFile(LogFile);
 
 BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
-assert (#BracketSplit eq 2);
+#BracketSplit;
 
 clist:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
 clist:= clist[2..5];
