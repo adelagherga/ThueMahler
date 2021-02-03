@@ -10,7 +10,7 @@ Description: Iterates through IncompleteJobs to determine if the error is relate
 
 Commentary:  The result of this code is to be sent to John Cannon to assess the Thue patch.
              Runt with
-cat /home/adela/ThueMahler/Data/ThueMahler/Data/SUnitEqData/OldIncompleteJobs | magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/IncompleteJobThueAssessment.m
+cat /home/adela/ThueMahler/Data/SUnitEqData/OldIncompleteJobs | parallel -j1 magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/IncompleteJobThueAssessment.m
 
 
 To do list:  N/A
@@ -24,7 +24,7 @@ SetLogFile(LogFile);
 
 print set;
 BracketSplit:= Split(set,"[]"); // split bash input by "[" and "]"
-#BracketSplit;
+assert (#BracketSplit eq 2);
 
 clist:= [StringToInteger(i) : i in Split(BracketSplit[2],",")];
 clist:= clist[2..5];
