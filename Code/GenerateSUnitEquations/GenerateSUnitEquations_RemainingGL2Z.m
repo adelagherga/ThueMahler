@@ -18,16 +18,16 @@ Description: This program generates all S-unit equations corresponding to the Th
 	     appropriately listed headings. Finally, "SUnitErr.txt" tracks any arising errors.
 
 	     NB. this algorithm does not use Magma's built-in Thue solver to generate GL2(Z)
-	     actions and is reserved for TM equations for which the Thue solver was unsuccessful
-             (ie. GenerateSUnitEquations.m)
+	     actions and is reserved for TM equations for which the Thue solver was
+	     unsuccessful (ie. GenerateSUnitEquations.m)
 
-Commentary: In this algorithm, neither Thue nor Thue-Mahler equations are solved.
-            Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
-	    "TMFormData.csv" with appropriate headings before running the algorithm with
-	    nohup cat /home/adela/ThueMahler/Data/SUnitEqData/KilledJobs | parallel -j32 --joblog tmplog_remainingGL2Z magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_RemainingGL2Z.m 2>&1 &
+Commentary:  In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+             Generate "NoSUnitEqPossible.csv", "NoSUnitEqNeeded.csv", "ThueEqToSolve.csv",
+	     "TMFormData.csv" with appropriate headings before running the algorithm with
+	     nohup cat /home/adela/ThueMahler/Data/SUnitEqData/IncompleteGenerateSUnitEqJobs | parallel -j32 --joblog tmplog_remainingGL2Z magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_RemainingGL2Z.m 2>&1 &
 
-To do list: 1. Reference list for: BeGhRe, Gh, Si
-            2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
+To do list:  1. Reference list for: BeGhRe, Gh, Si
+             2. compress files with gzip -k filename.csv ? and add original files to gitignore ?
 
 Example:
 
@@ -1551,74 +1551,3 @@ if (ThueToSolve ne []) then
 end if;
 
 UnsetLogFile();
-
-
-
-QUV<U,V>:=PolynomialRing(Rationals(),2);
-Qx<x>:= PolynomialRing(Rationals());
-Zx_<x_>:= PolynomialRing(Integers());
-
-// general setup for Thue-Mahler solver
-assert &and[c in Integers() : c in clist];
-c0:=Integers()!clist[1];
-assert c0 ne 0;
-n:=#clist-1;
-assert n eq 3;
-
-// generate the relevant Thue Mahler polynomial
-F:=&+[clist[i+1]*U^(n-i)*V^i : i in [0..n]];
-assert IsHomogeneous(F);
-DiscF:= -27*clist[1]^2*clist[4]^2 + clist[2]^2*clist[3]^2;
-DiscF:= DiscF + 18*clist[1]*clist[2]*clist[3]*clist[4];
-DiscF:= DiscF - 4*clist[1]*clist[3]^3 - 4*clist[2]^3*clist[4];
-assert DiscF eq Discriminant(Evaluate(F,[x,1]));
-
-fclist:= [1] cat [clist[i+1]*c0^(i-1) : i in [1..n]];
-f:=&+[fclist[i+1]*x^(n-i) : i in [0..n]];
-c0:= Integers()!fclist[1]; // update c0
-assert c0 eq 1;
-assert IsMonic(f);
-assert Coefficients(f) eq
-       Coefficients(clist[1]^(n-1)*Evaluate(F,[x/clist[1],1]));
-assert Degree(f) eq n;
-assert IsIrreducible(f);
-assert &and[c in Integers() : c in Coefficients(f)];
-GL2Zclists:= [];
-abs_max:= 100;
-for a in [-abs_max..abs_max] do
-    for c in [-abs_max..abs_max] do
-	if GCD(a,c) eq 1 then
-	    hasGL2Zaction:= false;
-
-	    if ((a eq 0) and (Abs(c) eq 1)) then
-		b:= -1/c;
-		d:= 0;
-		hasGL2Zaction:= true;
-	    elif ((c eq 0) and (Abs(a) eq 1)) then
-		d:= 1/a;
-		b:= 0;
-		hasGL2Zaction:= true;
-	    elif ((a ne 0) and (c ne 0) and (GCD(a,c) eq 1)) then
-		g,d,b:= XGCD(a,c);
-		b:= -b;
-		assert g eq 1;
-		hasGL2Zaction:= true;
-	    end if;
-
-	    if hasGL2Zaction then
-		assert (a*d - b*c eq 1);
-		GL2ZF:= Evaluate(F,[a*U+b*V,c*U+d*V]);
-		a0:= Abs(Integers()! Coefficients(GL2ZF)[1]);
-		if (#Divisors(a0) le 3) and (a0 le 200) then
-		    newclist:= [Integers()! MonomialCoefficient(GL2ZF,U^(n-i)*V^i) : i in [0..n]];
-		    assert newclist eq Reverse(Coefficients(Evaluate(GL2ZF,[x,1])));
-
-		    if (newclist notin GL2Zclists) and ([-i : i in newclist] notin GL2Zclists) then
-			Append(~GL2Zclists,newclist);
-		    end if;
-		end if;
-
-	    end if;
-	end if;
-    end for;
-end for;

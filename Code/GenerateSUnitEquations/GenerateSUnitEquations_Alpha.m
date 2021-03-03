@@ -16,20 +16,20 @@ Description: This program generates all S-unit equations corresponding to the Th
 	     file is manually generated as a .csv file with appropriately listed headings.
 	     Finally, "SUnitErr.txt" tracks any arising errors.
 
-Commentary: This algorithm uses the output "TMFormData.csv" of "GenerateSUnitEquations.m" as
-	    its input, using the optimal form as its input, and outputing all correponding
-	    alpha values for each S-unit equation in "TMFormData_Alpha.csv". Further, the file
-	    "ThueEqToSolve.csv" supercedes the "ThueEqToSolve" of "GenerateSUnitEquations.m",
-	    which is now rendered obsolete.
+Commentary:  This algorithm uses the output "TMFormData.csv" of "GenerateSUnitEquations.m" as
+	     its input, using the optimal form as its input, and outputing all correponding
+	     alpha values for each S-unit equation in "TMFormData_Alpha.csv". Further, the file
+	     "ThueEqToSolve.csv" supercedes the "ThueEqToSolve" of "GenerateSUnitEquations.m",
+	     which is now rendered obsolete.
 
-	    In this algorithm, neither Thue nor Thue-Mahler equations are solved.
-            Generate "Lemmatta.csv", "ThueEqToSolve.csv", "TMFormData.csv" with appropriate
-	    headings before running the algorithm with
+	     In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+             Generate "Lemmatta.csv", "ThueEqToSolve.csv", "TMFormData.csv" with appropriate
+	     headings before running the algorithm with
 nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j20 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/GenerateSUnitEquations_Alpha.m 2>&1 &
 
-To do list: 1. Reference list for: BeGhRe, Gh, Si, Ha
-            2. Algorithm for ThueEqToSolve.m from GenerateSUnitEquations.m
-            3. Internal error algorithm
+To do list:  1. Reference list for: BeGhRe, Gh, Si, Ha
+             2. Algorithm for ThueEqToSolve.m from GenerateSUnitEquations.m
+             3. Internal error algorithm
 
 Example:
 
