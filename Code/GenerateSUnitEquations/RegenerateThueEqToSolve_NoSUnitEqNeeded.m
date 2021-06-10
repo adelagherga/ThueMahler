@@ -1161,7 +1161,7 @@ end if;
 
 // export Thue data into .csv file
 if (ThueToSolve ne []) then
-    assert #ThueToSolve eq NoThueEq;
+    assert #ThueToSolve le NoThueEq;
     strRHS:= SeqEnumToString(Sort(ThueToSolve));
     fprintf ThueEqToSolve, hash cat "," cat strRHS cat "\n";
 end if;
