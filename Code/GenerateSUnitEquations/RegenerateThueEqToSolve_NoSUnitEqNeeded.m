@@ -472,7 +472,7 @@ prep0:= function(N,clist)
 
     // store Thue equations to be solved, if any
     if (RHSlist ne []) then
-	ThueToSolve:= RHSlist;
+	ThueToSolve:= Sort(RHSlist);
     end if;
 
     // if all cases are resolved via Thue equations
@@ -1155,8 +1155,8 @@ end if;
 
 // export Thue data into .csv file
 if (ThueToSolve ne []) then
-    assert #ThueToSolve eq noThueEq;
-    strRHS:= SeqEnumToString(ThueToSolve);
+    assert #ThueToSolve eq NoThueEq;
+    strRHS:= SeqEnumToString(Sort(ThueToSolve));
     fprintf ThueEqToSolve, hash cat "," cat strRHS cat "\n";
 end if;
 

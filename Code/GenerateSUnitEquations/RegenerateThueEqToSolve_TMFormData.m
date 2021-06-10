@@ -913,7 +913,7 @@ end if;
 
 // export Thue data into .csv file
 if (ThueToSolve ne []) then
-    strRHS:= SeqEnumToString(ThueToSolve);
+    strRHS:= SeqEnumToString(Sort(ThueToSolve));
     fprintf ThueEqToSolve, hash cat "," cat strRHS cat "\n";
 end if;
 
