@@ -1,4 +1,5 @@
 /*
+
 RegenerateThueEqToSolve_NoSUnitEqNeeded.m
 
 Author: Adela Gherga <adelagherga@gmail.com>
@@ -15,7 +16,12 @@ Description: This program iterates through "NoSUnitNeeded.csv" to
 	     reduced monic Thue forms were printed with no way to reproduce the corresponding,
 	     original Thue-Mahler form.
 
-Commentary:  This algorithm only needs to be applied once to "NoSUnitEqNeeded.csv"
+Commentary:  In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+             This algorithm only needs to be applied once to "NoSUnitEqNeeded.csv" via
+
+
+nohup cat /home/adela/ThueMahler/Data/SUnitEqData/NoSUnitEqNeeded.csv | parallel -j20 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/RegenerateThueEqToSolve_NoSUnitEqNeeded.m 2>&1 &
+
 
 To do list:
 

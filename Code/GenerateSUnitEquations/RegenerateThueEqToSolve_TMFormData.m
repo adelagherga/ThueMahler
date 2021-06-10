@@ -1,4 +1,5 @@
 /*
+
 RegenerateThueEqToSolve_TMFormData.m
 
 Author: Adela Gherga <adelagherga@gmail.com>
@@ -21,7 +22,10 @@ Description: This program iterates through "TMFormData.csv" to
 	     each line in "TMFormData.csv", all a values possible for the (optimal) form, as
 	     well as the (unique) primelist, where F(x,y) = a * &*[p : p in primelist]
 
-Commentary:  This algorithm only needs to be applied once to "TMFormData.csv".
+Commentary:  In this algorithm, neither Thue nor Thue-Mahler equations are solved.
+             This algorithm only needs to be applied once to "TMFormData.csv" via
+
+nohup cat /home/adela/ThueMahler/Data/SUnitEqData/TMFormData.csv | parallel -j20 --joblog tmplog magma set:={} /home/adela/ThueMahler/Code/GenerateSUnitEquations/RegenerateThueEqToSolve_TMFormData.m 2>&1 &
 
 To do list:  N/A
 
