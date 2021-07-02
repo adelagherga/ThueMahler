@@ -1,5 +1,5 @@
 #!/bin/bash
-# GenerateSUnitEquations.sh
+# SortRawForms.sh
 
 # Author: Adela Gherga <adelagherga@gmail.com>
 # Copyright © 2020, Adela Gherga, all rights reserved.

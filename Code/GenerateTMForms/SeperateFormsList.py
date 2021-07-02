@@ -21,31 +21,19 @@
 
 def fargle(X):
     Y = []
-    for char in X.split():
+    for char in X.split()[1:]:
         Y.append(int(char))
-    return [Y]
+    return tuple(Y)
 
-pos_forms = {}
-neg_forms = {}
+all_forms = set()
 
 for line in open("/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/Raw/irreduc_pos.txt"):
-    conductor = int(line.split()[0])
-    if conductor in pos_forms:
-        pos_forms[conductor] = pos_forms[conductor] + fargle(line)
-    else:
-        pos_forms[conductor] = fargle(line)
+    all_forms.add(fargle(line))
 
 for line in open("/Users/adela016/Documents/Work/Postdoc/ThueMahler/Data/FormsCond10To6/Raw/irreduc_neg.txt"):
-    conductor = -int(line.split()[0])
-    if conductor in neg_forms:
-        neg_forms[conductor] = neg_forms[conductor] + fargle(line)
-    else:
-        neg_forms[conductor] = fargle(line)
+    all_forms.add(fargle(line))
 
-for key in sorted(pos_forms):
-    for form in pos_forms[key]:
-        print("\\\"(" + str(form[1:]).replace(" ","").replace("[","").replace("]","") + ")\\\"")
+all_forms = sorted(all_forms)
 
-for key in sorted(neg_forms):
-    for form in neg_forms[key]:
-        print("\\\"(" + str(form[1:]).replace(" ","").replace("[","").replace("]","") + ")\\\"")
+for form in all_forms:
+    print(str(form).replace(" ",""))
