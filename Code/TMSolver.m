@@ -539,19 +539,16 @@ generateInvs:= function(fieldKinfo,R)
 	    end if;
 	end for;
 
+//	print toRemove;
 	// update invs
 	invsNew:= [invs[i] : i in [1..#invs] | i notin toRemove];
 	invs:= invsNew;
     end for;
 
+    return invs;
 
     // left off here; invs is in the wrong format; change to SetEnum
     // are we missing any possibilities? what if invs is empty?
-    invs:= normInv(R,OK);
-
-
-
-
 end function;
 
 
@@ -661,7 +658,7 @@ prep1:= function(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist)
     afplistNew:=[* *];
     for aset in alist do
 	a:= Integers()!aset`newa;
-	invs:= normInv(a,OK); // generate all ideals of norm a
+	invs:= generateInvs(fieldKinfo,a); // generate all ideals of norm a
 	for pr in afplist do
             af:=pr[1];
 	    fplist:= pr[2];
