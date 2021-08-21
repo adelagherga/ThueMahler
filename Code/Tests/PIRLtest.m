@@ -11,7 +11,8 @@ Description: This program runs "tmpackAllCasesChanges1001.m" on various sets in
 	     applied to a-values is correct and that no solutions are missing. All output is
 	     printed in "PIRLtestout.txt" and "PIRLtestlog.txt".
 
-Commentary:  Run with nohup magma /home/adela/ThueMahler/Code/Tests/PIRLtest.m &
+Commentary:  Run with
+             nohup magma /home/adela/ThueMahler/Code/Tests/PIRLtest.m &
 
 To do list:
 

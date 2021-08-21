@@ -182,6 +182,61 @@ prep0:= function(set)
     return hash,f,clist,classnumber,r,NoIdealEq,NoThueEq,avalues,primelist;
 end function;
 
+refinePIRL:= function(Lp,Mp,fprs)
+
+    /*
+     Description: refine and remove redundancy from Algorithm 3.3.3 and 3.3.4 of Gh
+     		  for a given p, applying this algorithm only to the primelist and not
+		  the avalues
+     Input: Lp:= the set Lp as in Algorithms 3.3.3 and 3.3.4 of Gh
+     	    	 displayed as [[#fprs+1],aaa], where #fprs+1 indicates no unbounded prime
+                 and aaa[i] is the exponent on the prime ideal fprs[i] in the ideal b
+            Mp:= the set Mp as in Algorithms 3.3.3 and 3.3.4 of Gh
+            	 displayed as [[k],aaa], where k indicates the unbounded prime ideal
+                 and aaa[i] is the exponent on the prime ideal fprs[i] in the ideal b
+            fprs:= prime ideals in K above p
+     Output: Lp:= the refined set Lp as in Algorithms 3.3.3 and 3.3.4 of Gh
+     	     	  displayed as [[#fprs+1],aaa], where #fprs+1 indicates no unbounded prime
+                  and aaa[i] is the exponent on the prime ideal fprs[i] in the ideal b
+             Mp:= the refined set Mp as in Algorithms 3.3.3 and 3.3.4 of Gh
+     Example:
+   */
+
+    // set aaa[k] = 0 for each [[k],aaa] in Mp and remove subsequently identical cases
+    for i in [1..#Mp] do
+        pr1:= Mp[i];
+        k:= pr1[1][1];
+        Mp[i][2][k]:= 0;
+    end for;
+    MpNew:= [];
+    for i in [1..#Mp] do
+	if Mp[i] notin MpNew then
+	    Append(~MpNew,Mp[i]);
+	end if;
+    end for;
+    Mp:= MpNew;
+
+    // remove redundancy; that is, remove cases of Lp covered by Mp
+    toRemove:= [];
+    for i in [1..#Lp] do
+	fb:=&*[fprs[j]^Lp[i][2][j] : j in [1..#fprs]];
+	for j in [1..#Mp] do
+	    fb_:=&*[fprs[k]^Mp[j][2][k] : k in [1..#fprs]];
+	    fp:=fprs[Mp[j][1][1]];
+	    if IsIntegral(fb/fb_) and (fb/fb_ eq fp^(Valuation(fb/fb_,fp))) then
+		if (Valuation(fb/fb_,fp) ge 0) then
+		    Append(~toRemove,i);
+		    break j;
+		end if;
+	    end if;
+	end for;
+    end for;
+    LpNew:= [Lp[i] : i in [1..#Lp] | i notin toRemove];
+    Lp:= LpNew;
+
+    return Lp, Mp;
+end function;
+
 algs1and2:= function(fieldKinfo,p)
 
     /*
@@ -281,40 +336,6 @@ algs1and2:= function(fieldKinfo,p)
         ulist:=ulistNew;
         t:=t+1;
     end while; // end of Algorithm 3.3.4
-
-    // refinements
-    // set aaa[k]=0 for each [[k],aaa] in Mp and remove subsequently identical cases
-    for i in [1..#Mp] do
-        pr1:= Mp[i];
-        k:= pr1[1][1];
-        Mp[i][2][k]:= 0;
-    end for;
-    MpNew:= [];
-    for i in [1..#Mp] do
-	if Mp[i] notin MpNew then
-	    Append(~MpNew,Mp[i]);
-	end if;
-    end for;
-    Mp:= MpNew;
-
-    // remove redundancy
-    // that is, remove cases of Lp covered by Mp
-    toRemove:= [];
-    for i in [1..#Lp] do
-	fb:=&*[fprs[j]^Lp[i][2][j] : j in [1..#fprs]];
-	for j in [1..#Mp] do
-	    fb_:=&*[fprs[k]^Mp[j][2][k] : k in [1..#fprs]];
-	    fp:=fprs[Mp[j][1][1]];
-	    if IsIntegral(fb/fb_) and (fb/fb_ eq fp^(Valuation(fb/fb_,fp))) then
-		if (Valuation(fb/fb_,fp) ge 0) then
-		    Append(~toRemove,i);
-		    break j;
-		end if;
-	    end if;
-	end for;
-    end for;
-    LpNew:= [Lp[i] : i in [1..#Lp] | i notin toRemove];
-    Lp:= LpNew;
 
     return Lp,Mp,fprs;
 end function;
@@ -450,16 +471,19 @@ monic:= function(fieldKinfo,clist,avalues,primelist)
     return alistNew;
 end function;
 
-normInv:= function(R,OK)
+normInv:= function(fieldKinfo,R)
 
     /*
-     Description: generate all ideals of OK having norm R
+     Description: generate all ideals of OK having norm R, conforming to
+     		  Algorithms 3.3.3 and 3.3.4 of Gh
      Input: R:= a positive integer
             OK:= corresponding ring of integers of the field K
-     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Output: all ideals of OK having norm R as per Algorithms 3.3.3 and 3.3.4, displayed
+     	     in an enumerated set
      Example:
    */
 
+    OK:= fieldKinfo`ringofintegers;
     assert R in Integers();
     assert R ge 1;
     R:=Integers()!R;
@@ -467,90 +491,37 @@ normInv:= function(R,OK)
     if R eq 1 then
 	return { 1*OK };
     end if;
-    p:=Max(PrimeDivisors(R));
-    fpr:=[fp[1] : fp in Factorisation(p*OK)];
-    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
-    if #fpr eq 0 then
+    p:= Max(PrimeDivisors(R));
+    ideals:= [];
+
+    // apply Algorithm 3.3.3 and Algorithm 3.3.4 of Gh to p
+    Lp,Mp,fprs:=algs1and2(fieldKinfo,p);
+
+    for j in [1..#Lp] do
+	assert (Lp[j][1][1] eq #fprs + 1);
+	fb:=&*[fprs[k]^Lp[j][2][k] : k in [1..#fprs]];
+	if Valuation(Norm(fb),p) eq Valuation(R,p) then
+	    Append(~ideals,fb);
+	end if;
+    end for;
+    for j in [1..#Mp] do
+	assert (Mp[j][1][1] lt #fprs + 1);
+	fb:=&*[fprs[k]^Mp[j][2][k] : k in [1..#fprs]];
+	while Valuation(Norm(fb),p) le Valuation(R,p) do
+	    if Valuation(Norm(fb),p) eq Valuation(R,p) then
+		Append(~ideals,fb);
+		break;
+	    else
+		fb:= fb*fprs[Mp[j][1][1]];
+	    end if;
+	end while;
+    end for;
+    if IsEmpty(ideals) then
 	return {};
     else
-	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+	return &join{{fp*fa : fa in $$(fieldKinfo, R div Norm(fp))} : fp in ideals };
     end if;
 end function;
-
-generateInvs:= function(fieldKinfo,R)
-
-/*
-     Description:
-     Input:
-     Output:
-     Example:
-*/
-
-    OK:= fieldKinfo`ringofintegers;
-    assert R in Integers();
-    assert R ge 1;
-    R:=Integers()!R;
-    assert R ge 1;
-
-    invs:= SetToIndexedSet(normInv(R,OK));
-
-    // remove ideals which do no align with BeGhRe
-    for p in PrimeDivisors(R) do
-	// apply Algorithm 3.3.3 and Algorithm 3.3.4 of Gh to primes of R
-        Lp,Mp,fprs:=algs1and2(fieldKinfo,p);
-
-	toRemove:= [];
-	for i in [1..#invs] do
-	    // determine all prime ideals of invs[i] above p
-	    invs_fprs:= [fp : fp in Factorization(invs[i]) | Norm(fp[1]) eq p];
-	    assert &and[fp[1] in fprs : fp in invs_fprs];
- 	    // set index k of unbounded prime to #fprs + 1 to indicate no
-	    // unbounded prime ideals
-            k:= #fprs + 1;
-	    // determine all exponents in invs[i]
-	    fbu:= [0 : fp in fprs];
-	    for fp in invs_fprs do
-		j:= Index(fprs,fp[1]);
-		fbu[j]:= fp[2];
-	    end for;
-	    ILp:= [[k],fbu];
-
-	    // remove redundancy
-	    // that is, remove cases of invs not covered by Lp or Mp
-	    if (ILp notin Lp) then
-		fb:=&*[fprs[j]^ILp[2][j] : j in [1..#fprs]];
-		assert IsIntegral(invs[i]/fb);
-		assert (Factorization(invs[i]/fb) eq
-			[fp : fp in Factorization(invs[i]) | Norm(fp[1]) ne p]);
-		for j in [1..#Mp] do
-		    fb_:=&*[fprs[k]^Mp[j][2][k] : k in [1..#fprs]];
-		    fp:=fprs[Mp[j][1][1]];
-		    if (IsIntegral(fb/fb_) eq false) then
-			Append(~toRemove,i);
-			break j;
-		    elif (fb/fb_ ne fp^(Valuation(fb/fb_,fp))) then
-			Append(~toRemove,i);
-			break j;
-		    elif (Valuation(fb/fb_,fp) lt 0) then
-			Append(~toRemove,i);
-			break j;
-		    end if;
-		end for;
-	    end if;
-	end for;
-
-//	print toRemove;
-	// update invs
-	invsNew:= [invs[i] : i in [1..#invs] | i notin toRemove];
-	invs:= invsNew;
-    end for;
-
-    return invs;
-
-    // left off here; invs is in the wrong format; change to SetEnum
-    // are we missing any possibilities? what if invs is empty?
-end function;
-
 
 removeThue:= procedure(~afplist,NoIdealEq,NoThueEq,primelist)
 
@@ -602,9 +573,9 @@ removeThue:= procedure(~afplist,NoIdealEq,NoThueEq,primelist)
     // remove cases covered by Thue solver
     afplistNew:= [afplist[i] : i in [1..#afplist] | i notin toRemove];
     afplist:= afplistNew;
-    assert #afplist eq NoIdealEq;
+    assert #afplist le NoIdealEq;
     assert IsEmpty(afplist) eq false;
-    assert #ThueToSolve eq NoThueEq;
+    assert #ThueToSolve le NoThueEq;
 
 end procedure;
 
@@ -621,6 +592,8 @@ prep1:= function(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist)
             primelist:= [p_1, \dots, p_v], rational primes on RHS of F(X,Y)
      Output: afplist:= [aset,caseprimes,ideal_a,prime_ideal_list] where
                        ideal_a and prime_ideal_list are as in (3.8) of Gh
+             avalues:= [a_1, \dots, a_m], fixed coefficients on RHS of F(X,Y), updated based
+	     	       on refinements from Algorithms 3.3.3 and 3.3.4 of Gh applied to avalues
      Example:
    */
 
@@ -640,8 +613,10 @@ prep1:= function(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist)
     afplist:=[* [* 1*OK, [] *] *];
     for p in primelist do
 	// apply Algorithm 3.3.3 and Algorithm 3.3.4 of Gh
-        Lp,Mp,fprs:=algs1and2(fieldKinfo,p);
-	// determine all possible combinations of prime ideals as arising from the PIRL of Gh
+        Lp0,Mp0,fprs:=algs1and2(fieldKinfo,p);
+	// refine and remove redundancy of Algorithms 3.3.3 and 3.3.4 of Gh
+	Lp,Mp:= refinePIRL(Lp0,Mp0,fprs);
+	// determine all possible combinations of prime ideals as arising from Lp, Mp
 	afplistNew1:=[*
 		      [*pr[1]*&*[fprs[i]^fb[2][i] : i in [1..#fprs]], pr[2]*]:
 		      fb in Lp, pr in afplist  *];
@@ -656,9 +631,17 @@ prep1:= function(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist)
     alist:= monic(fieldKinfo,clist,avalues,primelist);
 
     afplistNew:=[* *];
+    avaluesNew:= []; // store updated list of avalues
     for aset in alist do
 	a:= Integers()!aset`newa;
-	invs:= generateInvs(fieldKinfo,a); // generate all ideals of norm a
+	invs:= normInv(fieldKinfo,a); // generate all ideals of norm a
+	if (IsEmpty(invs) eq false) then
+	    for adu in aset`adu do
+		if adu[1] notin avaluesNew then
+		    Append(~avaluesNew,adu[1]);
+		end if;
+	    end for;
+	end if;
 	for pr in afplist do
             af:=pr[1];
 	    fplist:= pr[2];
@@ -691,56 +674,11 @@ prep1:= function(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist)
     end for;
 
     removeThue(~afplist,NoIdealEq,NoThueEq,primelist);
+    assert Set(avaluesNew) subset Set(avalues);
     assert IsEmpty(afplist) eq false;
-    return afplist;
+
+    return afplist,avaluesNew;
 end function;
-
-
-
-
-
-
-
-
-ijkAutL:= function(fieldLinfo)
-
-    /*
-     Description: generate automorphisms i0,j,k of L, as in Section 6.1 of Gh
-     Input: fieldLinfo:= record of the splitting field L of K = Q(th)
-     Output: ijk:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
-             AutL:= all automorphisms of L
-     Example:
-   */
-
-    L:= fieldLinfo`field;
-    tl:= fieldLinfo`gen;
-    G,Aut,tau:= AutomorphismGroup(L);
-    assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
-
-    ijk:= [];
-    for x in G do
-	if (Order(x) eq 3) and (tau(x)(tl[1]) eq tl[2]) then
-	    assert x^3 eq Id(G);
-	    ijk[1]:= tau(x);
-	    ijk[2]:= tau(x^2);
-	    ijk[3]:= tau(x^3); // identity map
-	    break x;
-	end if;
-    end for;
-
-    AutL:= [];
-    for x in G do
-        Append(~AutL, tau(x));
-    end for;
-
-    // verify that i,j,k permutes the roots tl
-    assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3]) and (ijk[3](tl[1]) eq tl[1]);
-    assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1]) and (ijk[3](tl[2]) eq tl[2]);
-    assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2]) and (ijk[3](tl[3]) eq tl[3]);
-
-    return ijk, AutL;
-end function;
-
 
 principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
 
@@ -805,6 +743,191 @@ principalize:= function(fieldKinfo,ClK,ideal_a,fplist)
         return false, 0, 0, 0, 0;
     end if;
 end function;
+
+prep2:=function(fieldKinfo,ClK,afplist,primelist)
+
+    /*
+     Description: iterate through each ideal equation (3.8) to generate all S-unit equations
+     		  (3.9) of Gh
+     Input: fieldKinfo:= record of the field K = Q(th)
+            ClK:= record of relevant class group info of the field K = Q(th)
+            afplist:= [aset,caseprimes,ideal_a,prime_ideal_list] where
+                      ideal_a and prime_ideal_list are as in (3.8) of Gh
+     Output: alphgamlist:= record of all S-unit equations corresponding to F(X,Y)
+     Example:
+   */
+
+    K:= fieldKinfo`field;
+    OK:=fieldKinfo`ringofintegers;
+    v:= #primelist;
+
+    // generate a record to store relevant S-unit equation info
+    SUnitInfo:= recformat< newa,adu,alpha,caseprimes,gammalist,matA,vecR,ideallist >;
+
+    alphgamlist:=[ ];
+    for pr in afplist do
+	caseprimes:= pr[2];
+        ideal_a:= pr[3];
+        fplist:= pr[4];
+	nu:= #caseprimes;
+	assert (nu eq #fplist);
+	assert caseprimes eq [Norm(fp) : fp in fplist];
+        tf,alpha,gammalist,matA,rr:=principalize(fieldKinfo,ClK,ideal_a,fplist);
+	if tf then
+	    // sanity checks on exponents of alpha, ideal_a, and ideal generators gamma
+            assert #gammalist eq #fplist;
+            rtest:= [];
+            for i in [1..v] do
+                p:= primelist[i];
+                if p in caseprimes then
+                    ind:= Index(caseprimes, p);
+                    rtest[i]:= rr[ind];
+                else
+                    rtest[i]:= 0;
+                end if;
+            end for;
+
+            tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+            zz:= [Valuation(Norm(ideal<OK|alpha>), primelist[i]) : i in [1..v]];
+            assert [tt[i] + rtest[i] : i in [1..v]] eq zz;
+            for i in [1..nu] do
+                gamma:= gammalist[i];
+                aa:= [Valuation(Norm(ideal<OK|gamma>), caseprimes[j]) : j in [1..nu]];
+                assert aa eq Eltseq(ColumnSubmatrixRange(matA,i,i));
+            end for;
+	    temp:=rec<SUnitInfo|newa:=pr[1]`newa,adu:=pr[1]`adu,caseprimes:=caseprimes,
+				alpha:=alpha,gammalist:=gammalist,matA:=matA,vecR:=rr,
+				ideallist:=fplist>;
+            Append(~alphgamlist,temp);
+        end if;
+    end for;
+    return alphgamlist;
+end function;
+
+// left off here; generate allgammas, allprimes in the next step when need to get info about primes; do this as a seperte function but contain it in the step
+
+    alphgamlist:= [ ];
+    allgammas:= [ ];
+    allprimes:= [ ];
+    red_alphgamlist:= [ ];
+
+    for pr in afplist do
+	primelist:= pr[2];
+        ideal_a:= pr[3];
+        fplist:= pr[4];
+	v:= #primelist;
+        tf,alpha,gammalist,matA,rr:=principalize(fieldKinfo,ClK,ideal_a,fplist);
+	if tf then
+	    // sanity checks on exponents of alpha, ideal_a, and ideal generators gamma
+            assert #gammalist eq #fplist;
+            nu:= #fplist;
+            Nm:= [Norm(fp) : fp in fplist];
+            assert #Nm eq nu;
+            assert &and[IsPrime(fp) : fp in Nm];
+            rtest:= [];
+            for i in [1..v] do
+                p:= primelist[i];
+                if p in Nm then
+                    ind:= Index(Nm, p);
+                    rtest[i]:= rr[ind];
+                else
+                    rtest[i]:= 0;
+                end if;
+            end for;
+            tt:= [Valuation(Norm(ideal_a), primelist[i]) : i in [1..v]];
+            zz:= [Valuation(Norm(ideal<OK|alpha>), primelist[i]) : i in [1..v]];
+            assert [tt[i] + rtest[i] : i in [1..v]] eq zz;
+            for i in [1..nu] do
+                gamma:= gammalist[i];
+                aa:= [Valuation(Norm(ideal<OK|gamma>), Nm[j]) : j in [1..nu]];
+                assert aa eq Eltseq(ColumnSubmatrixRange(matA,i,i));
+            end for;
+	    caseprimes:= [Norm(fp) : fp in fplist];
+	    assert &and[p in primelist : p in caseprimes];
+	    // determine and store all gammas in the S-unit equation across all cases
+	    for i in [1..#gammalist] do
+		if gammalist[i] notin allgammas then
+		Append(~allgammas,gammalist[i]);
+		end if;
+	    end for;
+	    // determine and store all unbounded primes in the S-unit equation across all cases
+	    for p in caseprimes do
+		if p notin allprimes then
+		    Append(~allprimes, p);
+		end if;
+	    end for;
+	    temp1:=rec<SUnitRec|primelist:=primelist,newa:=pr[1]`newa,adu:=pr[1]`adu,
+				alpha:=alpha,gammalist:=gammalist,matA:=matA,vecR:=rr,
+				ideallist:=fplist,caseprimes:=caseprimes>;
+	    temp2:= [*caseprimes,gammalist,matA,rr,fplist*];
+	    if temp2 notin red_alphgamlist then
+		Append(~red_alphgamlist, temp2);
+	    end if;
+ 	    red_index:= Index(red_alphgamlist,temp2);
+	    temp1:=rec<SUnitRec|red_index:=red_index,primelist:=primelist,newa:=pr[1]`newa,
+				adu:=pr[1]`adu,alpha:=alpha,gammalist:=gammalist,matA:=matA,
+				vecR:=rr,ideallist:=fplist,caseprimes:=caseprimes>;
+	    Append(~alphgamlist,temp1);
+        end if;
+    end for;
+    Sort(~allprimes);
+    red_alphgamlistNew:= [];
+    for C in red_alphgamlist do
+	temp:=rec<SUnitRec|gammalist:=C[2],matA:=C[3],vecR:=C[4],
+			   ideallist:=C[5],caseprimes:=C[1]>;
+	Append(~red_alphgamlistNew, temp);
+    end for;
+    red_alphgamlist:= red_alphgamlistNew;
+    assert #red_alphgamlist le #alphgamlist;
+
+    return alphgamlist,red_alphgamlist,allgammas,allprimes;
+end function;
+
+
+
+
+
+
+ijkAutL:= function(fieldLinfo)
+
+    /*
+     Description: generate automorphisms i0,j,k of L, as in Section 6.1 of Gh
+     Input: fieldLinfo:= record of the splitting field L of K = Q(th)
+     Output: ijk:= automorphisms i0,j,k: L -> L as in Section 6.1 of Gh
+             AutL:= all automorphisms of L
+     Example:
+   */
+
+    L:= fieldLinfo`field;
+    tl:= fieldLinfo`gen;
+    G,Aut,tau:= AutomorphismGroup(L);
+    assert IsIsomorphic(G, Sym(3)) or IsIsomorphic(G, Alt(3));
+
+    ijk:= [];
+    for x in G do
+	if (Order(x) eq 3) and (tau(x)(tl[1]) eq tl[2]) then
+	    assert x^3 eq Id(G);
+	    ijk[1]:= tau(x);
+	    ijk[2]:= tau(x^2);
+	    ijk[3]:= tau(x^3); // identity map
+	    break x;
+	end if;
+    end for;
+
+    AutL:= [];
+    for x in G do
+        Append(~AutL, tau(x));
+    end for;
+
+    // verify that i,j,k permutes the roots tl
+    assert (ijk[1](tl[1]) eq tl[2]) and (ijk[2](tl[1]) eq tl[3]) and (ijk[3](tl[1]) eq tl[1]);
+    assert (ijk[1](tl[2]) eq tl[3]) and (ijk[2](tl[2]) eq tl[1]) and (ijk[3](tl[2]) eq tl[2]);
+    assert (ijk[1](tl[3]) eq tl[1]) and (ijk[2](tl[3]) eq tl[2]) and (ijk[3](tl[3]) eq tl[3]);
+
+    return ijk, AutL;
+end function;
+
+
 
 prep2:=function(fieldKinfo,ClK,afplist)
 
@@ -2063,14 +2186,21 @@ th:=OK!th;
 fieldKinfo:= rec<FieldInfo | field:= K,gen:= th,ringofintegers:= OK,minpoly:= f>;
 
 // generate all ideal equations
-afplist:= prep1(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist);
+afplist,avaluesNew:= prep1(fieldKinfo,clist,NoIdealEq,NoThueEq,avalues,primelist);
+avalues:= avaluesNew;
 
 // generate a record to store relevant class group info
-ClassGroupRec:= recformat<classgroup,classnumber,map>;
-ClK:= rec< ClassGroupRec | >;
+ClassGroupInfo:= recformat<classgroup,classnumber,map>;
+ClK:= rec< ClassGroupInfo | >;
 ClK`classgroup, ClK`map:= ClassGroup(K);
 assert classnumber eq Integers()! ClassNumber(K);
 ClK`classnumber:= classnumber;
+
+// generate all S-unit equations
+alphgamlist:= prep2(fieldKinfo,ClK,afplist,primelist);
+
+
+
 
 // have added caseprimes to each afplist
 // maybe instead of red_alphgamlist (which has each matA,vecR,gammalist, (just different ideal b), we should collect all the same ideal b's first
@@ -2081,8 +2211,6 @@ ClK`classnumber:= classnumber;
 // generic gammalist, etc in prep2; maybe set up a seperate function to determine prime splitting from
 // maybe do this in prep1, when determining prime splitting (ie store the primes which have ef=1)
 
-
-alphgamlist:= prep2(fieldKinfo,ClK,afplist);
 
 
 
@@ -2106,7 +2234,7 @@ OL:= MaximalOrder(L);
 tf,mapKL:= IsSubfield(K,L);
 assert tf;
 assert (L!th eq mapKL(th)) and (mapKL(th) in tl);
-fieldLinfo:= rec<FieldRec | field:= L, gen:=tl,ringofintegers:= OL>;
+fieldLinfo:= rec<FieldInfo | field:= L, gen:=tl,ringofintegers:= OL>;
 Append(~timings,<Cputime(t2),"splitting field">);
 
 // generate all automorphisms of L, including i0,j,k as in Section 6.1 of Gh
@@ -2156,7 +2284,7 @@ assert f eq &+[fclist[i+1]*x^(n-i) : i in [0..n]];
 
 
 t7:= Cputime();
-alphgamlist,red_alphgamlist,allgammas,allprimes:= prep2(fieldKinfo,ClK,afplist);
+alphgamlist,red_alphgamlist,allgammas,allprimes:= prep2(fieldKinfo,ClK,Nuafplist);
 Append(~timings,<Cputime(t7),"S-unit equations">);
 assert #alphgamlist ne 0;
 
@@ -5152,4 +5280,137 @@ SeqEnumToString:= function(X : Quotations:=true)
     end if;
 
     return strX;
+end function;
+
+
+// obsolete
+normInv:= function(R,OK)
+
+    /*
+     Description: generate all ideals of OK having norm R
+     Input: R:= a positive integer
+            OK:= corresponding ring of integers of the field K
+     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Example:
+   */
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+    if R eq 1 then
+	return { 1*OK };
+    end if;
+    p:=Max(PrimeDivisors(R));
+    fpr:=[fp[1] : fp in Factorisation(p*OK)];
+    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
+    if #fpr eq 0 then
+	return {};
+    else
+	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+    end if;
+end function;
+
+normInv:= function(R,OK)
+
+    /*
+     Description: generate all ideals of OK having norm R
+     Input: R:= a positive integer
+            OK:= corresponding ring of integers of the field K
+     Output: all ideals of OK having norm R, displayed in an enumerated set
+     Example:
+   */
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+    if R eq 1 then
+	return { 1*OK };
+    end if;
+    p:=Max(PrimeDivisors(R));
+    fpr:=[fp[1] : fp in Factorisation(p*OK)];
+    fpr:=[fp : fp in fpr | Valuation(Norm(fp),p) le Valuation(R,p)];
+    if #fpr eq 0 then
+	return {};
+    else
+	return &join{{fp*fa : fa in $$(R div Norm(fp), OK)} : fp in fpr };
+    end if;
+end function;
+
+
+generateInvs:= function(fieldKinfo,R)
+
+/*
+     Description: CONTAINS AN ERROR WHICH REMOVES TOO MANY CASES
+     Input:
+     Output:
+     Example:
+*/
+
+    OK:= fieldKinfo`ringofintegers;
+    assert R in Integers();
+    assert R ge 1;
+    R:=Integers()!R;
+    assert R ge 1;
+
+    invs:= SetToIndexedSet(normInv(R,OK));
+
+    // remove ideals which do no align with BeGhRe
+    for p in PrimeDivisors(R) do
+
+	// apply Algorithm 3.3.3 and Algorithm 3.3.4 of Gh to primes of R
+        Lp,Mp,fprs:=algs1and2(fieldKinfo,p);
+
+	toRemove:= [];
+	for i in [1..#invs] do
+	    // determine all prime ideals of invs[i] above p
+	    invs_fprs:= [fp : fp in Factorization(invs[i]) | Norm(fp[1]) eq p];
+	    assert &and[fp[1] in fprs : fp in invs_fprs];
+ 	    // set index k of unbounded prime to #fprs + 1 to indicate no
+	    // unbounded prime ideals
+            k:= #fprs + 1;
+	    // determine all exponents in invs[i]
+	    fbu:= [0 : fp in fprs];
+	    for fp in invs_fprs do
+		j:= Index(fprs,fp[1]);
+		fbu[j]:= fp[2];
+	    end for;
+	    ILp:= [[k],fbu];
+
+	    // remove redundancy
+	    // that is, remove cases of invs not covered by Lp or Mp
+	    if (ILp notin Lp) then
+		fb:=&*[fprs[j]^ILp[2][j] : j in [1..#fprs]];
+		assert IsIntegral(invs[i]/fb);
+		assert (Factorization(invs[i]/fb) eq
+			[fp : fp in Factorization(invs[i]) | Norm(fp[1]) ne p]);
+		for j in [1..#Mp] do
+		    fb_:=&*[fprs[k]^Mp[j][2][k] : k in [1..#fprs]];
+		    fp:=fprs[Mp[j][1][1]];
+		    if (IsIntegral(fb/fb_) eq false) then
+			Append(~toRemove,i);
+			print "yes1";
+			break j;
+		    elif (fb/fb_ ne fp^(Valuation(fb/fb_,fp))) then
+			Append(~toRemove,i);
+			print "yes2";
+			break j;
+		    elif (Valuation(fb/fb_,fp) lt 0) then
+			Append(~toRemove,i);
+			print "yes3";
+			break j;
+		    end if;
+		end for;
+	    end if;
+	end for;
+
+//	print toRemove;
+	// update invs
+	invsNew:= {@invs[i] : i in [1..#invs] | i notin toRemove@};
+	invs:= invsNew;
+    end for;
+
+    return invs;
+
+    // left off here; invs is in the wrong format; change to SetEnum
+    // are we missing any possibilities? what if invs is empty?
 end function;
