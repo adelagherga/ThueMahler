@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  20 JAN 2021 13:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  3 SEP 2021 11:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -971,7 +971,7 @@ LaTeX Info: Redefining \nameref on input line 102.
 .1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.27 ...}Lattice-Based Reduction}{43}{section.3.6}
+l.27 ...}Lattice-Based Reduction}{45}{section.3.6}
                                                    [1
 
 ])
@@ -1077,150 +1077,183 @@ LaTeX Warning: Citation `TW3' on page 27 undefined on input line 661.
 LaTeX Warning: Citation `GhKaMaSi' on page 27 undefined on input line 661.
 
 [27] [28] [29]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 750.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 754.
 
  (/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 750.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 754.
 
 [30] [31]
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 838.
- [32]
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 843.
+
+Underfull \hbox (badness 3919) in paragraph at lines 846--847
+[][]\OT1/cmr/m/n/10.95 We ap-ply the PIRL to the ra-tio-nal primes above $\OML/
+cmm/m/it/10.95 c$\OT1/cmr/m/n/10.95 , that is, for the
+ []
+
+
+Underfull \hbox (badness 4699) in paragraph at lines 846--847
+\OT1/cmr/m/n/10.95 ideal $\U/euf/m/n/10.95 a$\OT1/cmr/m/n/10.95 . This re-duces
+ the num-ber of cases tremen-dously. For ex-am-ple,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 846--847
+\OT1/cmr/m/n/10.95 "947135,[](24,1,16,15)[],[](24,1,16,15)[],[](1,1,384,8640)[]
+,None,2,1,3948,2,[](1,8)[],[](5,7,27061)[]"
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 846--847
+\OT1/cmr/m/n/10.95 with the aval-ues PIRL and prin-ci-pal-iza-tion, goes from h
+av-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 846--847
+\OT1/cmr/m/n/10.95 1976 S-unit equa-tions to only 50. Huge im-prove-ment! This 
+set
+ []
+
+
+Overfull \hbox (52.67062pt too wide) in paragraph at lines 846--847
+\OT1/cmr/m/n/10.95 831855,"(16,10,33,21)","(16,10,33,21)","(1,10,528,5376)",Non
+e,2,1,1050,2,"(1,8)","(3,5,55457)"
+ []
+
+[32]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 864.
+(hyperref)                removing `math shift' on input line 870.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 864.
+(hyperref)                removing `math shift' on input line 870.
 
 [33]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 886.
+(hyperref)                removing `math shift' on input line 892.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 886.
+(hyperref)                removing `math shift' on input line 892.
 
 [34]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 921.
+(hyperref)                removing `math shift' on input line 927.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 921.
+(hyperref)                removing `math shift' on input line 927.
 
-[35]
-Underfull \hbox (badness 1454) in paragraph at lines 952--953
+[35] [36]
+Underfull \hbox (badness 1454) in paragraph at lines 958--959
 \OT1/cmr/m/n/10.95 re-duced to solv-ing finitely many equa-tions of the form []
  for the vari-ables
  []
 
 
-LaTeX Warning: Citation `TW3' on page 36 undefined on input line 959.
+LaTeX Warning: Citation `TW3' on page 37 undefined on input line 965.
 
-[36] [37]
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 969.
-
+[37]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `subscript' on input line 969.
+(hyperref)                removing `math shift' on input line 975.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 969.
+(hyperref)                removing `subscript' on input line 975.
 
 
-LaTeX Warning: Citation `TW3' on page 38 undefined on input line 974.
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 975.
+
+
+LaTeX Warning: Citation `TW3' on page 38 undefined on input line 980.
 
 [38]
 
-LaTeX Warning: Citation `TW3' on page 39 undefined on input line 994.
+LaTeX Warning: Citation `TW3' on page 39 undefined on input line 1000.
 
 
-LaTeX Warning: Citation `TW3' on page 39 undefined on input line 1005.
+LaTeX Warning: Citation `TW3' on page 39 undefined on input line 1011.
 
-[39] [40] [41] [42]
+[39] [40] [41] [42] [43] [44]
 
-LaTeX Warning: Reference `ch:Goormaghtigh' on page 43 undefined on input line 1
-148.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1152.
+LaTeX Warning: Reference `ch:Goormaghtigh' on page 45 undefined on input line 1
+219.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 1152.
+(hyperref)                removing `math shift' on input line 1223.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1152.
-
-[43]
-
-LaTeX Warning: Citation `LLL' on page 44 undefined on input line 1163.
+(hyperref)                removing `superscript' on input line 1223.
 
 
-LaTeX Warning: Citation `Weg0' on page 44 undefined on input line 1163.
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 1223.
 
-[44]
+[45]
 
-LaTeX Warning: Citation `LLL' on page 45 undefined on input line 1185.
-
-
-LaTeX Warning: Citation `LLL' on page 45 undefined on input line 1185.
+LaTeX Warning: Citation `LLL' on page 46 undefined on input line 1234.
 
 
-LaTeX Warning: Citation `Weg0' on page 45 undefined on input line 1185.
+LaTeX Warning: Citation `Weg0' on page 46 undefined on input line 1234.
+
+[46]
+
+LaTeX Warning: Citation `LLL' on page 47 undefined on input line 1256.
 
 
-LaTeX Warning: Citation `Sm' on page 45 undefined on input line 1185.
+LaTeX Warning: Citation `LLL' on page 47 undefined on input line 1256.
 
 
-LaTeX Warning: Citation `Weg0' on page 45 undefined on input line 1185.
+LaTeX Warning: Citation `Weg0' on page 47 undefined on input line 1256.
 
 
-LaTeX Warning: Citation `FP' on page 45 undefined on input line 1194.
+LaTeX Warning: Citation `Sm' on page 47 undefined on input line 1256.
 
 
-LaTeX Warning: Citation `Coh1' on page 45 undefined on input line 1194.
+LaTeX Warning: Citation `Weg0' on page 47 undefined on input line 1256.
 
-[45] [46]
 
-LaTeX Warning: Citation `FP' on page 47 undefined on input line 1234.
+LaTeX Warning: Citation `FP' on page 47 undefined on input line 1265.
 
-[47] [48] [49]
+
+LaTeX Warning: Citation `Coh1' on page 47 undefined on input line 1265.
+
+[47] [48]
+
+LaTeX Warning: Citation `FP' on page 49 undefined on input line 1305.
+
+[49] [50] [51]
 Chapter 4.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1273.
+(hyperref)                removing `math shift' on input line 1344.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1273.
+(hyperref)                removing `math shift' on input line 1344.
 
-[50
+[52
 
 ]
 
-LaTeX Warning: Citation `CrLi' on page 51 undefined on input line 1323.
+LaTeX Warning: Citation `CrLi' on page 53 undefined on input line 1394.
 
 
-LaTeX Warning: Citation `Pap' on page 51 undefined on input line 1327.
+LaTeX Warning: Citation `Pap' on page 53 undefined on input line 1398.
 
 
-LaTeX Warning: Citation `Pap' on page 51 undefined on input line 1336.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
+LaTeX Warning: Citation `Pap' on page 53 undefined on input line 1407.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
@@ -1228,174 +1261,177 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[51] [52] [53] [54]
-
-LaTeX Warning: Citation `RuSi' on page 55 undefined on input line 1615.
-
-[55]
-
-LaTeX Warning: Citation `Mor1' on page 56 undefined on input line 1630.
-
-
-LaTeX Warning: Citation `Mor' on page 56 undefined on input line 1631.
-
-
-LaTeX Warning: Citation `Spri' on page 56 undefined on input line 1637.
-
-[56] [57] [58]
-
-LaTeX Warning: Citation `CrLi' on page 59 undefined on input line 1715.
-
-[59]
-
-LaTeX Warning: Citation `TW2' on page 60 undefined on input line 1745.
-
-
-LaTeX Warning: Citation `TW3' on page 60 undefined on input line 1745.
-
-[60]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[61] [62] [63] [64] [65] [66] [67] [68]
+[53] [54] [55] [56]
 
-LaTeX Warning: Citation `Her1' on page 69 undefined on input line 2147.
+LaTeX Warning: Citation `RuSi' on page 57 undefined on input line 1686.
 
+[57]
 
-LaTeX Warning: Citation `Her2' on page 69 undefined on input line 2147.
-
-
-LaTeX Warning: Citation `Dav' on page 69 undefined on input line 2147.
+LaTeX Warning: Citation `Mor1' on page 58 undefined on input line 1701.
 
 
-LaTeX Warning: Citation `Dav2' on page 69 undefined on input line 2147.
+LaTeX Warning: Citation `Mor' on page 58 undefined on input line 1702.
 
 
-LaTeX Warning: Citation `DaHe' on page 69 undefined on input line 2147.
+LaTeX Warning: Citation `Spri' on page 58 undefined on input line 1708.
+
+[58] [59] [60]
+
+LaTeX Warning: Citation `CrLi' on page 61 undefined on input line 1786.
+
+[61]
+
+LaTeX Warning: Citation `TW2' on page 62 undefined on input line 1816.
 
 
-LaTeX Warning: Citation `Dav3' on page 69 undefined on input line 2152.
+LaTeX Warning: Citation `TW3' on page 62 undefined on input line 1816.
+
+[62]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[63] [64] [65] [66] [67] [68] [69] [70]
+
+LaTeX Warning: Citation `Her1' on page 71 undefined on input line 2218.
 
 
-LaTeX Warning: Citation `Be' on page 69 undefined on input line 2154.
+LaTeX Warning: Citation `Her2' on page 71 undefined on input line 2218.
 
 
-LaTeX Warning: Citation `BeCo' on page 69 undefined on input line 2154.
+LaTeX Warning: Citation `Dav' on page 71 undefined on input line 2218.
 
 
-LaTeX Warning: Citation `Cr' on page 69 undefined on input line 2155.
+LaTeX Warning: Citation `Dav2' on page 71 undefined on input line 2218.
 
 
-LaTeX Warning: Citation `BeMa' on page 69 undefined on input line 2156.
+LaTeX Warning: Citation `DaHe' on page 71 undefined on input line 2218.
 
 
-LaTeX Warning: Citation `Ju' on page 69 undefined on input line 2156.
+LaTeX Warning: Citation `Dav3' on page 71 undefined on input line 2223.
 
 
-LaTeX Warning: Citation `BeGh' on page 69 undefined on input line 2164.
-
-[69]
-
-LaTeX Warning: Citation `Cr' on page 70 undefined on input line 2209.
+LaTeX Warning: Citation `Be' on page 71 undefined on input line 2225.
 
 
-LaTeX Warning: Citation `Cr' on page 70 undefined on input line 2214.
+LaTeX Warning: Citation `BeCo' on page 71 undefined on input line 2225.
 
-[70]
+
+LaTeX Warning: Citation `Cr' on page 71 undefined on input line 2226.
+
+
+LaTeX Warning: Citation `BeMa' on page 71 undefined on input line 2227.
+
+
+LaTeX Warning: Citation `Ju' on page 71 undefined on input line 2227.
+
+
+LaTeX Warning: Citation `BeGh' on page 71 undefined on input line 2235.
+
+[71]
+
+LaTeX Warning: Citation `Cr' on page 72 undefined on input line 2280.
+
+
+LaTeX Warning: Citation `Cr' on page 72 undefined on input line 2285.
+
+[72]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2219.
+(hyperref)                removing `math shift' on input line 2290.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `subscript' on input line 2219.
+(hyperref)                removing `subscript' on input line 2290.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2219.
+(hyperref)                removing `math shift' on input line 2290.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2219.
+(hyperref)                removing `math shift' on input line 2290.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `subscript' on input line 2219.
+(hyperref)                removing `subscript' on input line 2290.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2219.
+(hyperref)                removing `math shift' on input line 2290.
 
-[71] [72]
+[73] [74]
 Chapter 5.
-[73
+[75
 
 ]
 
-LaTeX Warning: Citation `TW3' on page 74 undefined on input line 2288.
+LaTeX Warning: Citation `TW3' on page 76 undefined on input line 2359.
 
-[74] [75] [76] [77] [78] [79]
+[76] [77] [78] [79] [80] [81]
 
-LaTeX Warning: Citation `KanMat' on page 80 undefined on input line 2468.
+LaTeX Warning: Citation `KanMat' on page 82 undefined on input line 2539.
 
-[80]
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2508.
-
+[82]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\Sigma' on input line 2508.
+(hyperref)                removing `math shift' on input line 2579.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 2508.
+(hyperref)                removing `\Sigma' on input line 2579.
 
-[81] [82]
-Overfull \hbox (5.04453pt too wide) in paragraph at lines 2556--2556
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 2579.
+
+[83] [84]
+Overfull \hbox (5.04453pt too wide) in paragraph at lines 2627--2627
 [] 
  []
 
-[83] [84] [85] [86] [87] [88] [89] [90] [91] [92] [93] [94] [95] [96] [97]
-[98] [99]
-Underfull \hbox (badness 3601) in paragraph at lines 3228--3229
-\OT1/cmr/m/n/10.95 We now ap-ply Lemma [][]3.5.5[][] to ob-tain a small bound o
+[85] [86] [87] [88] [89] [90] [91] [92] [93] [94] [95] [96] [97] [98] [99]
+[100] [101]
+Underfull \hbox (badness 3601) in paragraph at lines 3299--3300
+\OT1/cmr/m/n/10.95 We now ap-ply Lemma [][]3.5.6[][] to ob-tain a small bound o
 n $[][] \OML/cmm/m/it/10.95 n[]a[]$ \OT1/cmr/m/n/10.95 when
  []
 
-[100]
+[102]
 
-LaTeX Warning: Citation `Ham' on page 101 undefined on input line 3253.
+LaTeX Warning: Citation `Ham' on page 103 undefined on input line 3324.
 
-[101] [102] [103] [104] [105] [106] [107] [108] [109] [110] [111]
+[103] [104] [105] [106] [107] [108] [109] [110] [111] [112] [113]
 
-LaTeX Warning: Reference `lem:mainnonarch' on page 112 undefined on input line 
-3554.
+LaTeX Warning: Reference `lem:mainnonarch' on page 114 undefined on input line 
+3625.
 
-[112] [113]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3904.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3904.
+[114] [115]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3975.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3975.
  (./TM.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3904.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3904.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3975.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3975.
 
 Package rerunfilecheck Info: File `TM.out' has not changed.
-(rerunfilecheck)             Checksum: 3D4A6BE4BE603178CA4E6B2E84E5ADAF;3881.
+(rerunfilecheck)             Checksum: AE088AE10278B70AC7828C15E34CB7DD;3881.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3904.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3975.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 1061 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 22738 strings out of 492995
- 392379 string characters out of 6132704
+ 22744 strings out of 492995
+ 392432 string characters out of 6132704
  563214 words of memory out of 5000000
- 25457 multiletter control sequences out of 15000+600000
+ 25460 multiletter control sequences out of 15000+600000
  30747 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,22n,54p,3240b,2901s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1425,10 +1461,10 @@ ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive
 2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm7.pfb></usr/local/texli
 ve/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on TM.pdf (114 pages, 628506 bytes).
+Output written on TM.pdf (116 pages, 636808 bytes).
 PDF statistics:
- 1494 PDF objects out of 1728 (max. 8388607)
- 1338 compressed objects within 14 object streams
- 381 named destinations out of 1000 (max. 500000)
+ 1508 PDF objects out of 1728 (max. 8388607)
+ 1350 compressed objects within 14 object streams
+ 384 named destinations out of 1000 (max. 500000)
  437 words of extra memory for PDF output out of 10000 (max. 10000000)
 

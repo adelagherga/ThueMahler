@@ -1237,7 +1237,7 @@ timings:= [];
 // setup for manual .csv input
 
 // logfile tracking any errors
-SUnitErr:= "/home/adela/ThueMahler/Data/vecRtest.csv";
+SUnitErr:= "/home/adela/ThueMahler/Data/Tests/vecRtest.csv";
 
 // .csv format is
 // N,"form","optimal form","(alphgamlist index,p,lemma 3.5.2 bound,lemma 3.5.5 bound)"

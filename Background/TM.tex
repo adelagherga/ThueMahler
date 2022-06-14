@@ -676,6 +676,9 @@ such that
 
 To generate the lists $M_p$, $L_p$ we consider two affine patches, $p \nmid y$ and $p \mid y$. We begin with the following lemmata.
 
+\edit{We claim that $p\nmid y$. In case $p$ divides $y$, each prime ideal above p also divides $y$. But a prime ideal dividing $y$ cannot divide $(x - y\theta)$ because $\gcd(x,y) = 1$. So if $p$ divides $y$, $\ord_{\mathfrak{q}}(x-y\theta) = 0$ for all ideals $\mathfrak{q}$ above $p$.
+More precisely, if $p \mid y$, then $\mathfrak{q}|y$ and we have $\ord_{\mathfrak{q}}(x-y\theta) = \{\ord_{\mathfrak{q}}(x), \ord_{\mathfrak{q}}(y) + \ord_{\mathfrak{q}}(\theta)\} = \min \{0, \ord_{\mathfrak{q}}(y) + \ord_{\mathfrak{q}}(\theta)\} = 0$ as $\ord_{\mathfrak{q}}(y) > 0$ and $\ord_{\mathfrak{q}}(x) = 0$.}
+
 \begin{lemma} \label{lem:AffinePatch1}
 Let $(x,y,z_1, \dots, z_v)$ be a solution of \eqref{eq:ThueMahler3} with $p \nmid y$, let $t$ be a positive integer, and suppose $x/y \equiv u \pmod{p^t}$, where ${u \in \{0,1,2,\dotsc,p^{t}-1\}}$. If $\mathfrak{q}$ is a prime ideal of $\mathcal{O}_K$ lying over $p$, then
 \[\ord_{\mathfrak{q}}(x-y\theta)\ge \min\{\ord_{\mathfrak{q}}(u-\theta), t \cdot e(\mathfrak{q}|p)\}.\]
@@ -683,6 +686,7 @@ Moreover, if $\ord_{\mathfrak{q}}(u-\theta) < t \cdot e(\mathfrak{q}|p)$, then
 \[\ord_\mathfrak{q}(x-y\theta) = \ord_{\mathfrak{q}}(u-\theta).\]
 \end{lemma}
 
+\edit{By the above claim, we in fact do not need this lemma.}
 \begin{lemma} \label{lem:AffinePatch2}
 Let $(x,y,z_1, \dots, z_v)$ be a solution of \eqref{eq:ThueMahler3} with $p \mid y$ (and thus $p \nmid x$), let $t$ be a positive integer, and suppose $y/x \equiv u \pmod{p^t}$, where $u \in \{0,1,2,\dotsc,p^{t}-1\}$. If $\mathfrak{q}$ is a prime ideal of $\mathcal{O}_K$ lying over $p$, then
 \[\ord_{\mathfrak{q}}(x-y\theta)\ge \min\{\ord_{\mathfrak{q}}(1-\theta u), t \cdot e(\mathfrak{q}|p)\}.\]
@@ -762,6 +766,7 @@ Suppose first that the hypothesis of (i) is satisfied: $\mathcal{P}_u = \emptyse
 Suppose next that the hypothesis of (ii) is satisfied: $\mathcal{P}_u=\{\mathfrak{p}\}$ where ${e(\mathfrak{p}|p)=f(\mathfrak{p}|p)=1}$ and there is a unique $\mathbb{Z}_p$ root $\alpha$ of $g(t)$ such that $\alpha \equiv u \mod{p^t}$. The algorithm adds $(\mathfrak{b}_u,\mathfrak{p})$ to the set $\mathcal{M}_p$. By the above, $(x-y\theta)\mathcal{O}_K/\mathfrak{b}_u$ is an integral ideal, not divisible by any prime ideal $\mathfrak{q} \neq \mathfrak{p}$ lying over $p$. Thus there is some positive integer $v_p \geq 0$ such that \eqref{eq:Mp} is satisfied, concluding the proof.
 \end{proof}
 
+\edit{Again, by the above claim, we do not need this algorithm either.}
 Having computed the lists arising from the affine patch $p \nmid y$, we initialize $L_p$ and $M_p$ as $\mathcal{L}_p$ and $\mathcal{M}_p$, respectively, and append to these lists the elements from the second patch, $p \mid y$, using the following algorithm.
 
 \begin{algorithm}\label{alg:AffinePatch2}
@@ -838,6 +843,7 @@ Moreover, this variant of the Prime Ideal Removing Lemma permits the following a
 \item Let $\mathfrak{b} \in L_p$. If there exists a pair $(\mathfrak{b}^\prime,\mathfrak{p}) \in M_p$ with $\mathfrak{b}^\prime \mid \mathfrak{b}$ and $\mathfrak{b}/\mathfrak{b}^\prime=\mathfrak{p}^w$
 for some $w \ge 0$, then we may delete $\mathfrak{b}$ from $L_p$. In doing so, the conclusion to Lemma~\ref{lem:AffinePatch2Check} continues to hold.
 \item Suppose $(\mathfrak{b},\mathfrak{p})$, $(\mathfrak{b}^\prime,\mathfrak{p}) \in M_p$ with $\mathfrak{b}^{\prime} \mid \mathfrak{b}$, and $\mathfrak{b}/\mathfrak{b}^{\prime}=\mathfrak{p}^w$ for some ${w \geq 0}$. Then, we may delete $(\mathfrak{b},\mathfrak{p})$ from $M_p$ without affecting the conclusion to Lemma~\ref{lem:AffinePatch2Check}.
+\item \edit{We apply the PIRL to the rational primes above $c$, that is, for the ideal $\mathfrak{a}$. This reduces the number of cases tremendously. For example, "947135,\"(24,1,16,15)\",\"(24,1,16,15)\",\"(1,1,384,8640)\",None,2,1,3948,2,\"(1,8)\",\"(5,7,27061)\"" with the avalues PIRL and principalization, goes from having 1976 S-unit equations to only 50. Huge improvement! This set 831855,"(16,10,33,21)","(16,10,33,21)","(1,10,528,5376)",None,2,1,1050,2,"(1,8)","(3,5,55457)" goes down from 1050 ideal equations to only 56, and subsequently only 27 S-unit equations}
 \end{itemize}
 
 %---------------------------------------------------------------------------------------------%
@@ -964,7 +970,7 @@ However, when generating the vectors $\mathbf{r} = (r_1, \dots, r_{\nu})$ using 
 
 In most cases, the method described in \autoref{subsec:FactorizationTMwithOK} is far more efficient than that of \autoref{subsec:FactorizationTMwithoutOK}. However, computing the class group may be a very costly computation. Indeed, for some Thue-Mahler equations, this may be the bottle-neck of the algorithm. In this case, it may happen that computing the class group will take longer than directly checking each potential $S$-unit equation arising from the alternative method. Unfortunately, we cannot know a priori how long computing $\Cl(K)$ will take in so much that we cannot know a priori how long solving all $S$-unit equations from the other algorithm will take. In practicality, generating the class group in Magma is a process which cannot be terminated without exiting the program. For this reason, we cannot simply apply a timeout in Magma if computing $\Cl(K)$ is exceeding what we deem a reasonable amount of time. Adding to this, Magma does not support parallelization, so we cannot implement both algorithms simultaneously. Our compromise to solve a single Thue-Mahler equation is to run two separate instances of Magma in parallel, each generating the $S$-unit equations using the two aforementioned algorithms. When one of these instances finishes, the other is forced to terminate. In this way, though far from ideal, we are able to select the most computationally efficient option.
 
-%---------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 
 \section{A small upper bound for $u_l$ in a special case}
 \label{sec:SmallBoundForSpecialCase}
@@ -1012,7 +1018,72 @@ and on the other hand,
 \end{align*}
 \end{proof}
 
-For the remainder of this section, we assume $\ord_{p_l}(\delta_1) = 0$. Here, it is convenient to use the notation
+\begin{remark}
+  Using the Prime Ideal Removing Lemma of Section~\ref{sec:PIRL}, the conditions of the above lemma never hold. That is to say, after applying Lemma~\ref{lem:AffinePatch1} and Lemma~\ref{lem:AffinePatch2}, we are always in the case that $\ord_{p_l}(\delta_1) = 0$.
+
+  \begin{proof}
+    We claim $\ord_{p_l}(\delta_1) = 0$, where
+    \begin{align*}
+      \ord_{p_l}(\delta_1)
+      & = \ord_{p_l}\left(\frac{\theta^{(i_0)} - \theta^{(j)}}{\theta^{(i_0)} - \theta^{(k)}}
+        \cdot \frac{\alpha^{(k)}\zeta^{(k)}}{\alpha^{(j)}\zeta^{(j)}}\right) \\
+      & = \ord_{p_l}(\theta^{(i_0)} -\theta^{(j)}) - \ord_{p_l}(\theta^{(i_0)} -\theta^{(k)})
+        + \ord_{p_l}(\alpha^{(k)}) - \ord_{p_l}(\alpha^{(j)}).
+    \end{align*}
+    Consider the factorization $g(t) = g_1(t) \cdots g_m(t)$ of $g(t)$ in $\mathbb{Q}_{p_l}[t]$. Note that $\theta^{(j)}$ is a root of some $g_j(t) \neq g_{i_0}(t)$, where $g_{i_0}$ corresponds to the unbounded prime ideal $\mathfrak{p}_{i_0}$. Let $\mathfrak{p}_j$ be the corresponding prime ideal above $p_l$ and $e(\mathfrak{p}_j|p_l)$ be its ramification index. Since
+    \[(\alpha)\mathcal{O}_K = \mathfrak{a} \cdot \tilde{\mathfrak{p}}^\mathbf{r} = \mathfrak{a} \mathfrak{p}_1^{r_1} \cdots \mathfrak{p}_{\nu}^{r_{\nu}}\]
+    we have
+    \[\ord_{p_l}(\alpha^{(j)}) = \frac{1}{e(\mathfrak{p}_j|p_l)}\ord_{\mathfrak{p}_j}(\mathfrak{a})\]
+    as $\mathfrak{p}_j$ is bounded and thus not among $\mathfrak{p}_1, \dots, \mathfrak{p}_{\nu}$. Similarly, we have
+    \[\ord_{p_l}(\alpha^{(k)}) = \frac{1}{e(\mathfrak{p}_k|p_l)}\ord_{\mathfrak{p}_k}(\mathfrak{a}).\]
+    Now, as $p_l \nmid y$
+    \begin{align*}
+      \ord_{p_l}(\theta^{(i_0)} - \theta^{(j)})
+      & = \ord_{p_l}(\theta^{(i_0)} - \theta^{(j)}) + \ord_{p_l}(y) \\
+      & = \ord_{p_l}(y\theta^{(i_0)} - y\theta^{(j)})\\
+      & = \ord_{p_l}((x-y\theta^{(j)}) - (x - y\theta^{(i_0)}))\\
+      & \geq \min\left(\ord_{p_l}(x-y\theta^{(j)}),\ord_{p_l}(x - y\theta^{(i_0)})\right)\\
+      & =  \min\left(\frac{\ord_{\mathfrak{p}_{j}}(x-y\theta)}{e(\mathfrak{p}_j | p_l)},\ord_{\mathfrak{p}_{i_0}}(x - y\theta)\right)
+\end{align*}
+where $e(\mathfrak{p}_{i_0} | p_l) = 1$. Now, by Lemma~\ref{lem:AffinePatch1}, for some positive integers $u,t$, we have both
+\[\ord_{\mathfrak{p}_j}(x-y\theta) = \ord_{\mathfrak{p}_j}(u - \theta) < t \cdot e(\mathfrak{p}_j | p_l)\]
+so that
+\[\frac{\ord_{\mathfrak{p}_j}(x-y\theta)}{e(\mathfrak{p}_j | p_l)} < t,\]
+and
+\[\ord_{\mathfrak{p}_{i_0}}(x-y\theta) \geq \min\left( \ord_{\mathfrak{p}_{i_0}}(u - \theta), t\right) \geq t,\]
+where the last inequality follows from $\ord_{\mathfrak{p}_{i_0}}(u-\theta) \geq t$.
+Thus,
+\[\ord_{\mathfrak{p}_{i_0}}(x-y\theta) \geq t > \frac{\ord_{\mathfrak{p}_j}(x-y\theta)}{e(\mathfrak{p}_j | p_l)}\]
+and so we have the equality
+\[ \ord_{p_l}(\theta^{(i_0)} - \theta^{(j)}) =  \min\left(\frac{\ord_{\mathfrak{p}_{j}}(x-y\theta)}{e(\mathfrak{p}_j | p_l)},\ord_{\mathfrak{p}_{i_0}}(x - y\theta)\right) = \frac{\ord_{\mathfrak{p}_{j}}(x-y\theta)}{e(\mathfrak{p}_j | p_l)}.\]
+Since
+$(x-y\theta)\mathcal{O}_K = \mathfrak{a}\mathfrak{p}_1^{u_1}\cdots\mathfrak{p}_{\nu}^{u_{\nu}}$, where $\mathfrak{p}_1, \dots, \mathfrak{p}_{\nu}$ are unbounded prime ideals not containing $\mathfrak{p}_j$ (and respectively, $\mathfrak{p}_k$), we thus have
+\[ \ord_{p_l}(\theta^{(i_0)} - \theta^{(j)})
+  = \frac{\ord_{\mathfrak{p}_{j}}(x-y\theta)}{e(\mathfrak{p}_j | p_l)}
+  = \frac{\ord_{\mathfrak{p}_{j}}(\mathfrak{a})}{e(\mathfrak{p}_j | p_l)}.\]
+\edit{It might be helpful here to distinguish $\mathfrak{p}_j$ as pertaining to $p_l$ by writing $\mathfrak{p}_{lj}$ so that we don't mistake it as belonging to $\mathfrak{p}_1, \dots, \mathfrak{p}_{\nu}$.}
+Analogously,
+\[ \ord_{p_l}(\theta^{(i_0)} - \theta^{(k)}) = \frac{\ord_{\mathfrak{p}_{k}}(\mathfrak{a})}{e(\mathfrak{p}_k | p_l)}.\]
+
+Putting this all together yields
+    \begin{align*}
+      \ord_{p_l}(\delta_1)
+      & = \ord_{p_l}\left(\frac{\theta^{(i_0)} -
+        \theta^{(j)}}{\theta^{(i_0)} -\theta^{(k)}} \cdot \frac{\alpha^{(k)}\zeta^{(k)}}
+        {\alpha^{(j)}\zeta^{(j)}}\right) \\
+      & = \ord_{p_l}(\theta^{(i_0)} -\theta^{(j)}) - \ord_{p_l}(\theta^{(i_0)} -\theta^{(k)})
+        + \ord_{p_l}(\alpha^{(k)}) - \ord_{p_l}(\alpha^{(j)})\\
+      & = \frac{\ord_{\mathfrak{p}_j}(\mathfrak{a})}{e(\mathfrak{p}_j|p_l)} -
+        \frac{\ord_{\mathfrak{p}_k}(\mathfrak{a})}{e(\mathfrak{p}_k|p_l)} +
+        \frac{\ord_{\mathfrak{p}_k}(\mathfrak{a})}{e(\mathfrak{p}_k|p_l)} -
+        \frac{\ord_{\mathfrak{p}_j}(\mathfrak{a})}{e(\mathfrak{p}_j|p_l)}\\
+      & = 0.
+    \end{align*}
+  \end{proof}
+
+\end{remark}
+
+It thus follows that $\ord_{p_l}(\delta_1) = 0$ in all cases. Here, it is convenient to use the notation
 \[b_1 = 1, \quad b_{1+i} = n_i \ \text{ for } i \in \{1, \dots, \nu\},\]
 and
 \[ b_{1+{\nu}+i} = a_i \ \text{ for } i  \in \{1, \dots, r\}.\]

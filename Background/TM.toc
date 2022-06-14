@@ -18,44 +18,44 @@
 \contentsline {section}{\numberline {3.2}The relevant algebraic number field}{26}{section.3.2}
 \contentsline {section}{\numberline {3.3}The prime ideal removing lemma}{27}{section.3.3}
 \contentsline {subsection}{\numberline {3.3.1}Computational remarks and refinements}{32}{subsection.3.3.1}
-\contentsline {section}{\numberline {3.4}Factorization of the Thue-Mahler equation}{32}{section.3.4}
+\contentsline {section}{\numberline {3.4}Factorization of the Thue-Mahler equation}{33}{section.3.4}
 \contentsline {subsection}{\numberline {3.4.1}Avoiding the class group $\text {Cl}(K)$}{33}{subsection.3.4.1}
 \contentsline {subsection}{\numberline {3.4.2}Using the class group $\text {Cl}(K)$}{34}{subsection.3.4.2}
 \contentsline {subsection}{\numberline {3.4.3}The $S$-unit equation}{35}{subsection.3.4.3}
 \contentsline {subsection}{\numberline {3.4.4}Computational remarks and comparisons}{37}{subsection.3.4.4}
 \contentsline {section}{\numberline {3.5}A small upper bound for $u_l$ in a special case}{38}{section.3.5}
-\contentsline {section}{\numberline {3.6}Lattice-Based Reduction}{43}{section.3.6}
-\contentsline {subsection}{\numberline {3.6.1}The $L^3$-lattice basis reduction algorithm}{43}{subsection.3.6.1}
-\contentsline {subsection}{\numberline {3.6.2}The Fincke-Pohst algorithm}{45}{subsection.3.6.2}
-\contentsline {subsection}{\numberline {3.6.3}Computational remarks and translated lattices}{47}{subsection.3.6.3}
-\contentsline {chapter}{\numberline {4}Computing Elliptic Curves over $\mathbb {Q}$}{50}{chapter.4}
-\contentsline {section}{\numberline {4.1}Elliptic curves}{50}{section.4.1}
-\contentsline {section}{\numberline {4.2}Cubic forms: the main theorem and algorithm}{51}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}Remarks}{56}{subsection.4.2.1}
-\contentsline {subsubsection}{Historical comments}{56}{section*.2}
-\contentsline {subsubsection}{$2$-division fields and reducible forms}{56}{section*.3}
-\contentsline {subsubsection}{Imprimitive forms}{57}{section*.4}
-\contentsline {subsubsection}{Possible twists}{57}{section*.5}
-\contentsline {subsubsection}{Necessity, but not sufficiency}{58}{section*.6}
-\contentsline {subsubsection}{Special binary cubic forms}{58}{section*.7}
-\contentsline {subsubsection}{The case $j_E = 0$}{59}{section*.8}
-\contentsline {subsection}{\numberline {4.2.2}The algorithm}{59}{subsection.4.2.2}
-\contentsline {section}{\numberline {4.3}Proof of Theorem \autoref {fisk}}{60}{section.4.3}
-\contentsline {section}{\numberline {4.4}Finding representative forms}{68}{section.4.4}
-\contentsline {subsection}{\numberline {4.4.1}Irreducible Forms}{69}{subsection.4.4.1}
-\contentsline {subsection}{\numberline {4.4.2}Reducible forms}{69}{subsection.4.4.2}
-\contentsline {subsection}{\numberline {4.4.3}Computing forms of fixed discriminant}{70}{subsection.4.4.3}
-\contentsline {subsection}{\numberline {4.4.4}$\unhbox \voidb@x \hbox {GL}_2(\mathbb {Z})$ vs $\unhbox \voidb@x \hbox {SL}_2(\mathbb {Z})$}{71}{subsection.4.4.4}
-\contentsline {subsection}{\numberline {4.4.5}Pseudocode for finding representative forms}{71}{subsection.4.4.5}
-\contentsline {chapter}{\numberline {5}Towards Efficient Resolution of Thue-Mahler Equations}{73}{chapter.5}
-\contentsline {section}{\numberline {5.1}Decomposition of the Weil height}{74}{section.5.1}
-\contentsline {section}{\numberline {5.2}Initial height bounds}{79}{section.5.2}
-\contentsline {section}{\numberline {5.3}Coverings of $\Sigma $}{82}{section.5.3}
-\contentsline {section}{\numberline {5.4}Construction of the ellipsoids}{83}{section.5.4}
-\contentsline {subsection}{\numberline {5.4.1}The Archimedean ellipsoid: the real case}{89}{subsection.5.4.1}
-\contentsline {subsection}{\numberline {5.4.2}The non-Archimedean ellipsoid}{95}{subsection.5.4.2}
-\contentsline {section}{\numberline {5.5}The Archimedean sieve: the real case}{97}{section.5.5}
-\contentsline {section}{\numberline {5.6}The non-Archimedean Sieve}{99}{section.5.6}
-\contentsline {subsection}{\numberline {5.6.1}Applying Lemma~\ref {lem:Delta1}}{100}{subsection.5.6.1}
-\contentsline {subsection}{\numberline {5.6.2}Applying Lemma~\ref {lem:specialcase}}{100}{subsection.5.6.2}
-\contentsline {subsection}{\numberline {5.6.3}The reduction procedure}{101}{subsection.5.6.3}
+\contentsline {section}{\numberline {3.6}Lattice-Based Reduction}{45}{section.3.6}
+\contentsline {subsection}{\numberline {3.6.1}The $L^3$-lattice basis reduction algorithm}{45}{subsection.3.6.1}
+\contentsline {subsection}{\numberline {3.6.2}The Fincke-Pohst algorithm}{47}{subsection.3.6.2}
+\contentsline {subsection}{\numberline {3.6.3}Computational remarks and translated lattices}{49}{subsection.3.6.3}
+\contentsline {chapter}{\numberline {4}Computing Elliptic Curves over $\mathbb {Q}$}{52}{chapter.4}
+\contentsline {section}{\numberline {4.1}Elliptic curves}{52}{section.4.1}
+\contentsline {section}{\numberline {4.2}Cubic forms: the main theorem and algorithm}{53}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Remarks}{58}{subsection.4.2.1}
+\contentsline {subsubsection}{Historical comments}{58}{section*.2}
+\contentsline {subsubsection}{$2$-division fields and reducible forms}{58}{section*.3}
+\contentsline {subsubsection}{Imprimitive forms}{59}{section*.4}
+\contentsline {subsubsection}{Possible twists}{59}{section*.5}
+\contentsline {subsubsection}{Necessity, but not sufficiency}{60}{section*.6}
+\contentsline {subsubsection}{Special binary cubic forms}{60}{section*.7}
+\contentsline {subsubsection}{The case $j_E = 0$}{61}{section*.8}
+\contentsline {subsection}{\numberline {4.2.2}The algorithm}{61}{subsection.4.2.2}
+\contentsline {section}{\numberline {4.3}Proof of Theorem \autoref {fisk}}{62}{section.4.3}
+\contentsline {section}{\numberline {4.4}Finding representative forms}{70}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Irreducible Forms}{71}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Reducible forms}{71}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Computing forms of fixed discriminant}{72}{subsection.4.4.3}
+\contentsline {subsection}{\numberline {4.4.4}$\unhbox \voidb@x \hbox {GL}_2(\mathbb {Z})$ vs $\unhbox \voidb@x \hbox {SL}_2(\mathbb {Z})$}{73}{subsection.4.4.4}
+\contentsline {subsection}{\numberline {4.4.5}Pseudocode for finding representative forms}{73}{subsection.4.4.5}
+\contentsline {chapter}{\numberline {5}Towards Efficient Resolution of Thue-Mahler Equations}{75}{chapter.5}
+\contentsline {section}{\numberline {5.1}Decomposition of the Weil height}{76}{section.5.1}
+\contentsline {section}{\numberline {5.2}Initial height bounds}{81}{section.5.2}
+\contentsline {section}{\numberline {5.3}Coverings of $\Sigma $}{84}{section.5.3}
+\contentsline {section}{\numberline {5.4}Construction of the ellipsoids}{85}{section.5.4}
+\contentsline {subsection}{\numberline {5.4.1}The Archimedean ellipsoid: the real case}{91}{subsection.5.4.1}
+\contentsline {subsection}{\numberline {5.4.2}The non-Archimedean ellipsoid}{97}{subsection.5.4.2}
+\contentsline {section}{\numberline {5.5}The Archimedean sieve: the real case}{99}{section.5.5}
+\contentsline {section}{\numberline {5.6}The non-Archimedean Sieve}{101}{section.5.6}
+\contentsline {subsection}{\numberline {5.6.1}Applying Lemma~\ref {lem:Delta1}}{102}{subsection.5.6.1}
+\contentsline {subsection}{\numberline {5.6.2}Applying Lemma~\ref {lem:specialcase}}{102}{subsection.5.6.2}
+\contentsline {subsection}{\numberline {5.6.3}The reduction procedure}{103}{subsection.5.6.3}

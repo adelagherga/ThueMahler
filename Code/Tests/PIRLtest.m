@@ -22,11 +22,11 @@ Example:
 
 Attach("/home/adela/ThueMahler/Code/TdWCode/tmpackAllCasesChanges1001.m");
 
-clist:= [1,7,16,106];
-p:= [5,31,41,47];
-A:= 8;
-LogFile:= "/home/adela/ThueMahler/Data/Tests/PIRLtestlog.txt";
-OutFile:= "/home/adela/ThueMahler/Data/Tests/PIRLtestout.txt";
+clist:= [24,1,16,15];
+p:= [2,5,7,27061];
+A:= 1;
+LogFile:= "/home/adela/ThueMahler/Data/Tests/PIRLtest4log.txt";
+OutFile:= "/home/adela/ThueMahler/Data/Tests/PIRLtest4out.txt";
 
 TMAllCases(clist,p,A,LogFile,OutFile,true);
 exit;
