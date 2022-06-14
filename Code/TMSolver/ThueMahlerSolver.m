@@ -1,3 +1,30 @@
+/*
+ThueMahlerSolver.m
+
+Authors: Adela Gherga <adelagherga@gmail.com>
+         Samir Siksek <samir.siksek@gmail.com>
+Created: 14 June 2022
+
+Description: Input: clist, a, primelist, bound
+	            clist is a list of coefficients c_0,c_1,..,c_n.
+		    a is an integer.
+		    primelist is a list of rational primes p_1,p_2,..,p_v.
+	     This solves c_0 X^n+...+c_n Y^n= a \times p_1^{z_1} ... p_t^{z_t}
+	     subject to the assumptions that X, Y are coprime integers
+	     and gcd(Y,c_0)=1.
+	     Output: sols.
+	     	     sols is a list of solutions to the Thue--Mahler equation.
+
+Commentary:
+
+Example: clist:=[3,2,7,2];
+	 a:=1;
+	 primelist:=[2,3,7,41];
+	 time sols:=solveThueMahler(clist,a,primelist);
+	 sols;
+
+*/
+
 // problem: given ideal fa in OK
 // and elements alpha_1,..,alpha_n of K^*
 // whose support is disjoint from fa
@@ -217,29 +244,6 @@ multGroup := function(fb,alphaList)
     end for;
     return D, alphaListImage;
 end function;
-/*
-Qx<x>:=PolynomialRing(Rationals());
-f:=x^6-x-1;
-K<theta>:=NumberField(f);
-OK:=MaximalOrder(K);
-fp1:=Factorisation(5*OK)[1,1];
-fp2:=Factorisation(5*OK)[2,1];
-fp3:=2*OK;
-fb:=fp1^350*fp2^550*fp3^250;
-alphaList:=[theta,theta-1,theta+3,7,theta^30,(theta^2-theta)/7,theta/(theta+3),1];
-time D,l:=multGroup(fb, alphaList);
-assert l[8] eq D!0;
-assert l[5] eq 30*l[1];
-assert l[6] eq l[1]+l[2]-l[4];
-assert l[7] eq l[1]-l[3];
-
-// Compare times with the inbuilt Magma implementation:
-time R,phi:=quo<OK | fb>;
-time U,psi:=UnitGroup(R);
-assert IsIsomorphic(D,U);
-// WARNING: the next one will take forever!
-time lU:=[ (phi(alpha))@@psi : alpha in [theta,theta-1,theta+3,7,theta^30,1]];
-*/
 
 degL:=function(K)
     // Given K=\Q(\theta) of degree at least 3, determine the smallest possible
@@ -339,14 +343,6 @@ initialBound:=function(K,theta,tau,deltaList,S)
 	end if;
 	M := [ [LocalDegree(j)*Log(AbsoluteValue(Evaluate(delta,j))) : j in shortembeds] cat
 	       [Log(Norm(P)^(-Valuation(delta*OK,P))) : P in shortS] : delta in deltaList ];
-
-//    if #S ne 0 then
-//	shortS := S[1..(#S-1)];
-//	M := [ [LocalDegree(i)*Log(AbsoluteValue(Evaluate(delta,i))) : i in embeds] cat [Log(Norm(P)^(-Valuation(delta*OK,P))) : P in shortS] : delta in deltaList ];
-//    else
-//	embeds:=embeds[1..(#embeds-1)];
-//	M := [ [LocalDegree(i)*Log(AbsoluteValue(Evaluate(delta,i))) : i in embeds]  : delta in deltaList ];
-	//    end if;
 
 	M:=Transpose(Matrix(RealField(),M));
 	assert NumberOfRows(M) eq r;
@@ -501,129 +497,6 @@ valuationBound:=function(theta,tau,deltaList,fp,cB1)
     // (or conditions (i), (ii)) are satisfied.
     return k-1;
 end function;
-
-/*
-valuationNeq:=function(theta,tau,deltaList,fp,cB1,k);
-	// We're looking at (*)
-	// fp is a prime in S.
-	// cB1 is an upper bound for the L^2-norm of (b_1,..,b_r).
-	// This return true if \ord_\fp(c_0 X - Y \theta) = k leads
-	// to a contradiction, otherwise returns false.
-	// (i.e. true means we've succeed in showing
-	// \ord_\fp(c_0 X- Y\theta) < k).
-	K:=NumberField(Universe([theta] cat [tau] cat deltaList));
-	d:=Degree(K);
-	assert d ge 3;
-	assert theta eq K.1;
-	OK:=MaximalOrder(K);
-	r:=#deltaList;
-	p:=Characteristic(ResidueClassField(fp));
-	assert Degree(fp) eq 1;
-	assert Valuation(p*OK,fp) eq 1;
-	fa:=p*OK/fp;
-	for fact in Factorisation(fa) do
-		assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
-	end for;
-	mpol:=MinimalPolynomial(theta);
-	lcf:=LeadingCoefficient(mpol);
-	assert lcf eq 1; // Surely \theta is an algebraic integer!
-	hprec:=2*Valuation(Discriminant(mpol),p)+k+1;
-	rts:=Roots(mpol,pAdicRing(p,hprec));
-	rts:=[Integers()!r[1] : r in rts];
-	rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge k];
-	assert #rts ge 1;
-	theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge k.
-	taufacts:=Factorisation(tau*OK);
-	taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
-	// The factorization
-	// of the numerator ideal of tau*OK.
-	if #taunumfacts eq 0 then
-		taunum:=1*OK;
-	else
-		taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
-	end if;
-	// Now taunum is the numerator ideal of \tau.
-	if (taunum+fa^k) ne ((theta-theta0)*OK+fa^k) then
-		// Condition (i) of the proposition.
-		return true;
-	end if;
-	fb:=fa^k/(taunum+fa^k);
-	tau0:=(theta0-theta)/tau;
-	for fact in Factorisation(fb) do
-		assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
-	end for;
-	if fb eq 1*OK then
-		kprime:=0;
-	else
-		kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1]))  : fact in Factorisation(fb)]);
-	end if;
-	pkprime:=p^kprime;
-	assert Denominator(pkprime*OK/fb) eq 1;
-	if kprime ge 1 then
-		assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
-	end if;  // kprime really is the smallest positive
-		// integer such thta fb divides p^kprime.
-	Zmod:=Integers(pkprime);
-	U,eps:=UnitGroup(Zmod);
-	gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
-	if IsOdd(p) and kprime ge 1 then
-		assert #gens eq 1; // Sanity check: there is a primitive root.
-	end if;
-	alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
-	D,alphaList:=multGroup(fb,alphaList);
-	// D is (isomorphic to) the group (OK/fb)^* and alphaList
-	// is the image in D of the original alphaList defined above,
-	// i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
-	tau0im:=alphaList[1];
-	alphaList:=alphaList[2..#alphaList];
-	gensim:=alphaList[1..#gens];
-	alphaList:=alphaList[(#gens+1)..#alphaList];
-	assert #alphaList eq #deltaList;
-	G,pi:=quo< D | sub<D | gensim> >;
-	tau0im:=pi(tau0im);
-	alphaList:=[pi(alpha) : alpha in alphaList];
-	assert #alphaList eq r;
-	Zr:=FreeAbelianGroup(r);
-	phi:=hom<Zr->G | alphaList>;
-	// This the map \phi in the paper.
-	if tau0im in Image(phi) eq false then
-		// Condition (ii) of the proposition.
-		return true;
-	end if;
-	w:=tau0im@@phi;
-	L:=Kernel(phi);
-	Z1:=FreeAbelianGroup(1);
-	eta:=hom<Zr->Z1 | [ Valuation(delta,fp)*Z1.1  : delta in deltaList  ]>;
-	H:=Kernel(eta);
-	vp:=(k-Valuation(tau,fp))*Z1.1;
-	if vp in Image(eta) eq false then
-		return true;
-	end if;
-	v:=vp@@eta;
-	D,i1,i2,p1,p2:=DirectSum(H,L);
-	kappa:=hom<D->Zr | [ p1(d)+p2(d)  : d in OrderedGenerators(D)]>;
-	assert Image(kappa) eq sub<Zr | OrderedGenerators(H) cat OrderedGenerators(L) >;
-	if v-w in Image(kappa) eq false then
-		return true;
-	end if;
-	vmw:=(v-w)@@kappa;
-	h1:=p1(vmw);
-	l1:=p2(vmw);
-	assert v-w eq h1+l1;
-	M:=H meet L;
-	u:=w+l1;
-	ZZr:=StandardLattice(r);
-	MM:=sub<ZZr | [ ZZr!(Eltseq((Zr!m))) : m in OrderedGenerators(M)]>;
-	uu:=ZZr!Eltseq(Zr!u);
-	DMusq:=Norm(ClosestVectors(MM,-uu)[1]+uu);
-	// This is D(M,u)^2 in the notation of the paper.
-	if DMusq gt cB1^2 then
-		return true;
-	else
-		return false;
-	end if;
-end function;
-*/
 
 cvp:=function(LL,vv,distSq)
 
@@ -895,203 +768,6 @@ sift:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,cB1sq,bigInfs,depth)
     end for;
     return vecs;
 end function;
-
-/*
-sift2:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,absMinv,vecU,vecB,bigInfs,depth)
-
-    assert #rangeLeft eq #SLeft;
-//    print "SLeft:", SLeft;
-    rk:=#Invariants(Lcum);
-    det,len:=detSVP(Zr,Lcum);
-    //expect:=(1/det)*Pi(RealField())^(rk/2)*cB1sq^(rk/2)/Gamma(1+rk/2);
-    cB1sq:= &+[i^2 : i in vecB];
-    print "cB1sq:", cB1sq;
-    if len gt 4*cB1sq then // len is the squared norm, hence use 4*squared(cB1)
-//	print "len exit";
-	vecs:=vectorsInCoset(Zr,Lcum,wcum,cB1sq);
-	//print "Expecting", expect;
-	//print "found", #vecs;
-	for I in bigInfs do
-	    phiq:=I[3];
-	    Tq:=I[4];
-	    vecs:=[v : v in vecs | phiq(Domain(phiq)!v) in Tq];
-	end for;
-	//print "cut down to", #vecs;
-	//print #SLeft;
-	return vecs;
-    end if;
-    if #SLeft eq 0 then
-	return deeperSift(tau,deltaList,Zr,Lcum,wcum,cB1sq,bigInfs,depth+1);
-    end if;
-    K:=NumberField(Universe([tau] cat deltaList));
-    theta:=K.1;
-    d:=Degree(K);
-    assert d ge 3;
-    OK:=MaximalOrder(K);
-    r:=#deltaList;
-    s:= NumberOfRows(absMinv);
-    fp:=SLeft[1];
-    SLeft:=SLeft[2..#SLeft];
-    krange:=rangeLeft[1];
-    rangeLeft:=rangeLeft[2..#rangeLeft];
-    assert #SLeft eq #rangeLeft;
-    kmin:=krange[1];
-    kmax:=krange[2]; // k is the valution of (c_0 X- \theta Y) at fp.
-    assert kmin ge 0;
-    assert kmax ge kmin;
-    p:=Characteristic(ResidueClassField(fp));
-    assert Degree(fp) eq 1;
-    assert Valuation(p*OK,fp) eq 1;
-    fa:=p*OK/fp;
-    for fact in Factorisation(fa) do
-	assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
-    end for;
-    mpol:=MinimalPolynomial(theta);
-    lcf:=LeadingCoefficient(mpol);
-    assert lcf eq 1; // Surely \theta is an algebraic integer!
-    henPrec:=2*(Valuation(Discriminant(mpol),p))+kmax+1;
-    rts:=Roots(mpol,pAdicRing(p,henPrec));
-    rts:=[Integers()!r[1] : r in rts];
-    rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge kmax+1];
-    assert #rts ge 1;
-    theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge kmax+1.
-    taufacts:=Factorisation(tau*OK);
-    taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
-    // The factorization
-    // of the numerator ideal of tau*OK.
-    if #taunumfacts eq 0 then
-	taunum:=1*OK;
-    else
-	taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
-    end if;
-    // Now taunum is the numerator ideal of \tau.
-    //Zr:=FreeAbelianGroup(r);
-    Z1:=FreeAbelianGroup(1);
-    eta:=hom<Zr->Z1 | [ Valuation(delta,fp)*Z1.1  : delta in deltaList  ]>;
-    etaLcum:=eta(Lcum);
-    assert #OrderedGenerators(etaLcum) eq 1;
-    modulus:=Eltseq(Z1!(etaLcum.1))[1];
-    class:=Valuation(tau,fp)+Eltseq(Z1!(eta(wcum)))[1];
-    krange:=[kmin..kmax];
-    krange:=[k : k in krange | IsDivisibleBy(k-class,modulus) ];
-    if #krange eq 0 then
-	return [];
-    end if;
-    H:=Kernel(eta);
-    vecs:=[];
-    kmin:=Minimum(krange);
-
-    assert kmin ge 0;
-    if kmin eq 0 then
-	vp:=(-Valuation(tau,fp))*Z1.1;
-	tf,wcumNew,LcumNew:=cosetIntersect(Zr,vp@@eta,H,wcum,Lcum);
-	if tf then
-//	    print "passed";
-//	    print "----------";
-	    invs:=Invariants(LcumNew);
-	    assert #invs eq rk-1; // Checking that the rank has gone done by 1.
-	    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-	    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-	    kfpp:=Valuation(tau*OK,fp);
-	    kfppp:=kmin-kfpp;
-	    vecUnew:= vecU;
-	    vecBnew:= vecB;
-	    vecUnew[depth,1]:= Abs(Log(Norm(fp)))*Max([Abs(kfpp),Abs(kfppp)]);
-	    vecB0:= Eltseq(absMinv*vecUnew);
-	    for j in [1..s] do
-		if vecB0[j] lt vecBnew[r-s-1+j] then
-		    vecBnew[r-s+j]:= Round(vecB0[j]);
-		end if;
-	    end for;
-//	    print 0,fp;
-	    vecs:=vecs cat
-		  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-		     absMinv,vecUnew,vecBnew,bigInfs,depth+1);
-	end if;
-    end if;
-    krange:=[k : k in krange | k ge 1];
-    krange:=[ k : k in krange | (taunum+fa^k) eq ((theta-theta0)*OK+fa^k)];
-
-    for k in krange do
-//	print k,fp;
-	fb:=fa^k/(taunum+fa^k);
-	tau0:=(theta0-theta)/tau;
-	for fact in Factorisation(fb) do
-	    assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
-	end for;
-	kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1]))  : fact in Factorisation(fb)]);
-	pkprime:=p^kprime;
-	assert Denominator(pkprime*OK/fb) eq 1;
-	if kprime ge 1 then
-	    assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
-	end if;  // kprime really is the smallest positive
-	// integer such that fb divides p^kprime.
-	Zmod:=Integers(pkprime);
-	U,eps:=UnitGroup(Zmod);
-	gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
-	if IsOdd(p) and kprime ge 1 then
-	    assert #gens eq 1; // Sanity check: there is a primitive root.
-	end if;
-	alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
-	D,alphaList:=multGroup(fb,alphaList);
-	// D is (isomorphic to) the group (OK/fb)^* and alphaList
-	// is the image in D of the original alphaList defined above,
-	// i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
-	tau0im:=alphaList[1];
-	alphaList:=alphaList[2..#alphaList];
-	gensim:=alphaList[1..#gens];
-	alphaList:=alphaList[(#gens+1)..#alphaList];
-	assert #alphaList eq #deltaList;
-	G,pi:=quo< D | sub<D | gensim> >;
-	tau0im:=pi(tau0im);
-	alphaList:=[pi(alpha) : alpha in alphaList];
-	assert #alphaList eq r;
-	phi:=hom<Zr->G | alphaList>;
-	// This the map \phi in the paper.
-	if tau0im in Image(phi) then
-	    w:=tau0im@@phi;
-	    L:=Kernel(phi);
-	    tf,wcumNew,LcumNew:=cosetIntersect(Zr,w,L,wcum,Lcum);
-	    if tf then
-		invs:=Invariants(LcumNew);
-		assert #invs eq rk; // Checking that the rank has is same.
-		vp:=(k-Valuation(tau,fp))*Z1.1;
-		//if vp in Image(eta) then
-		v:=vp@@eta;
-		tf,wcumNew,LcumNew:=cosetIntersect(Zr,v,H,wcumNew,LcumNew);
-		if tf then
-//		    print "passed";
-//		    print "-----------";
-		    invs:=Invariants(LcumNew);
-		    assert #invs eq rk-1; // Checking that the rank has is reduced by 1.
-		    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-		    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-		    kfpp:=Valuation(tau*OK,fp);
-		    kfppp:=k-kfpp;
-		    vecUnew:= vecU;
-		    vecBnew:= vecB;
-		    vecUnew[depth,1]:= Abs(Log(Norm(fp)))*Max([Abs(kfpp),Abs(kfppp)]);
-		    vecB0:= Eltseq(absMinv*vecUnew);
-		    for j in [1..s] do
-			if vecB0[j] lt vecBnew[r-s+j] then
-			    vecBnew[r-s+j]:= Round(vecB0[j]);
-			end if;
-		    end for;
-
-		    vecs:=vecs cat
-			  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-			     absMinv,vecUnew,vecBnew,bigInfs,depth+1);
-		end if;
-		//end if;
-	    end if;
-	end if;
-    end for;
-//    print "vecs:", vecs;
-//    print "--------------";
-
-    return vecs;
-end function;
-*/
 
 c21Func:=function(theta,tau,deltaList,S,absMinv,vecU,vecB)
     // Evaluate c_21 in the notation of the paper.
@@ -1423,11 +1099,8 @@ reducedBoundFixedEmbedding2:=function(K,theta,tau,deltaList,S,consts,sigma : ver
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
 	    DLwsq:=distanceLBsq(LL,ww);
-	    //print C,DLwsq+0.0;
 	    // This D(L,w)^2 in the notation of paper.
 	    tf1:=DLwsq gt cB5^2;
-//	    tf2:=(ww in LL) eq false;
-	    //	    if (tf1 and tf2) eq false then
 	    if tf1 eq false then
 		if verb then
 		    printf "Increasing C.\n";
@@ -1697,9 +1370,6 @@ alg2:=function(c0,th,p)
     // Returns Lp, Mp.
     OK:=MaximalOrder(Parent(th));
     Lp,Mp:=alg1( -th/c0 , c0, p);
-//    L2,M2:=alg1(-c0/(p*th) , -p*th, p);
-//    Lp:=L1 join {1*OK};
-//    Mp:=M1 join {};
 
     // Now for the refinements.
     Mp:={ <pr[1]/pr[2]^Valuation(pr[1],pr[2]) , pr[2]> : pr in Mp  };
@@ -1857,50 +1527,7 @@ prep2:=function(clist,a,primelist)
 
 end function;
 
-/*
-smallSieveInfo:=function(c0, theta, qBound)
-//    qBound:=200;
-    printf "Getting the small sieve information.";
-    K:=NumberField(Parent(theta));
-    assert K.1 eq theta;
-    OK:=MaximalOrder(K);
-    qlist:=[q : q in PrimesInInterval(2,qBound) | Valuation(c0,q) eq 0];
-    smallInf:=[* *];
-    for q in qlist do
-	qfacts:=[fq[1] : fq in Factorisation(q*OK)];
-	if &and[Norm(fq) lt 10^10 : fq in qfacts] then
-	    AqOrd:=&*[Norm(fq)-1 : fq in qfacts];
-	    assert IsDivisibleBy(AqOrd,q-1);
-	    BqOrd:=AqOrd div (q-1);
-	    OModq,modq:=quo<OK | q*OK>;
-	    Aq,eta:=UnitGroup(OModq);
-	    Zqs,fromZqs:=UnitGroup(Integers(q));
-	    ZqsGens:=[Integers()!(z@fromZqs) : z in Generators(Zqs)];
-	    Bq,toBq:=quo<Aq | sub<Aq | [(modq(OK!z))@@eta : z in ZqsGens]> >;
-	    // This is \mathfrak{B}_q.
-	    if IsPrime(q) and (IsDivisibleBy(Discriminant(OK),q) eq false) then
-		assert #Bq eq ((&*[Norm(fq)-1 : fq in qfacts]) div (q-1));
-	    end if;
-	    factq:=Factorisation(q);
-	    assert #factq eq 1;
-	    p:=factq[1,1]; t:=factq[1,2];
-	    Rq:=[(c0*u-theta) : u in [0..(q-1)]] cat [c0-theta*p*u : u in [0..(p^(t-1)-1)]];
-	    Rqstar:=[ rho : rho in Rq | &and [Valuation(rho*OK,fq) eq 0 :
-					      fq in qfacts ]];	// R_q \cap \OO_q^\times.
-	    imdelFunc:=func<del | toBq((reduce(del,modq,q*OK))@@eta)>;
-	    // Function to compute the image of del in Bq. Here del
-	    // must be an element of O_q.
-	    SqShifted:=[toBq((modq(rho))@@eta) : rho in Rqstar];
-	    // Subtract the image of tau from SqShifted to get Sq.
-	    Append(~smallInf, [* q, Bq, imdelFunc, SqShifted, Rqstar, eta, modq, fromZqs *]);
-	end if;
-    end for;
-    return smallInf;
-end function;
-*/
-
-smallSieveInfo2:=function(smallInf,c0,theta,qBound)
-
+smallSieveInfo:=function(smallInf,c0,theta,qBound)
     if IsEmpty(smallInf) then
 	qMax:= 0;
     else
@@ -1987,8 +1614,6 @@ bigSieveInfo:=function(tau,deltaList,smallInf)
     end for;
     return Zr, bigInf;
 end function;
-
-
 
 function furtherreduced(tau, deltaList, c21, vecB)
     K:=Universe([tau] cat deltaList);
@@ -2088,429 +1713,6 @@ function furtherreduced(tau, deltaList, c21, vecB)
      return vecB;
 end function;
 
-/*
-sift3:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,absMinv,vecU,vecB,c21vec,bigInfs,depth)
-
-    assert #rangeLeft eq #SLeft;
-//    print "SLeft:", SLeft;
-    rk:=#Invariants(Lcum);
-    det,len:=detSVP(Zr,Lcum);
-    //expect:=(1/det)*Pi(RealField())^(rk/2)*cB1sq^(rk/2)/Gamma(1+rk/2);
-    cB1sq:= &+[i^2 : i in vecB];
-    if len gt 4*cB1sq then // len is the squared norm, hence use 4*squared(cB1)
-//	print "len exit";
-	vecs:=vectorsInCoset(Zr,Lcum,wcum,cB1sq);
-	//print "Expecting", expect;
-	//print "found", #vecs;
-	for I in bigInfs do
-	    phiq:=I[3];
-	    Tq:=I[4];
-	    vecs:=[v : v in vecs | phiq(Domain(phiq)!v) in Tq];
-	end for;
-	//print "cut down to", #vecs;
-	//print #SLeft;
-	return vecs;
-    end if;
-    if #SLeft eq 0 then
-	return deeperSift(tau,deltaList,Zr,Lcum,wcum,cB1sq,bigInfs,depth+1);
-    end if;
-    K:=NumberField(Universe([tau] cat deltaList));
-    theta:=K.1;
-    d:=Degree(K);
-    assert d ge 3;
-    OK:=MaximalOrder(K);
-    r:=#deltaList;
-    s:= NumberOfRows(absMinv);
-    fp:=SLeft[1];
-    SLeft:=SLeft[2..#SLeft];
-    krange:=rangeLeft[1];
-    rangeLeft:=rangeLeft[2..#rangeLeft];
-    assert #SLeft eq #rangeLeft;
-    kmin:=krange[1];
-    kmax:=krange[2]; // k is the valution of (c_0 X- \theta Y) at fp.
-    assert kmin ge 0;
-    assert kmax ge kmin;
-    p:=Characteristic(ResidueClassField(fp));
-    assert Degree(fp) eq 1;
-    assert Valuation(p*OK,fp) eq 1;
-    fa:=p*OK/fp;
-    for fact in Factorisation(fa) do
-	assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
-    end for;
-    mpol:=MinimalPolynomial(theta);
-    lcf:=LeadingCoefficient(mpol);
-    assert lcf eq 1; // Surely \theta is an algebraic integer!
-    henPrec:=2*(Valuation(Discriminant(mpol),p))+kmax+1;
-    rts:=Roots(mpol,pAdicRing(p,henPrec));
-    rts:=[Integers()!r[1] : r in rts];
-    rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge kmax+1];
-    assert #rts ge 1;
-    theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge kmax+1.
-    taufacts:=Factorisation(tau*OK);
-    taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
-    // The factorization
-    // of the numerator ideal of tau*OK.
-    if #taunumfacts eq 0 then
-	taunum:=1*OK;
-    else
-	taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
-    end if;
-    // Now taunum is the numerator ideal of \tau.
-    //Zr:=FreeAbelianGroup(r);
-    Z1:=FreeAbelianGroup(1);
-    eta:=hom<Zr->Z1 | [ Valuation(delta,fp)*Z1.1  : delta in deltaList  ]>;
-    etaLcum:=eta(Lcum);
-    assert #OrderedGenerators(etaLcum) eq 1;
-    modulus:=Eltseq(Z1!(etaLcum.1))[1];
-    class:=Valuation(tau,fp)+Eltseq(Z1!(eta(wcum)))[1];
-    krange:=[kmin..kmax];
-    krange:=[k : k in krange | IsDivisibleBy(k-class,modulus) ];
-    if #krange eq 0 then
-	return [];
-    end if;
-    H:=Kernel(eta);
-    vecs:=[];
-    kmin:=Minimum(krange);
-
-    assert kmin ge 0;
-    if kmin eq 0 then
-	vp:=(-Valuation(tau,fp))*Z1.1;
-	tf,wcumNew,LcumNew:=cosetIntersect(Zr,vp@@eta,H,wcum,Lcum);
-	if tf then
-//	    print "passed";
-//	    print "----------";
-	    invs:=Invariants(LcumNew);
-	    assert #invs eq rk-1; // Checking that the rank has gone done by 1.
-	    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-	    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-	    kfpp:=Valuation(tau*OK,fp);
-	    kfppp:=kmin-kfpp;
-	    vecUnew:= vecU;
-	    vecBnew:= vecB;
-	    newc21vec:= c21vec;
-	    vecUnew[depth,1]:= Abs(Log(Norm(fp)))*Max([Abs(kfpp),Abs(kfppp)]);
-	    newc21vec[depth]:= Abs(Log(Norm(fp)))*Max(0,Abs(kfppp));
-	    vecB0:= Eltseq(absMinv*vecUnew);
-	    for j in [1..s] do
-		if vecB0[j] lt vecBnew[r-s-1+j] then
-		    vecBnew[r-s+j]:= Round(vecB0[j]);
-		end if;
-	    end for;
-
-//	    print "vecBnew before:", vecBnew;
-	    vecBnew:= furtherreduced(tau,deltaList,&+newc21vec, vecBnew);
-//	    print "vecBnew:",vecBnew;
-//	    print "newc21vec:",newc21vec;
-	    vecs:=vecs cat
-		  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-		     absMinv,vecUnew,vecBnew,newc21vec,bigInfs,depth+1);
-	end if;
-    end if;
-    krange:=[k : k in krange | k ge 1];
-    krange:=[ k : k in krange | (taunum+fa^k) eq ((theta-theta0)*OK+fa^k)];
-
-    for k in krange do
-//	print k,fp;
-	fb:=fa^k/(taunum+fa^k);
-	tau0:=(theta0-theta)/tau;
-	for fact in Factorisation(fb) do
-	    assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
-	end for;
-	kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1]))  : fact in Factorisation(fb)]);
-	pkprime:=p^kprime;
-	assert Denominator(pkprime*OK/fb) eq 1;
-	if kprime ge 1 then
-	    assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
-	end if;  // kprime really is the smallest positive
-	// integer such that fb divides p^kprime.
-	Zmod:=Integers(pkprime);
-	U,eps:=UnitGroup(Zmod);
-	gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
-	if IsOdd(p) and kprime ge 1 then
-	    assert #gens eq 1; // Sanity check: there is a primitive root.
-	end if;
-	alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
-	D,alphaList:=multGroup(fb,alphaList);
-	// D is (isomorphic to) the group (OK/fb)^* and alphaList
-	// is the image in D of the original alphaList defined above,
-	// i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
-	tau0im:=alphaList[1];
-	alphaList:=alphaList[2..#alphaList];
-	gensim:=alphaList[1..#gens];
-	alphaList:=alphaList[(#gens+1)..#alphaList];
-	assert #alphaList eq #deltaList;
-	G,pi:=quo< D | sub<D | gensim> >;
-	tau0im:=pi(tau0im);
-	alphaList:=[pi(alpha) : alpha in alphaList];
-	assert #alphaList eq r;
-	phi:=hom<Zr->G | alphaList>;
-	// This the map \phi in the paper.
-	if tau0im in Image(phi) then
-	    w:=tau0im@@phi;
-	    L:=Kernel(phi);
-	    tf,wcumNew,LcumNew:=cosetIntersect(Zr,w,L,wcum,Lcum);
-	    if tf then
-		invs:=Invariants(LcumNew);
-		assert #invs eq rk; // Checking that the rank has is same.
-		vp:=(k-Valuation(tau,fp))*Z1.1;
-		//if vp in Image(eta) then
-		v:=vp@@eta;
-		tf,wcumNew,LcumNew:=cosetIntersect(Zr,v,H,wcumNew,LcumNew);
-		if tf then
-
-//		    print "passed";
-//		    print "-----------";
-		    invs:=Invariants(LcumNew);
-		    assert #invs eq rk-1; // Checking that the rank has is reduced by 1.
-		    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-		    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-		    kfpp:=Valuation(tau*OK,fp);
-		    kfppp:=k-kfpp;
-		    vecUnew:= vecU;
-		    vecBnew:= vecB;
-		    newc21vec:= c21vec;
-		    vecUnew[depth,1]:= Abs(Log(Norm(fp)))*Max([Abs(kfpp),Abs(kfppp)]);
-		    newc21vec[depth]:= Abs(Log(Norm(fp)))*Max(0,Abs(kfppp));
-		    vecB0:= Eltseq(absMinv*vecUnew);
-		    for j in [1..s] do
-			if vecB0[j] lt vecBnew[r-s+j] then
-			    vecBnew[r-s+j]:= Round(vecB0[j]);
-			end if;
-		    end for;
-//		    print "vecBnew before:", vecBnew;
-		    vecBnew:= furtherreduced(tau,deltaList,&+newc21vec, vecBnew);
-//		    print "vecBnew after:",vecBnew;
-//		    print "newc21vec:",newc21vec;
-
-		    vecs:=vecs cat
-			  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-			     absMinv,vecUnew,vecBnew,newc21vec,bigInfs,depth+1);
-		end if;
-		//end if;
-	    end if;
-	end if;
-    end for;
-//    print "vecs:", vecs;
-//    print "--------------";
-
-    return vecs;
-end function;
-
-sift4:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,Minv,vecU,vecB,c21vec,bigInfs,depth)
-
-    K:=NumberField(Universe([tau] cat deltaList));
-    u,v:= Signature(K);
-
-    assert #rangeLeft eq #SLeft;
-//    print "SLeft:", SLeft;
-    rk:=#Invariants(Lcum);
-    det,len:=detSVP(Zr,Lcum);
-    //expect:=(1/det)*Pi(RealField())^(rk/2)*cB1sq^(rk/2)/Gamma(1+rk/2);
-    print "vecB before:", vecB;
-    print "size before:", &+[i^2 : i in vecB];
-    if #SLeft eq 0 then
-	vecBtemp:= Eltseq(Minv*vecU);
-	print "vecBtemp:", vecBtemp;
-	for j in [1..NumberOfRows(vecU)] do
-	    if vecBtemp[j] lt vecB[u+v-1+j] then
-		vecB[u+v-1+j]:= Round(vecBtemp[j]);
-	    end if;
-	end for;
-	vecB:= furtherreduced(tau,deltaList,&+c21vec, vecB);
-    end if;
-    print "vecB after:", vecB;
-    print "size after:", &+[i^2 : i in vecB];
-
-    cB1sq:= &+[i^2 : i in vecB];
-    if len gt 4*cB1sq then // len is the squared norm, hence use 4*squared(cB1)
-//	print "len exit";
-	vecs:=vectorsInCoset(Zr,Lcum,wcum,cB1sq);
-	//print "Expecting", expect;
-	//print "found", #vecs;
-	for I in bigInfs do
-	    phiq:=I[3];
-	    Tq:=I[4];
-	    vecs:=[v : v in vecs | phiq(Domain(phiq)!v) in Tq];
-	end for;
-	//print "cut down to", #vecs;
-	//print #SLeft;
-	return vecs;
-    end if;
-    if #SLeft eq 0 then
-	return deeperSift(tau,deltaList,Zr,Lcum,wcum,cB1sq,bigInfs,depth+1);
-    end if;
-    K:=NumberField(Universe([tau] cat deltaList));
-    theta:=K.1;
-    d:=Degree(K);
-    assert d ge 3;
-    OK:=MaximalOrder(K);
-    r:=#deltaList;
-    fp:=SLeft[1];
-    SLeft:=SLeft[2..#SLeft];
-    krange:=rangeLeft[1];
-    rangeLeft:=rangeLeft[2..#rangeLeft];
-    assert #SLeft eq #rangeLeft;
-    kmin:=krange[1];
-    kmax:=krange[2]; // k is the valution of (c_0 X- \theta Y) at fp.
-    assert kmin ge 0;
-    assert kmax ge kmin;
-    p:=Characteristic(ResidueClassField(fp));
-    assert Degree(fp) eq 1;
-    assert Valuation(p*OK,fp) eq 1;
-    fa:=p*OK/fp;
-    for fact in Factorisation(fa) do
-	assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
-    end for;
-    mpol:=MinimalPolynomial(theta);
-    lcf:=LeadingCoefficient(mpol);
-    assert lcf eq 1; // Surely \theta is an algebraic integer!
-    henPrec:=2*(Valuation(Discriminant(mpol),p))+kmax+1;
-    rts:=Roots(mpol,pAdicRing(p,henPrec));
-    rts:=[Integers()!r[1] : r in rts];
-    rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge kmax+1];
-    assert #rts ge 1;
-    theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge kmax+1.
-    taufacts:=Factorisation(tau*OK);
-    taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
-    // The factorization
-    // of the numerator ideal of tau*OK.
-    if #taunumfacts eq 0 then
-	taunum:=1*OK;
-    else
-	taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
-    end if;
-    // Now taunum is the numerator ideal of \tau.
-    //Zr:=FreeAbelianGroup(r);
-    Z1:=FreeAbelianGroup(1);
-    eta:=hom<Zr->Z1 | [ Valuation(delta,fp)*Z1.1  : delta in deltaList  ]>;
-    etaLcum:=eta(Lcum);
-    assert #OrderedGenerators(etaLcum) eq 1;
-    modulus:=Eltseq(Z1!(etaLcum.1))[1];
-    class:=Valuation(tau,fp)+Eltseq(Z1!(eta(wcum)))[1];
-    krange:=[kmin..kmax];
-    krange:=[k : k in krange | IsDivisibleBy(k-class,modulus) ];
-    if #krange eq 0 then
-	return [];
-    end if;
-    H:=Kernel(eta);
-    vecs:=[];
-    kmin:=Minimum(krange);
-
-    assert kmin ge 0;
-    if kmin eq 0 then
-	vp:=(-Valuation(tau,fp))*Z1.1;
-	tf,wcumNew,LcumNew:=cosetIntersect(Zr,vp@@eta,H,wcum,Lcum);
-	if tf then
-//	    print "passed";
-//	    print "----------";
-	    invs:=Invariants(LcumNew);
-	    assert #invs eq rk-1; // Checking that the rank has gone done by 1.
-	    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-	    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-	    kfpp:=Valuation(tau*OK,fp);
-	    kfppp:=kmin-kfpp;
-	    vecUnew:= vecU;
-	    vecUnew[depth,1]:= Log(Norm(fp))*(kfpp);
-	    newc21vec:= c21vec;
-	    if vecUnew[depth,1] eq 0 then
-		newc21vec[depth]:= 0;
-	    else
-		newc21vec[depth]:= Max(0,1/vecUnew[depth,1]);
-	    end if;
-
-
-//	    print "vecBnew:",vecBnew;
-//	    print "newc21vec:",newc21vec;
-	    vecs:=vecs cat
-		  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-		     Minv,vecUnew,vecB,newc21vec,bigInfs,depth+1);
-	end if;
-    end if;
-    krange:=[k : k in krange | k ge 1];
-    krange:=[ k : k in krange | (taunum+fa^k) eq ((theta-theta0)*OK+fa^k)];
-
-    for k in krange do
-//	print k,fp;
-	fb:=fa^k/(taunum+fa^k);
-	tau0:=(theta0-theta)/tau;
-	for fact in Factorisation(fb) do
-	    assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
-	end for;
-	kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1]))  : fact in Factorisation(fb)]);
-	pkprime:=p^kprime;
-	assert Denominator(pkprime*OK/fb) eq 1;
-	if kprime ge 1 then
-	    assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
-	end if;  // kprime really is the smallest positive
-	// integer such that fb divides p^kprime.
-	Zmod:=Integers(pkprime);
-	U,eps:=UnitGroup(Zmod);
-	gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
-	if IsOdd(p) and kprime ge 1 then
-	    assert #gens eq 1; // Sanity check: there is a primitive root.
-	end if;
-	alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
-	D,alphaList:=multGroup(fb,alphaList);
-	// D is (isomorphic to) the group (OK/fb)^* and alphaList
-	// is the image in D of the original alphaList defined above,
-	// i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
-	tau0im:=alphaList[1];
-	alphaList:=alphaList[2..#alphaList];
-	gensim:=alphaList[1..#gens];
-	alphaList:=alphaList[(#gens+1)..#alphaList];
-	assert #alphaList eq #deltaList;
-	G,pi:=quo< D | sub<D | gensim> >;
-	tau0im:=pi(tau0im);
-	alphaList:=[pi(alpha) : alpha in alphaList];
-	assert #alphaList eq r;
-	phi:=hom<Zr->G | alphaList>;
-	// This the map \phi in the paper.
-	if tau0im in Image(phi) then
-	    w:=tau0im@@phi;
-	    L:=Kernel(phi);
-	    tf,wcumNew,LcumNew:=cosetIntersect(Zr,w,L,wcum,Lcum);
-	    if tf then
-		invs:=Invariants(LcumNew);
-		assert #invs eq rk; // Checking that the rank has is same.
-		vp:=(k-Valuation(tau,fp))*Z1.1;
-		//if vp in Image(eta) then
-		v:=vp@@eta;
-		tf,wcumNew,LcumNew:=cosetIntersect(Zr,v,H,wcumNew,LcumNew);
-		if tf then
-
-//		    print "passed";
-//		    print "-----------";
-		    invs:=Invariants(LcumNew);
-		    assert #invs eq rk-1; // Checking that the rank has is reduced by 1.
-		    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
-		    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
-		    kfpp:=Valuation(tau*OK,fp);
-		    kfppp:=k-kfpp;
-		    vecUnew:= vecU;
-		    vecUnew[depth,1]:= Log(Norm(fp))*(kfpp - k);
-		    newc21vec:= c21vec;
-		    if vecUnew[depth,1] eq 0 then
-			newc21vec[depth]:= 0;
-		    else
-			newc21vec[depth]:= Max(0,1/vecUnew[depth,1]);
-		    end if;
-
-
-		    vecs:=vecs cat
-			  $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,
-			     Minv,vecUnew,vecB,newc21vec,bigInfs,depth+1);
-		end if;
-		//end if;
-	    end if;
-	end if;
-    end for;
-//    print "vecs:", vecs;
-//    print "--------------";
-
-    return vecs;
-end function;
-*/
-
 SetAutoColumns(false);
 SetColumns(235);
 
@@ -2547,10 +1749,8 @@ solveThueMahler:=function(clist,a,primelist : verb:=false)
     assert Degree(K) eq (#clist-1);
     sols:={};
     eqncount:=0;
-    //smallInf:=smallSieveInfo(c0, theta, qBound, smoothBound);
-//    smallInf:=smallSieveInfo(c0, theta, 200); // qBound);
 
-    smallInf:=smallSieveInfo2([* *],c0, theta, 200);
+    smallInf:=smallSieveInfo([* *],c0, theta, 200);
     if (#tauDeltaList eq 1) then
 	printf "We have %o S-unit equation to solve.\n", #tauDeltaList;
 	printf "The rank is %o.\n", Sort([#pr[2] : pr in tauDeltaList]);
@@ -2577,7 +1777,7 @@ solveThueMahler:=function(clist,a,primelist : verb:=false)
 	else
 	    qBound:=200;
 	end if;
-	smallInf:=smallSieveInfo2(smallInf,c0,theta,qBound);
+	smallInf:=smallSieveInfo(smallInf,c0,theta,qBound);
 	Zr, bigInfs:=bigSieveInfo(tau,deltaList,smallInf);
 	vecs:=sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cB2sq,bigInfs,1);
 	printf "Finished applying the Dirichlet sieve to equation number %o.\n", eqncount;
