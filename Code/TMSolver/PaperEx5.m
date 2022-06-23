@@ -1728,7 +1728,7 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
     // sols is a list of solutions to the Thue--Mahler equation.
     printf
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "clist:=%o; primelist:=%o; a:=%o; \n", clist,primelist,a;
+    printf "clist:=%o; a:=%o; primelist:=%o; \n", clist,a,primelist;
     printf
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
@@ -1865,11 +1865,11 @@ end function;
 //sols;
 
 // Example 3a (improvement on Soydan and Tzanakis)
-clist:=[3,65,-290,-2110,975,3149];
-a:= -(2^5)*(3^4);
-primelist:=[5,11];
-time sols:=solveThueMahler(clist,primelist,a);
-sols;
+//clist:=[3,65,-290,-2110,975,3149];
+//a:= -(2^5)*(3^4);
+//primelist:=[5,11];
+//time sols:=solveThueMahler(clist,a,primelist);
+//sols;
 
 // Example 3b (improvement on Soydan and Tzanakis)
 //clist:=[3,65,-290,-2110,975,3149];
@@ -1887,28 +1887,9 @@ sols;
 //sols2;
 
 // Example 5
-//SetClassGroupBounds("GRH");
-//clist:=[ 5,  1,  4,  1,  6,  1,  6,  0,  6,  0,  4, -2];
-//a:=1;
-//primelist:=[2,3,5,7,11];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-//sols;
-
-// Example 6 (de Weger--Tzanakis)
-//clist:=[1,-23,5,24];
-//primelist:=[2,3,5,7];
-//time sols:=solveThueMahler(clist,1,primelist) join solveThueMahler(clist,-1,primelist);
-//sols;
-
-// Example 7 (no real places)
-//clist:=[ 1, 0, 0, 0, 3 ];
-//a:= 1;
-//primelist:= [ 2, 7, 23, 31 ];
-//time sols:=solveThueMahler(clist,1,primelist) join solveThueMahler(clist,-1,primelist);
-
-// Mike's Example
-//SetClassGroupBounds("GRH");
-//clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
-//a:= 1;
-//primelist:= [3];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
+SetClassGroupBounds("GRH");
+clist:=[ 5,  1,  4,  1,  6,  1,  6,  0,  6,  0,  4, -2];
+a:=1;
+primelist:=[2,3,5,7,11];
+time sols:=solveThueMahler(clist,primelist,a : verb:=true);
+sols;
