@@ -1186,7 +1186,7 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    cB0New:=2*c17*(c21+c22);
 	    if cB0New lt cB0 then
 		if verb then
-		    printf "The reduction process gives a new bound of %o.\n", cB0New;
+		    printf "The reduction process gives a new bound of %o.\n", Floor(cB0New);
 		end if;
 		cB0:=Floor(cB0New);
 		for i in [1..r] do
@@ -1196,7 +1196,8 @@ reducedBound:=function(tau,deltaList : verb:=false)
 		end for;
 	    else
 		if verb then
-		    printf "The reduction process gives a worse bound of %o.\n", cB0New;
+		    printf "The reduction process gives a worse bound of %o.\n",
+			   Floor(cB0New);
 		end if;
 		finished:=true;
 	    end if;
@@ -1205,7 +1206,7 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    expSbds[i,1]:=expSbds[i,1]+Valuation(tau,S[i]);
 	    expSbds[i,2]:=expSbds[i,2]+Valuation(tau,S[i]);
 	end for;
-	return vecB, S, expSbds;
+	return [Integers()!b : b in vecB], S, expSbds;
     end if;
     assert t ge 1; // We've now finished with the totally complex case.
     if verb then
@@ -1532,6 +1533,9 @@ smallSieveInfo:=function(smallInf,c0,theta,qBound)
 	qMax:= 0;
     else
 	qMax:= smallInf[#smallInf][1]; //primes already computed
+    end if;
+    if (qBound lt qMax+1) then
+	return smallInf;
     end if;
     if IsEmpty(PrimesInInterval(qMax+1,qBound)) then
 	return smallInf;
@@ -1865,11 +1869,11 @@ end function;
 //sols;
 
 // Example 3a (improvement on Soydan and Tzanakis)
-clist:=[3,65,-290,-2110,975,3149];
-a:= -(2^5)*(3^4);
-primelist:=[5,11];
-time sols:=solveThueMahler(clist,primelist,a);
-sols;
+//clist:=[3,65,-290,-2110,975,3149];
+//a:= -(2^5)*(3^4);
+//primelist:=[5,11];
+//time sols:=solveThueMahler(clist,primelist,a);
+//sols;
 
 // Example 3b (improvement on Soydan and Tzanakis)
 //clist:=[3,65,-290,-2110,975,3149];
@@ -1912,3 +1916,19 @@ sols;
 //a:= 1;
 //primelist:= [3];
 //time sols:=solveThueMahler(clist,a,primelist : verb:=true);
+
+// Goormaghtigh's Example
+// 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
+clist:= [718,718,718,718,719];
+clist:= [189,189,189,189,190];
+a:=1;
+primelist:= [719];
+SetClassGroupBounds("GRH");
+time solveThueMahler(clist,primelist,a : verb:=true);
+
+// Goormaghtigh's Example
+clist:= [189,189,189,189,190];
+a:=1;
+primelist:= [2,5,19]; //[190];
+SetClassGroupBounds("GRH");
+time solveThueMahler(clist,primelist,a : verb:=true);
