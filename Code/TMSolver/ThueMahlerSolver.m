@@ -1919,16 +1919,15 @@ end function;
 
 // Goormaghtigh's Example
 // 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
-clist:= [718,718,718,718,719];
-clist:= [189,189,189,189,190];
-a:=1;
-primelist:= [719];
-SetClassGroupBounds("GRH");
-time solveThueMahler(clist,primelist,a : verb:=true);
+//clist:= [718,718,718,718,719];
+//a:=1;
+//primelist:= [719];
+//SetClassGroupBounds("GRH");
+//time solveThueMahler(clist,primelist,a : verb:=true);
 
 // Goormaghtigh's Example
-clist:= [189,189,189,189,190];
-a:=1;
-primelist:= [2,5,19]; //[190];
-SetClassGroupBounds("GRH");
-time solveThueMahler(clist,primelist,a : verb:=true);
+//clist:= [189,189,189,189,190];
+//a:=1;
+//primelist:= [2,5,19]; //[190];
+//SetClassGroupBounds("GRH");
+//time solveThueMahler(clist,primelist,a : verb:=true);
