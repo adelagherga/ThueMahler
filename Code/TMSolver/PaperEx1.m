@@ -2022,9 +2022,9 @@ function ConvertTMToEllipticCurves(N,clist,sols)
     F:= a*x^3 + b*x^2*y + c*x*y^2 + d*y^3;
     DF:= -27*a^2*d^2 + b^2*c^2 + 18*a*b*c*d - 4*a*c^3 - 4*b^3*d;
 
-    a0:= Valuation(DF,2);
-    b0:= Valuation(DF,3);
-    N1:= Abs(DF)/(2^a0*3^b0);
+    a0:= Integers()!Valuation(DF,2);
+    b0:= Integers()!Valuation(DF,3);
+    N1:= Integers()! (Abs(DF)/(2^a0*3^b0));
     assert (a0 eq 3) or (a0 eq 4);
     assert (b0 eq 0) or (b0 eq 1);
     assert N1 in Divisors(7^2*41);
@@ -2036,9 +2036,9 @@ function ConvertTMToEllipticCurves(N,clist,sols)
     for s in sols do
         u:= s[1];
         v:= s[2];
-	Fuv:= Evaluate(F,[u,v]);
-	a1:= Valuation(Fuv,2);
-	b1:= Valuation(Fuv,3);
+	Fuv:= Integers()!Evaluate(F,[u,v]);
+	a1:= Integers()!Valuation(Fuv,2);
+	b1:= Integers()!Valuation(Fuv,3);
 	if (a1 eq 0) and (b1 ge 0) and
 	   (&and[Valuation(Fuv,p) in [0,1] : p in [7,41] | IsDivisibleBy(N1,p^2)]) then
 
