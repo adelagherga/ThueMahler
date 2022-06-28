@@ -2019,32 +2019,47 @@ function ConvertTMToEllipticCurves(N,clist,sols)
     H:= (b^2-3*a*c)*x^2 + (b*c-9*a*d)*x*y + (c^2-3*b*d)*y^2;
     G:= (-27*a^2*d + 9*a*b*c-2*b^3)*x^3 + (-3*b^2*c - 27*a*b*d + 18*a*c^2)*x^2*y +
 	(3*b*c^2 - 18*b^2*d + 27*a*c*d)*x*y^2 + (-9*b*c*d + 2*c^3 + 27*a*d^2)*y^3;
+    F:= a*x^3 + b*x^2*y + c*x*y^2 + d*y^3;
+    DF:= -27*a^2*d^2 + b^2*c^2 + 18*a*b*c*d - 4*a*c^3 - 4*b^3*d;
+
+    a0:= Valuation(DF,2);
+    b0:= Valuation(DF,3);
+    N1:= Abs(DF)/(2^a0*3^b0);
+    assert (a0 eq 3) or (a0 eq 4);
+    assert (b0 eq 0) or (b0 eq 1);
+    assert N1 in Divisors(7^2*41);
 
     Divs6N:= [D : D in Divisors(6*N) |  IsSquarefree(D)];
+    assert 1 in Divs6N;
 
     ECs:= [];
     for s in sols do
         u:= s[1];
         v:= s[2];
-	a_4:= -27*(Evaluate(H,[u,v]));
-	a_6:= 27*(Evaluate(G,[u,v]));
-        E:= [0,0,0, a_4, a_6];
+	Fuv:= Evaluate(F,[u,v]);
+	a1:= Valuation(Fuv,2);
+	b1:= Valuation(Fuv,3);
+	if (a1 eq 0) and (b1 ge 0) and
+	   (&and[Valuation(Fuv,p) in [0,1] : p in [7,41] | IsDivisibleBy(N1,p^2)]) then
 
-        MinE:= MinimalModel(EllipticCurve(E));
-        CondE:= Conductor(MinE);
-        Append(~ECs, < CondE, aInvariants(MinE), [u,v] > );
+	    a_4:= -27*(Evaluate(H,[u,v]));
+	    a_6:= 27*(Evaluate(G,[u,v]));
+            E:= [0,0,0, a_4, a_6];
 
-	TwistE:= QuadraticTwist(MinE,-1);
-        TwistMinE:= MinimalModel(EllipticCurve(TwistE));
-        TwistCondE:= Conductor(TwistMinE);
-        Append(~ECs, < TwistCondE, aInvariants(TwistMinE), [u,v] > );
+            MinE:= MinimalModel(EllipticCurve(E));
+            CondE:= Conductor(MinE);
+            Append(~ECs, < CondE, aInvariants(MinE), [u,v] > );
 
-	for D in Divs6N do
-	    DTwistE:= QuadraticTwist(MinE,D);
-            DTwistMinE:= MinimalModel(EllipticCurve(DTwistE));
-            DTwistCondE:= Conductor(DTwistMinE);
-            Append(~ECs, < DTwistCondE, aInvariants(DTwistMinE), [u,v] > );
-	end for;
+	    for D in Divs6N do
+		MinE2:= MinimalModel(QuadraticTwist(MinE,D));
+		CondE2:= Conductor(MinE2);
+		Append(~ECs, < CondE2, aInvariants(MinE2), [u,v] > );
+
+		TwistMinE2:= MinimalModel(QuadraticTwist(MinE2,-1));
+		TwistCondE2:= Conductor(TwistMinE2);
+		Append(~ECs, < TwistCondE2, aInvariants(TwistMinE2), [u,v] > );
+	    end for;
+	end if;
     end for;
 
     Sort(~ECs);
