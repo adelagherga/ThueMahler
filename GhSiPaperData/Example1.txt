@@ -1,0 +1,1545 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 4, 3, 6 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 4 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 2 S-unit equations to solve.
+The ranks are [ 3, 3 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [36, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 2>, <0, 8> ].
+The bound on the norm squared of (b1,..,br) is 413.
+Applying the Dirichlet sieve to equation number 1 out of 2.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [36, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 3>, <0, 8> ].
+The bound on the norm squared of (b1,..,br) is 459.
+Applying the Dirichlet sieve to equation number 2 out of 2.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 3.240[r]
+Time: 3.240[r]
+[
+    [ -11, 6, 0, 0, 2 ],
+    [ 1, 0, 0, 0, 0 ],
+    [ -29, 8, 3, 0, 0 ],
+    [ -5, 2, 2, 1, 0 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 1, 4, 3, 6 ] :
+ {
+    <771456, [ 0, 1, 0, -22066, -4016314 ], [ -11, 6 ]>,
+    <771456, [ 0, 1, 0, -88265, 32042247 ], [ -11, 6 ]>,
+    <771456, [ 0, 1, 0, -450, -11838 ], [ -11, 6 ]>,
+    <771456, [ 0, -1, 0, -88265, -32042247 ], [ -11, 6 ]>,
+    <771456, [ 0, 1, 0, -1801, 92903 ], [ -11, 6 ]>,
+    <771456, [ 0, -1, 0, -1801, -92903 ], [ -11, 6 ]>,
+    <771456, [ 0, -1, 0, -22066, 4016314 ], [ -11, 6 ]>,
+    <771456, [ 0, -1, 0, -450, 11838 ], [ -11, 6 ]>
+}
+==============================================================================
+Time: 0.020
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 1, 0, 12 ]; a:=4; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 8 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 8 S-unit equations to solve.
+The ranks are [ 2, 2, 3, 3, 3, 3, 4, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 416.
+Applying the Dirichlet sieve to equation number 1 out of 8.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 370.
+Applying the Dirichlet sieve to equation number 2 out of 8.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [27, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1478.
+Applying the Dirichlet sieve to equation number 3 out of 8.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [27, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1715.
+Applying the Dirichlet sieve to equation number 4 out of 8.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 7>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 8293.
+Applying the Dirichlet sieve to equation number 5 out of 8.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 8>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 7433.
+Applying the Dirichlet sieve to equation number 6 out of 8.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [27, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 6>, <0, 11>, <0, 22> ].
+The bound on the norm squared of (b1,..,br) is 31266.
+Applying the Dirichlet sieve to equation number 7 out of 8.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [27, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [1, 1, 0]
+]
+The range is [ <0, 6>, <0, 11>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 29079.
+Applying the Dirichlet sieve to equation number 8 out of 8.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 19.070
+Time: 19.070
+[
+    [ 4, 1, 1, 2, 0 ],
+    [ 2, -1, 2, 0, 0 ],
+    [ -6, 5, 1, 0, 1 ],
+    [ 18, -13, 1, 1, 1 ],
+    [ -50, 61, 5, 4, 0 ],
+    [ 0, 1, 1, 0, 0 ],
+    [ -4, 3, 0, 0, 0 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 2, 1, 0, 3 ] :
+ {
+    <771456, [ 0, -1, 0, 13655, 2351833 ], [ 4, 1 ]>,
+    <771456, [ 0, 1, 0, 13655, -2351833 ], [ 4, 1 ]>,
+    <771456, [ 0, -1, 0, 3414, -295686 ], [ 4, 1 ]>,
+    <771456, [ 0, -1, 0, -38089, 2873977 ], [ -4, 3 ]>,
+    <771456, [ 0, 1, 0, -9522, 354486 ], [ -4, 3 ]>,
+    <771456, [ 0, -1, 0, -9522, -354486 ], [ -4, 3 ]>,
+    <771456, [ 0, 1, 0, 3414, 295686 ], [ 4, 1 ]>,
+    <771456, [ 0, -1, 0, -6729, -257319 ], [ 2, -1 ]>,
+    <771456, [ 0, -1, 0, -2183946, 1733569902 ], [ -50, 61 ]>,
+    <771456, [ 0, 1, 0, -8735785, 13859823431 ], [ -50, 61 ]>,
+    <771456, [ 0, -1, 0, -8735785, -13859823431 ], [ -50, 61 ]>,
+    <771456, [ 0, -1, 0, -1682, 33006 ], [ 2, -1 ]>,
+    <771456, [ 0, 1, 0, -6729, 257319 ], [ 2, -1 ]>,
+    <771456, [ 0, 1, 0, -1682, -33006 ], [ 2, -1 ]>,
+    <771456, [ 0, 1, 0, -38089, -2873977 ], [ -4, 3 ]>,
+    <771456, [ 0, 1, 0, -2183946, -1733569902 ], [ -50, 61 ]>
+}
+============================================================================== 
+Time: 0.040
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 4, 12, 36 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 6 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 6 S-unit equations to solve.
+The ranks are [ 2, 2, 3, 3, 3, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 333.
+Applying the Dirichlet sieve to equation number 1 out of 6.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 340.
+Applying the Dirichlet sieve to equation number 2 out of 6.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [23, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 2>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 990.
+Applying the Dirichlet sieve to equation number 3 out of 6.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [23, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1478.
+Applying the Dirichlet sieve to equation number 4 out of 6.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 0, 1]
+]
+The range is [ <0, 8>, <0, 16> ].
+The bound on the norm squared of (b1,..,br) is 8784.
+Applying the Dirichlet sieve to equation number 5 out of 6.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [23, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 0, 1]
+]
+The range is [ <0, 5>, <0, 10>, <0, 21> ].
+The bound on the norm squared of (b1,..,br) is 26166.
+Applying the Dirichlet sieve to equation number 6 out of 6.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 13.820
+Time: 13.820
+[
+    [ -1, 1, 0, 0, 0 ],
+    [ -1, 2, 1, 1, 0 ],
+    [ 13, -11, 1, 0, 1 ],
+    [ -27, 26, 0, 3, 1 ],
+    [ -3, 3, 3, 0, 0 ],
+    [ -3, 6, 4, 1, 0 ],
+    [ -7, 6, 1, 0, 0 ],
+    [ 1, 0, 1, 0, 0 ],
+    [ -5, 6, 2, 0, 1 ],
+    [ -1, 3, 4, 0, 0 ],
+    [ 4675, -3981, 11, 3, 1 ],
+    [ 39, -33, 4, 0, 1 ],
+    [ 5, -3, 1, 2, 0 ],
+    [ -81, 78, 3, 3, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 3, 4, 4, 4 ] :
+ {}
+==============================================================================
+Time: 0.060
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 4, 24, 48 ]; a:=16; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 4 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 3 S-unit equations to solve.
+The ranks are [ 2, 3, 3 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [18, 2, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 122.
+Applying the Dirichlet sieve to equation number 1 out of 3.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [18, 2, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 2, 0]
+]
+The range is [ <0, 3>, <0, 10> ].
+The bound on the norm squared of (b1,..,br) is 1174.
+Applying the Dirichlet sieve to equation number 2 out of 3.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [18, 2, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 2, 0]
+]
+The range is [ <0, 3>, <0, 11> ].
+The bound on the norm squared of (b1,..,br) is 1250.
+Applying the Dirichlet sieve to equation number 3 out of 3.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 3.660
+Time: 3.660
+[
+    [ 0, 1, 1, 0, 0 ],
+    [ 3, -5, 1, 0, 0 ],
+    [ 1, -1, 1, 0, 0 ],
+    [ 1198, -2011, 7, 0, 2 ],
+    [ 2, 1, 2, 1, 0 ],
+    [ -2, 5, 1, 0, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 4, 4, 6, 3 ] :
+ {}
+============================================================================== 
+Time: 0.030
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 5, 0, 24 ]; a:=4; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 16 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 16 S-unit equations to solve.
+The ranks are [ 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 0.
+Applying the Dirichlet sieve to equation number 1 out of 16.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 0.
+Applying the Dirichlet sieve to equation number 2 out of 16.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 10> ].
+The bound on the norm squared of (b1,..,br) is 3349.
+Applying the Dirichlet sieve to equation number 3 out of 16.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 340.
+Applying the Dirichlet sieve to equation number 4 out of 16.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 50.
+Applying the Dirichlet sieve to equation number 5 out of 16.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 122.
+Applying the Dirichlet sieve to equation number 6 out of 16.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 1241.
+Applying the Dirichlet sieve to equation number 7 out of 16.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 1845.
+Applying the Dirichlet sieve to equation number 8 out of 16.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 9...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0]
+]
+The range is [ <0, 3>, <0, 7> ].
+The bound on the norm squared of (b1,..,br) is 3902.
+Applying the Dirichlet sieve to equation number 9 out of 16.
+Finished applying the Dirichlet sieve to equation number 9.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 10...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0]
+]
+The range is [ <0, 3>, <0, 6> ].
+The bound on the norm squared of (b1,..,br) is 1566.
+Applying the Dirichlet sieve to equation number 10 out of 16.
+Finished applying the Dirichlet sieve to equation number 10.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 11...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 3>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 6237.
+Applying the Dirichlet sieve to equation number 11 out of 16.
+Finished applying the Dirichlet sieve to equation number 11.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 12...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 4>, <0, 14> ].
+The bound on the norm squared of (b1,..,br) is 14853.
+Applying the Dirichlet sieve to equation number 12 out of 16.
+Finished applying the Dirichlet sieve to equation number 12.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 13...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 8>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 9505.
+Applying the Dirichlet sieve to equation number 13 out of 16.
+Finished applying the Dirichlet sieve to equation number 13.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 14...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 7>, <0, 14> ].
+The bound on the norm squared of (b1,..,br) is 10046.
+Applying the Dirichlet sieve to equation number 14 out of 16.
+Finished applying the Dirichlet sieve to equation number 14.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 15...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 6>, <0, 11>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 32559.
+Applying the Dirichlet sieve to equation number 15 out of 16.
+Finished applying the Dirichlet sieve to equation number 15.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 16...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [12, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [3, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 5>, <0, 12>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 27426.
+Applying the Dirichlet sieve to equation number 16 out of 16.
+Finished applying the Dirichlet sieve to equation number 16.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 35.620
+Time: 35.620
+[
+    [ 3, 5, 1, 3, 0 ],
+    [ 19, -1, 5, 2, 0 ],
+    [ 3, -1, 1, 0, 0 ],
+    [ -1, 1, 2, 0, 0 ],
+    [ -37, 13, 1, 1, 1 ],
+    [ -5, 3, 0, 1, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 2, 5, 0, 6 ] :
+ {
+    <771456, [ 0, -1, 0, -702, 50058 ], [ -1, 1 ]>,
+    <771456, [ 0, -1, 0, -4636249, -3841001975 ], [ -37, 13 ]>,
+    <771456, [ 0, -1, 0, -1159062, 480704778 ], [ -37, 13 ]>,
+    <771456, [ 0, -1, 0, -2809, -397655 ], [ -1, 1 ]>,
+    <771456, [ 0, -1, 0, -717817, -571712567 ], [ 19, -1 ]>,
+    <771456, [ 0, 1, 0, -717817, 571712567 ], [ 19, -1 ]>,
+    <771456, [ 0, 1, 0, -4636249, 3841001975 ], [ -37, 13 ]>,
+    <771456, [ 0, 1, 0, -2809, 397655 ], [ -1, 1 ]>,
+    <771456, [ 0, 1, 0, -702, -50058 ], [ -1, 1 ]>,
+    <771456, [ 0, -1, 0, -179454, 71553798 ], [ 19, -1 ]>,
+    <771456, [ 0, 1, 0, -179454, -71553798 ], [ 19, -1 ]>,
+    <771456, [ 0, 1, 0, -1159062, -480704778 ], [ -37, 13 ]>
+}
+============================================================================== 
+Time: 0.030
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 7, 42, 126 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 8 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 4 S-unit equations to solve.
+The ranks are [ 2, 2, 3, 3 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 10> ].
+The bound on the norm squared of (b1,..,br) is 153.
+Applying the Dirichlet sieve to equation number 1 out of 4.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 37.
+Applying the Dirichlet sieve to equation number 2 out of 4.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [11, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 3>, <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 547.
+Applying the Dirichlet sieve to equation number 3 out of 4.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [11, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 2>, <0, 8> ].
+The bound on the norm squared of (b1,..,br) is 302.
+Applying the Dirichlet sieve to equation number 4 out of 4.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 3.930
+Time: 3.930
+[
+    [ -25, 18, 1, 0, 1 ],
+    [ 1, 0, 1, 0, 0 ],
+    [ 107, -24, 10, 0, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 3, 7, 14, 14 ] :
+ {
+    <771456, [ 0, -1, 0, 5031, 144873 ], [ 1, 0 ]>,
+    <771456, [ 0, 1, 0, 26, 62 ], [ 1, 0 ]>,
+    <771456, [ 0, 1, 0, 5031, -144873 ], [ 1, 0 ]>,
+    <771456, [ 0, -1, 0, -61497, 5890473 ], [ -25, 18 ]>,
+    <771456, [ 0, 1, 0, -3013369, -2014405513 ], [ -25, 18 ]>,
+    <771456, [ 0, -1, 0, -3013369, 2014405513 ], [ -25, 18 ]>,
+    <771456, [ 0, 1, 0, 103, -393 ], [ 1, 0 ]>,
+    <771456, [ 0, -1, 0, -15374, -728622 ], [ -25, 18 ]>,
+    <771456, [ 0, -1, 0, -753342, -251424018 ], [ -25, 18 ]>,
+    <771456, [ 0, 1, 0, -753342, 251424018 ], [ -25, 18 ]>,
+    <771456, [ 0, -1, 0, 1258, -18738 ], [ 1, 0 ]>,
+    <771456, [ 0, 1, 0, -61497, -5890473 ], [ -25, 18 ]>,
+    <771456, [ 0, -1, 0, 26, -62 ], [ 1, 0 ]>,
+    <771456, [ 0, 1, 0, -15374, 728622 ], [ -25, 18 ]>,
+    <771456, [ 0, -1, 0, 103, 393 ], [ 1, 0 ]>,
+    <771456, [ 0, 1, 0, 1258, 18738 ], [ 1, 0 ]>
+}
+============================================================================== 
+Time: 0.020
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 7, 4, 12 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 8 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 8 S-unit equations to solve.
+The ranks are [ 1, 2, 2, 2, 3, 3, 3, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 1.
+Applying the Dirichlet sieve to equation number 1 out of 8.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 450.
+Applying the Dirichlet sieve to equation number 2 out of 8.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [28, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 65.
+Applying the Dirichlet sieve to equation number 3 out of 8.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 7> ].
+The bound on the norm squared of (b1,..,br) is 1274.
+Applying the Dirichlet sieve to equation number 4 out of 8.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [28, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [5, 1, 0]
+]
+The range is [ <0, 3>, <0, 7> ].
+The bound on the norm squared of (b1,..,br) is 2659.
+Applying the Dirichlet sieve to equation number 5 out of 8.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [28, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 3>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 7459.
+Applying the Dirichlet sieve to equation number 6 out of 8.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [5, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 8>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 11525.
+Applying the Dirichlet sieve to equation number 7 out of 8.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [28, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [5, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 5>, <0, 12>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 28419.
+Applying the Dirichlet sieve to equation number 8 out of 8.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 16.320
+Time: 16.320
+[
+    [ 1, 0, 0, 0, 0 ],
+    [ -1893, 646, 9, 1, 3 ],
+    [ -3, 2, 1, 2, 0 ],
+    [ 15, -2, 2, 0, 1 ],
+    [ 1, 4, 1, 1, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 1, 7, 4, 12 ] :
+ {}
+============================================================================== 
+Time: 0.030
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 3, -3, 63 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 8 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 8 S-unit equations to solve.
+The ranks are [ 1, 2, 2, 2, 3, 3, 3, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 0.
+Applying the Dirichlet sieve to equation number 1 out of 8.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 592.
+Applying the Dirichlet sieve to equation number 2 out of 8.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [35, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 17.
+Applying the Dirichlet sieve to equation number 3 out of 8.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 2, 2]
+]
+The range is [ <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 1930.
+Applying the Dirichlet sieve to equation number 4 out of 8.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [35, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [0, 1, 0]
+]
+The range is [ <0, 3>, <0, 7> ].
+The bound on the norm squared of (b1,..,br) is 1739.
+Applying the Dirichlet sieve to equation number 5 out of 8.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [35, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 2, 2]
+]
+The range is [ <0, 3>, <0, 17> ].
+The bound on the norm squared of (b1,..,br) is 8579.
+Applying the Dirichlet sieve to equation number 6 out of 8.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [0, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 2, 2]
+]
+The range is [ <0, 7>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 8738.
+Applying the Dirichlet sieve to equation number 7 out of 8.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [35, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [0, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [2, 2, 2]
+]
+The range is [ <0, 5>, <0, 12>, <0, 22> ].
+The bound on the norm squared of (b1,..,br) is 34878.
+Applying the Dirichlet sieve to equation number 8 out of 8.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 20.980
+Time: 20.980
+[
+    [ 4, 1, 5, 0, 0 ],
+    [ 2, -1, 1, 0, 0 ],
+    [ -3, 2, 0, 0, 1 ],
+    [ -154, 83, 5, 2, 0 ],
+    [ -1, 2, 2, 1, 0 ],
+    [ 56, -13, 3, 3, 1 ],
+    [ -427, 230, 1, 1, 1 ],
+    [ 0, 1, 0, 1, 0 ],
+    [ 2, 1, 0, 0, 1 ],
+    [ 12, 3, 8, 0, 0 ],
+    [ 203, 204, 1, 7, 1 ],
+    [ 6, -3, 4, 0, 0 ],
+    [ 1, 0, 1, 0, 0 ],
+    [ -9, 6, 3, 0, 1 ],
+    [ -462, 249, 8, 2, 0 ],
+    [ -3, 6, 5, 1, 0 ],
+    [ 168, -39, 6, 3, 1 ],
+    [ -1281, 690, 4, 1, 1 ],
+    [ 0, 3, 3, 1, 0 ],
+    [ 6, 3, 3, 0, 1 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 3, 3, -1, 7 ] :
+ {
+    <771456, [ 0, -1, 0, -51, -1413 ], [ -1, 2 ]>,
+    <771456, [ 0, -1, 0, -40080595, -97654023221 ], [ -462, 249 ]>,
+    <771456, [ 0, -1, 0, -160322381, 781392508149 ], [ -462, 249 ]>,
+    <771456, [ 0, 1, 0, -160322381, -781392508149 ], [ -462, 249 ]>,
+    <771456, [ 0, 1, 0, -12135405, 28607809131 ], [ 168, -39 ]>,
+    <771456, [ 0, 1, 0, 1013, -52459 ], [ 0, 3 ]>,
+    <771456, [ 0, -1, 0, -6435, 202203 ], [ 2, -1 ]>,
+    <771456, [ 0, -1, 0, -160322381, 781392508149 ], [ -154, 83 ]>,
+    <771456, [ 0, 1, 0, 24435, -2064693 ], [ 6, 3 ]>,
+    <771456, [ 0, -1, 0, 6109, -261141 ], [ 2, 1 ]>,
+    <771456, [ 0, -1, 0, 4051, -423723 ], [ 0, 3 ]>,
+    <771456, [ 0, -1, 0, -3033851, 3577493067 ], [ 168, -39 ]>,
+    <771456, [ 0, -1, 0, -12135405, -28607809131 ], [ 56, -13 ]>,
+    <771456, [ 0, 1, 0, 8853, 1858149 ], [ 12, 3 ]>,
+    <771456, [ 0, -1, 0, 4051, -423723 ], [ 0, 1 ]>,
+    <771456, [ 0, 1, 0, -40080595, 97654023221 ], [ -154, 83 ]>,
+    <771456, [ 0, 1, 0, -2515, 489677 ], [ -1, 2 ]>,
+    <771456, [ 0, 1, 0, 4051, 423723 ], [ 0, 1 ]>,
+    <771456, [ 0, -1, 0, -40080595, -97654023221 ], [ -154, 83 ]>,
+    <771456, [ 0, 1, 0, -10061, -3927477 ], [ -1, 2 ]>,
+    <771456, [ 0, -1, 0, 24435, 2064693 ], [ 2, 1 ]>,
+    <771456, [ 0, 1, 0, -3033851, -3577493067 ], [ 168, -39 ]>,
+    <771456, [ 0, -1, 0, 8853, -1858149 ], [ 12, 3 ]>,
+    <771456, [ 0, 1, 0, 35411, -14829781 ], [ 12, 3 ]>,
+    <771456, [ 0, -1, 0, -2515, -489677 ], [ -3, 6 ]>,
+    <771456, [ 0, -1, 0, -12135405, -28607809131 ], [ 168, -39 ]>,
+    <771456, [ 0, -1, 0, 35411, 14829781 ], [ 4, 1 ]>,
+    <771456, [ 0, 1, 0, -51, 1413 ], [ -1, 2 ]>,
+    <771456, [ 0, 1, 0, 24435, -2064693 ], [ 2, 1 ]>,
+    <771456, [ 0, -1, 0, 1013, 52459 ], [ 0, 3 ]>,
+    <771456, [ 0, -1, 0, -3033851, 3577493067 ], [ 56, -13 ]>,
+    <771456, [ 0, -1, 0, -205, 11509 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -51, 1413 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -10061, -3927477 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -40080595, 97654023221 ], [ -462, 249 ]>,
+    <771456, [ 0, 1, 0, 4051, 423723 ], [ 0, 3 ]>,
+    <771456, [ 0, 1, 0, -2515, 489677 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -6435, -202203 ], [ 6, -3 ]>,
+    <771456, [ 0, 1, 0, -160322381, -781392508149 ], [ -154, 83 ]>,
+    <771456, [ 0, -1, 0, -10061, 3927477 ], [ -3, 6 ]>,
+    <771456, [ 0, -1, 0, -10061, 3927477 ], [ -1, 2 ]>,
+    <771456, [ 0, -1, 0, -25741, -1591883 ], [ 6, -3 ]>,
+    <771456, [ 0, -1, 0, -205, 11509 ], [ -1, 2 ]>,
+    <771456, [ 0, 1, 0, -25741, 1591883 ], [ 2, -1 ]>,
+    <771456, [ 0, -1, 0, -51, -1413 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -12135405, 28607809131 ], [ 56, -13 ]>,
+    <771456, [ 0, 1, 0, -6435, -202203 ], [ 2, -1 ]>,
+    <771456, [ 0, -1, 0, -2515, -489677 ], [ -1, 2 ]>,
+    <771456, [ 0, -1, 0, 6109, -261141 ], [ 6, 3 ]>,
+    <771456, [ 0, -1, 0, -25741, -1591883 ], [ 2, -1 ]>,
+    <771456, [ 0, 1, 0, 35411, -14829781 ], [ 4, 1 ]>,
+    <771456, [ 0, -1, 0, 8853, -1858149 ], [ 4, 1 ]>,
+    <771456, [ 0, -1, 0, 1013, 52459 ], [ 0, 1 ]>,
+    <771456, [ 0, 1, 0, 6109, 261141 ], [ 6, 3 ]>,
+    <771456, [ 0, -1, 0, 35411, 14829781 ], [ 12, 3 ]>,
+    <771456, [ 0, 1, 0, 1013, -52459 ], [ 0, 1 ]>,
+    <771456, [ 0, 1, 0, -205, -11509 ], [ -3, 6 ]>,
+    <771456, [ 0, 1, 0, -3033851, -3577493067 ], [ 56, -13 ]>,
+    <771456, [ 0, -1, 0, 24435, 2064693 ], [ 6, 3 ]>,
+    <771456, [ 0, 1, 0, 6109, 261141 ], [ 2, 1 ]>,
+    <771456, [ 0, 1, 0, -205, -11509 ], [ -1, 2 ]>,
+    <771456, [ 0, 1, 0, -25741, 1591883 ], [ 6, -3 ]>,
+    <771456, [ 0, -1, 0, -6435, 202203 ], [ 6, -3 ]>,
+    <771456, [ 0, 1, 0, 8853, 1858149 ], [ 4, 1 ]>
+}
+============================================================================== 
+Time: 0.090
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 1, 48, -96 ]; a:=16; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 16 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 16 S-unit equations to solve.
+The ranks are [ 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 1.
+Applying the Dirichlet sieve to equation number 1 out of 16.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 1.
+Applying the Dirichlet sieve to equation number 2 out of 16.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 10> ].
+The bound on the norm squared of (b1,..,br) is 1949.
+Applying the Dirichlet sieve to equation number 3 out of 16.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 340.
+Applying the Dirichlet sieve to equation number 4 out of 16.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0]
+]
+The range is [ <0, 2> ].
+The bound on the norm squared of (b1,..,br) is 85.
+Applying the Dirichlet sieve to equation number 5 out of 16.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0]
+]
+The range is [ <0, 2> ].
+The bound on the norm squared of (b1,..,br) is 68.
+Applying the Dirichlet sieve to equation number 6 out of 16.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0]
+]
+The range is [ <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 340.
+Applying the Dirichlet sieve to equation number 7 out of 16.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 1845.
+Applying the Dirichlet sieve to equation number 8 out of 16.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 9...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1259.
+Applying the Dirichlet sieve to equation number 9 out of 16.
+Finished applying the Dirichlet sieve to equation number 9.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 10...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1330.
+Applying the Dirichlet sieve to equation number 10 out of 16.
+Finished applying the Dirichlet sieve to equation number 10.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 11...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 4>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 7049.
+Applying the Dirichlet sieve to equation number 11 out of 16.
+Finished applying the Dirichlet sieve to equation number 11.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 12...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 4>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 8705.
+Applying the Dirichlet sieve to equation number 12 out of 16.
+Finished applying the Dirichlet sieve to equation number 12.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 13...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 7>, <0, 15> ].
+The bound on the norm squared of (b1,..,br) is 8018.
+Applying the Dirichlet sieve to equation number 13 out of 16.
+Finished applying the Dirichlet sieve to equation number 13.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 14...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 7>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 8114.
+Applying the Dirichlet sieve to equation number 14 out of 16.
+Finished applying the Dirichlet sieve to equation number 14.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 15...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 6>, <0, 11>, <0, 21> ].
+The bound on the norm squared of (b1,..,br) is 28487.
+Applying the Dirichlet sieve to equation number 15 out of 16.
+Finished applying the Dirichlet sieve to equation number 15.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 16...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [22, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [2, 4, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [4, 1, 0]
+]
+The range is [ <0, 6>, <0, 11>, <0, 22> ].
+The bound on the norm squared of (b1,..,br) is 32325.
+Applying the Dirichlet sieve to equation number 16 out of 16.
+Finished applying the Dirichlet sieve to equation number 16.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 22.040
+Time: 22.040
+[
+    [ -1, -5, 2, 2, 0 ],
+    [ 1, -1, 1, 1, 0 ],
+    [ 19, 23, 5, 3, 0 ],
+    [ -3, -7, 1, 0, 1 ],
+    [ 5, 11, 0, 2, 0 ],
+    [ 9, 17, 1, 2, 1 ],
+    [ 3, 1, 1, 2, 0 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 4, 1, 12, -6 ] :
+ {
+    <771456, [ 0, -1, 0, 13655, 2351833 ], [ 1, -1 ]>,
+    <771456, [ 0, 1, 0, 13655, -2351833 ], [ 1, -1 ]>,
+    <771456, [ 0, -1, 0, 3414, -295686 ], [ 1, -1 ]>,
+    <771456, [ 0, 1, 0, 3414, 295686 ], [ 1, -1 ]>
+}
+============================================================================== 
+Time: 0.010
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+clist:=[ 1, 9, 15, 171 ]; a:=1; primelist:=[ 3, 7, 41 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+There are 8 ideal equations to solve.
+Getting the small sieve information...Done.
+We have 8 S-unit equations to solve.
+The ranks are [ 1, 2, 2, 2, 3, 3, 3, 4 ].
++++++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+S is  []
+The range is [].
+The bound on the norm squared of (b1,..,br) is 4.
+Applying the Dirichlet sieve to equation number 1 out of 8.
+Finished applying the Dirichlet sieve to equation number 1.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 2> ].
+The bound on the norm squared of (b1,..,br) is 148.
+Applying the Dirichlet sieve to equation number 2 out of 8.
+Finished applying the Dirichlet sieve to equation number 2.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [7, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 26.
+Applying the Dirichlet sieve to equation number 3 out of 8.
+Finished applying the Dirichlet sieve to equation number 3.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 2, 2]
+]
+The range is [ <0, 10> ].
+The bound on the norm squared of (b1,..,br) is 2036.
+Applying the Dirichlet sieve to equation number 4 out of 8.
+Finished applying the Dirichlet sieve to equation number 4.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [7, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 1403.
+Applying the Dirichlet sieve to equation number 5 out of 8.
+Finished applying the Dirichlet sieve to equation number 5.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [7, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 2, 2]
+]
+The range is [ <0, 4>, <0, 14> ].
+The bound on the norm squared of (b1,..,br) is 9237.
+Applying the Dirichlet sieve to equation number 6 out of 8.
+Finished applying the Dirichlet sieve to equation number 6.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 2, 2]
+]
+The range is [ <0, 8>, <0, 17> ].
+The bound on the norm squared of (b1,..,br) is 9189.
+Applying the Dirichlet sieve to equation number 7 out of 8.
+Finished applying the Dirichlet sieve to equation number 7.
++++++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+S is  [
+    Prime Ideal of OK
+    Two element generators:
+        [41, 0, 0]
+        [7, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [7, 0, 0]
+        [6, 1, 0],
+    Prime Ideal of OK
+    Two element generators:
+        [3, 0, 0]
+        [0, 2, 2]
+]
+The range is [ <0, 5>, <0, 10>, <0, 22> ].
+The bound on the norm squared of (b1,..,br) is 26530.
+Applying the Dirichlet sieve to equation number 8 out of 8.
+Finished applying the Dirichlet sieve to equation number 8.
++++++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 18.070
+Time: 18.070
+[
+    [ 15, -4, 0, 2, 1 ],
+    [ -2374, 767, 11, 2, 1 ],
+    [ -1, 2, 1, 2, 0 ],
+    [ 10, 1, 4, 2, 0 ],
+    [ 25, -8, 1, 2, 0 ],
+    [ 23, -4, 2, 2, 1 ],
+    [ 4, -1, 0, 2, 0 ],
+    [ -2, 1, 1, 1, 0 ],
+    [ 45, -12, 3, 2, 1 ],
+    [ -7122, 2301, 14, 2, 1 ],
+    [ -3, 6, 4, 2, 0 ],
+    [ 1, 0, 1, 0, 0 ],
+    [ -46, 15, 1, 2, 1 ],
+    [ 30, 3, 7, 2, 0 ],
+    [ 75, -24, 4, 2, 0 ],
+    [ 69, -12, 5, 2, 1 ],
+    [ 12, -3, 3, 2, 0 ],
+    [ -6, 3, 4, 1, 0 ]
+]
+Elliptic curves corresponding to conductor N = 771456 and form clist:=[ 3, 9, 5, 19 ] :
+ {}
+============================================================================== 
+Time: 0.010
+
+Total time: 157.750 [157.141] seconds, Total memory usage: 64.12MB
