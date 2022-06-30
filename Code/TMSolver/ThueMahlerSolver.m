@@ -1843,21 +1843,19 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
 end function;
 
 
-
-
 //----------------------------------------------//
 
 // Example 1
 //clist:=[3,2,7,2];
 //a:=1;
 //primelist:=[2,3,7,41];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
+//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
 //sols;
 
 //clist:=[1,2,4,6];
 //a:=1;
 //primelist:=[2,3,7,41,1109];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
+//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
 //sols;
 
 
@@ -1865,7 +1863,7 @@ end function;
 //clist:=[7,1,29,-25];
 //a:=1;
 //primelist:=[2,3,7,37,53];
-//time sols:=solveThueMahler(clist,a,primelist);
+//time sols:=solveThueMahler(clist,primelist,a);
 //sols;
 
 // Example 3a (improvement on Soydan and Tzanakis)
@@ -1879,14 +1877,14 @@ end function;
 //clist:=[3,65,-290,-2110,975,3149];
 //a:= -1;
 //primelist:=[2,3,5,7,11,13,17];
-//time sols:=solveThueMahler(clist,a,primelist);
+//time sols:=solveThueMahler(clist,primelist,a);
 //sols;
 
 // Example 4
 //clist:=[1,0,0,0,-2];
 //primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-//time sols1:=solveThueMahler(clist,1,primelist);
-//time sols2:=solveThueMahler(clist,-1,primelist);
+//time sols1:=solveThueMahler(clist,primelist,1);
+//time sols2:=solveThueMahler(clist,primelist,-1);
 //sols1;
 //sols2;
 
@@ -1901,21 +1899,21 @@ end function;
 // Example 6 (de Weger--Tzanakis)
 //clist:=[1,-23,5,24];
 //primelist:=[2,3,5,7];
-//time sols:=solveThueMahler(clist,1,primelist) join solveThueMahler(clist,-1,primelist);
+//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
 //sols;
 
 // Example 7 (no real places)
 //clist:=[ 1, 0, 0, 0, 3 ];
 //a:= 1;
 //primelist:= [ 2, 7, 23, 31 ];
-//time sols:=solveThueMahler(clist,1,primelist) join solveThueMahler(clist,-1,primelist);
+//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
 
 // Mike's Example
 //SetClassGroupBounds("GRH");
-//clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
-//a:= 1;
-//primelist:= [3];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
+clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
+a:= 1;
+primelist:= [3];
+time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
 
 // Goormaghtigh's Example
 // 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
@@ -1931,3 +1929,9 @@ end function;
 //primelist:= [2,5,19]; //[190];
 //SetClassGroupBounds("GRH");
 //time solveThueMahler(clist,primelist,a : verb:=true);
+
+
+clist:=[14,20,24,15];
+a:=1;
+primelist:= [2,3,17,37,53];
+time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
