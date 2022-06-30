@@ -1910,10 +1910,10 @@ end function;
 
 // Mike's Example
 //SetClassGroupBounds("GRH");
-clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
-a:= 1;
-primelist:= [3];
-time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
+//clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
+//a:= 1;
+//primelist:= [3];
+//time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
 
 // Goormaghtigh's Example
 // 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
@@ -1930,8 +1930,7 @@ time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
 //SetClassGroupBounds("GRH");
 //time solveThueMahler(clist,primelist,a : verb:=true);
 
-
-clist:=[14,20,24,15];
-a:=1;
-primelist:= [2,3,17,37,53];
-time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
+//clist:=[14,20,24,15];
+//a:=1;
+//primelist:= [2,3,17,37,53];
+//time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
