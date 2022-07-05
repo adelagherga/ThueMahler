@@ -491,7 +491,14 @@ valuationBound:=function(theta,tau,deltaList,fp,cB1)
 	ZZr:=StandardLattice(r);
 	LL:=sub<ZZr | [ ZZr!(Eltseq((Zr!l))) : l in OrderedGenerators(L)]>;
 	ww:=ZZr!Eltseq(Zr!w);
-	DLwsq:=Norm(ClosestVectors(LL,-ww)[1]+ww);
+
+	cvps:= [];
+	P:= CloseVectorsProcess(LL,-ww,Floor(cB1^2));
+	while (IsEmpty(P) eq false) do
+	    Append(~cvps, Norm(NextVector(P)+ww));
+	end while;
+	DLwsq:= Min(cvps);
+//	DLwsq:=Norm(ClosestVectors(LL,-ww)[1]+ww);
 	// This is D(L,w)^2 in the notation of the paper.
     until DLwsq gt cB1^2; // We keep increasing k until condtion (iii)
     // (or conditions (i), (ii)) are satisfied.
@@ -1850,12 +1857,109 @@ end function;
 clist:=[3,65,-290,-2110,975,3149];
 a:= -(2^5)*(3^4);
 primelist:=[5,11];
-time sols:=solveThueMahler(clist,a,primelist);
+time sols:=solveThueMahler(clist,primelist,a);
 sols;
 
 // Example 3b (improvement on Soydan and Tzanakis)
 clist:=[3,65,-290,-2110,975,3149];
 a:= -1;
 primelist:=[2,3,5,7,11,13,17];
-time sols:=solveThueMahler(clist,a,primelist);
+time sols:=solveThueMahler(clist,primelist,a);
 sols;
+
+
+primelists:=
+[
+    [ 2, 11, 877, 27277 ],
+    [ 61315456967 ],
+    [ 5, 952881593 ],
+    [ 2, 429157147 ],
+    [ 2, 14160257 ],
+    [ 1573849301 ],
+    [ 156654479 ],
+    [ 2, 13, 41, 181 ],
+    [ 2, 2657 ],
+    [ 2, 14160257 ],
+    [ 2, 1573849301 ],
+    [ 31197044191 ],
+    [ 37, 271040437 ],
+    [ 2, 156654479 ],
+    [ 2, 13, 41, 181 ],
+    [ 5, 11, 743, 937 ],
+    [ 181, 89237 ],
+    [ 2, 2657 ],
+    [ 5, 4336428857 ],
+    [ 23561, 1850803 ],
+    [ 2, 13, 41, 181 ],
+    [ 2, 5, 11, 743, 937 ],
+    [ 47, 44579617 ],
+    [ 496100263 ],
+    [ 2, 181, 89237 ],
+    [ 2, 2657 ],
+    [ 107, 183319 ],
+    [ 2, 5, 13, 41, 181 ],
+    [ 97, 569, 848273 ],
+    [ 12805222627 ],
+    [ 2, 18747181 ],
+    [ 2, 23, 193, 9257 ],
+    [ 1695996377 ],
+    [ 269, 2865931 ],
+    [ 2, 5, 2657 ],
+    [ 2, 67, 4999 ]
+];
+solsy:= [
+    [ 1, 25 ],
+    [ 2, 23 ],
+    [ 4, 19 ],
+    [ 5, 17 ],
+    [ 7, 13 ],
+    [ 8, 11 ],
+    [ 10, 7 ],
+    [ 11, 5 ],
+    [ 13, 1 ],
+    [ 14, 26 ],
+    [ 16, 22 ],
+    [ 17, 20 ],
+    [ 19, 16 ],
+    [ 20, 14 ],
+    [ 22, 10 ],
+    [ 23, 8 ],
+    [ 25, 4 ],
+    [ 26, 2 ],
+    [ 41, 26 ],
+    [ 43, 22 ],
+    [ 44, 20 ],
+    [ 46, 16 ],
+    [ 47, 14 ],
+    [ 49, 10 ],
+    [ 50, 8 ],
+    [ 52, 4 ],
+    [ 53, 2 ],
+    [ 55, 25 ],
+    [ 56, 23 ],
+    [ 58, 19 ],
+    [ 59, 17 ],
+    [ 61, 13 ],
+    [ 62, 11 ],
+    [ 64, 7 ],
+    [ 65, 5 ],
+    [ 67, 1 ]
+];
+clist:=[ 1, 65, -870, -18990, 26325, 255069 ];
+a:=27;
+
+for i in [1..#primelists] do
+    testsols:=solveThueMahler(clist,primelists[i],a);
+    print "=============================================================";
+    print "=============================================================";
+    testsols, solsy[i];
+    print "=============================================================";
+    print "=============================================================";
+end for;
+
+// a lot of these are very slow, presumably because of the large prime
+// issue is in multGroup function
+// issue is in multGroupPrimePower when computing
+//     xList := [(modfp(x))@@phi1 : x in xList];
+// struggles on even the first element of xList
+// stuggling on computing the preimage under phi1

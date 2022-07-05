@@ -1186,7 +1186,7 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    cB0New:=2*c17*(c21+c22);
 	    if cB0New lt cB0 then
 		if verb then
-		    printf "The reduction process gives a new bound of %o.\n", cB0New;
+		    printf "The reduction process gives a new bound of %o.\n", Floor(cB0New);
 		end if;
 		cB0:=Floor(cB0New);
 		for i in [1..r] do
@@ -1196,7 +1196,8 @@ reducedBound:=function(tau,deltaList : verb:=false)
 		end for;
 	    else
 		if verb then
-		    printf "The reduction process gives a worse bound of %o.\n", cB0New;
+		    printf "The reduction process gives a worse bound of %o.\n",
+			   Floor(cB0New);
 		end if;
 		finished:=true;
 	    end if;
@@ -1205,7 +1206,7 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    expSbds[i,1]:=expSbds[i,1]+Valuation(tau,S[i]);
 	    expSbds[i,2]:=expSbds[i,2]+Valuation(tau,S[i]);
 	end for;
-	return vecB, S, expSbds;
+	return [Integers()!b : b in vecB], S, expSbds;
     end if;
     assert t ge 1; // We've now finished with the totally complex case.
     if verb then
@@ -1533,6 +1534,9 @@ smallSieveInfo:=function(smallInf,c0,theta,qBound)
     else
 	qMax:= smallInf[#smallInf][1]; //primes already computed
     end if;
+    if (qBound lt qMax+1) then
+	return smallInf;
+    end if;
     if IsEmpty(PrimesInInterval(qMax+1,qBound)) then
 	return smallInf;
     end if;
@@ -1728,7 +1732,7 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
     // sols is a list of solutions to the Thue--Mahler equation.
     printf
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "clist:=%o; a:=%o; primelist:=%o; \n", clist,a,primelist;
+    printf "clist:=%o; primelist:=%o; a:=%o; \n", clist,primelist,a;
     printf
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
@@ -1838,56 +1842,9 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
     return sols;
 end function;
 
-
-
-
 //----------------------------------------------//
 
-// Example 1
-//clist:=[3,2,7,2];
-//a:=1;
-//primelist:=[2,3,7,41];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
-//sols;
-
-//clist:=[1,2,4,6];
-//a:=1;
-//primelist:=[2,3,7,41,1109];
-//time sols:=solveThueMahler(clist,a,primelist : verb:=true);
-//sols;
-
-
-// Example 2
-//clist:=[7,1,29,-25];
-//a:=1;
-//primelist:=[2,3,7,37,53];
-//time sols:=solveThueMahler(clist,a,primelist);
-//sols;
-
-// Example 3a (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -(2^5)*(3^4);
-//primelist:=[5,11];
-//time sols:=solveThueMahler(clist,a,primelist);
-//sols;
-
-// Example 3b (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -1;
-//primelist:=[2,3,5,7,11,13,17];
-//time sols:=solveThueMahler(clist,a,primelist);
-//sols;
-
-// Example 4
-//clist:=[1,0,0,0,-2];
-//primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-//time sols1:=solveThueMahler(clist,1,primelist);
-//time sols2:=solveThueMahler(clist,-1,primelist);
-//sols1;
-//sols2;
-
 // Example 5
-SetClassGroupBounds("GRH");
 clist:=[ 5,  1,  4,  1,  6,  1,  6,  0,  6,  0,  4, -2];
 a:=1;
 primelist:=[2,3,5,7,11];

@@ -1934,3 +1934,7 @@ end function;
 //a:=1;
 //primelist:= [2,3,17,37,53];
 //time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
+
+
+// very very slow at large prime
+//clist:=[ 1, 65, -870, -18990, 26325, 255069 ]; primelist:=[ 61315456967 ]; a:=27;
