@@ -1136,7 +1136,8 @@ reducedBoundFixedEmbedding2:=function(K,theta,tau,deltaList,S,consts,sigma : ver
 	    M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
-	    DLwsq:=distanceLBsq2(LL,ww,cB5^2);
+	    //DLwsq:=distanceLBsq2(LL,ww,cB5^2);
+	    DLwsq:=distanceLBsq(LL,ww);
 	    // This D(L,w)^2 in the notation of paper.
 	    tf1:=DLwsq gt cB5^2;
 	    if tf1 eq false then
@@ -1782,105 +1783,354 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
     return sols;
 end function;
 
+SetC0To1:=function(clist,primelist,a)
+    // Input: clist, a, primelist
+    // clist is a list of coefficients c_0,c_1,..,c_n.
+    // a is an integer.
+    // primelist is a list of the primes p_1,p_2,..,p_v.
+    // This applies a change of variables to the Thue-Mahler
+    // equation associated to clist to ensure c_0 = 1 so that
+    // we may compute all solutions subject to the assumptions that
+    // X, Y are coprime integers and  gcd(Y,c_0)!= 1.
+    // Output: nD
+    // nD is the change of variables to convert the solutions to satisfy the
+    // original Thue-Mahler equation as given by clist.
+    n:=#clist-1;
+    v:=#primelist;
+
+    a_i:= [];
+    b_i:= [];
+    q:= [f[1] : f in Factorization(a)];
+    d:= [];
+
+    for i in [1..v] do
+        Append(~a_i, [0..Valuation(clist[0+1],primelist[i])]);
+    end for;
+
+    for i in [1..#q] do
+        Append(~b_i, [0..Min( Valuation(a,q[i]) , Valuation(clist[1],q[i]) )] );
+    end for;
+
+    Prod1:= [];
+    Prod2:= [];
+
+    ExponentCombos1:= CartesianProduct(a_i);
+    for c in ExponentCombos1 do
+        Append(~Prod1, &*{primelist[i]^c[i] : i in [1..v]});
+    end for;
+
+    if q ne [] then
+        ExponentCombos2:= CartesianProduct(b_i);
+        for c in ExponentCombos2 do
+            Append(~Prod2, &*{q[i]^c[i] : i in [1..#q]});
+        end for;
+    else
+        Prod2:= [1];
+    end if;
+
+    if Prod1 eq [] then
+        Prod1:= [1];
+    end if;
+
+    D:= [];
+    for c in Prod1 do
+        for d in Prod2 do
+            Append(~D, c*d);
+        end for;
+    end for;
+
+    Sort(~D);
+    b_d:= [**];
+    a_d:= [];
+
+    for i in [1..#D] do
+        d:= D[i];
+        b_d[i]:= [[d],[]];
+
+        new_a:=( clist[0+1]/d )^(n-1)*a*(1/d);
+
+        for j in [1..v] do
+	    // stores ord_{p_i}(a) to ensure gcd(a,p_1, ..., p_v) = 1
+            b_d[i][2][j]:= Valuation(new_a,primelist[j]);
+	    // divides out factors of p_i from a; ensures gcd(a,p_1, ..., p_v) = 1
+            new_a:= new_a/( primelist[j]^b_d[i][2][j] );
+        end for;
+        a_d[i]:= new_a;
+    end for;
+
+    U_a:= [];
+    for i in [1..#D] do
+        if a_d[i] notin U_a then
+            Append(~U_a, a_d[i]);
+        end if;
+    end for;
+    Sort(~U_a);
+
+    nD:= [];
+    for i in [1..#U_a] do
+        nD[i]:= [* [U_a[i]] *];
+        nD[i][2]:= [];
+        for j in [1..#D] do
+            if a_d[j] eq U_a[i] then
+                Append(~nD[i][2], b_d[j]);
+            end if;
+        end for;
+    end for;
+
+    return nD;
+end function;
+
+preProcessTM:=function(clist,primelist,a)
+    // Input: clist, a, primelist
+    // clist is a list of coefficients c_0,c_1,..,c_n.
+    // a is an integer.
+    // primelist is a list of the primes p_1,p_2,..,p_v.
+    // This solves c_0 X^n+...+c_n Y^n= a \times p_1^{z_1} ... p_t^{z_t}
+    // subject to the assumptions that X, Y are coprime integers
+    // and gcd(Y,c_0)!=1.
+    // Output: sols.
+    // sols is a list of solutions to the Thue--Mahler equation.
+    n:= #clist-1;
+    v:= #primelist;
+    originalp:= primelist;
+    originalv:= v; // generates a copy of the number of primes, {p_1, ..., p_v}
+
+    c:= []; // stores coefficients of F(X,Y) = X^n + c[1]X^{n-1}Y + \cdots + c[n]Y^n
+    b:= []; // stores
+
+    for i in [1..n] do
+        c[i]:=clist[i+1]*clist[1]^(i-1); // c_i = C[i+1]*C[1]^{i-1} for i = 1, ..., n
+	                                   // used to reduce to the case where c_0 = 1
+    end for;
+    c:= [1] cat c;
+
+    for i in [1..originalv] do
+	// stores ord_{p_i}(a) to ensure gcd(a,p_1, ..., p_v) = 1
+        b[i]:= Valuation(a,primelist[i]);
+	// divides out factors of p_i from a; ensures gcd(a,p_1, ..., p_v) = 1
+        a:= a/( primelist[i]^b[i] );
+    end for;
+    a:= Integers()! a;
+
+    SOL2:=[];
+    nD:= SetC0To1(clist,primelist,a);
+    R<X,Y>:= PolynomialRing(Integers(),2);
+    F:= clist[1]*X^3 +clist[2]*X^2*Y + clist[3]*X*Y^2 + clist[4]*Y^3;
+
+    for D in nD do
+        new_a:= D[1][1];
+        b_d:= D[2];
+
+        a:= Integers() ! new_a;
+	time SOL1:=solveThueMahler(c,primelist,a);
+	SOL1;
+        for b2 in b_d do
+            d:= b2[1][1];
+            bd:= b2[2];
+            for sol1 in SOL1 do
+                sol2:=[0 : i in [1..v+2]];
+                if IsDivisibleBy(d*sol1[1],clist[1]) then
+                    sol2[1]:=Integers() ! (d*sol1[1]/clist[1]);
+                    sol2[2]:=Integers() ! (d*sol1[2]);
+                    if Evaluate(F,[sol2[1],sol2[2]]) ne 0 then
+                        Fac:= Factorization(Evaluate(F,[sol2[1],sol2[2]]));
+			// primes appearing in Factorization of RHS of F
+                        Fac1:= [f[1] : f in Fac];
+			 // exponents on primes appearing on RHS of F
+                        Fac2:= [f[2] : f in Fac];
+                        for i in [1..v] do
+                            for j in [1..#Fac] do
+                                if originalp[i] eq Fac1[j] then
+                                    sol2[i+2]:= Fac2[j];
+                                end if;
+                            end for;
+                        end for;
+                        Append(~SOL2,sol2);
+                    end if;
+                end if;
+            end for;
+        end for;
+    end for;
+    return SOL2;
+end function;
+
+function ConvertTMToEllipticCurves(N,clist,sols)
+    // INPUT: N, clist, sols
+    // Here N is the conductor corresponding to the
+    // Thue-Mahler form given by clist with solutions sols
+    // OUTPUT: Elliptic curves with no nontrivial 2-torsion points
+    d:=#clist-1;
+    assert d eq 3;
+    a,b,c,d:= Explode(clist);
+    Q<x,y>:= PolynomialRing(Integers(),2);
+    H:= (b^2-3*a*c)*x^2 + (b*c-9*a*d)*x*y + (c^2-3*b*d)*y^2;
+    G:= (-27*a^2*d + 9*a*b*c-2*b^3)*x^3 + (-3*b^2*c - 27*a*b*d + 18*a*c^2)*x^2*y +
+	(3*b*c^2 - 18*b^2*d + 27*a*c*d)*x*y^2 + (-9*b*c*d + 2*c^3 + 27*a*d^2)*y^3;
+
+    Divs6N:= [D : D in Divisors(6*N) |  IsSquarefree(D)];
+
+    ECs:= [];
+    for s in sols do
+        u:= s[1];
+        v:= s[2];
+	a_4:= -27*(Evaluate(H,[u,v]));
+	a_6:= 27*(Evaluate(G,[u,v]));
+        E:= [0,0,0, a_4, a_6];
+
+        MinE:= MinimalModel(EllipticCurve(E));
+        CondE:= Conductor(MinE);
+        Append(~ECs, < CondE, aInvariants(MinE), [u,v] > );
+
+	TwistE:= QuadraticTwist(MinE,-1);
+        TwistMinE:= MinimalModel(EllipticCurve(TwistE));
+        TwistCondE:= Conductor(TwistMinE);
+        Append(~ECs, < TwistCondE, aInvariants(TwistMinE), [u,v] > );
+
+	for D in Divs6N do
+	    DTwistE:= QuadraticTwist(MinE,D);
+            DTwistMinE:= MinimalModel(EllipticCurve(DTwistE));
+            DTwistCondE:= Conductor(DTwistMinE);
+            Append(~ECs, < DTwistCondE, aInvariants(DTwistMinE), [u,v] > );
+	end for;
+    end for;
+
+    Sort(~ECs);
+    RelECs:= {};
+    for E in ECs do
+	if E[1] eq N then
+	    RelECs:= RelECs join {E};
+	end if;
+    end for;
+
+    printf "Elliptic curves corresponding to conductor N = %o and form clist:=%o :\n ",
+	   N, clist;
+    print RelECs;
+    printf "=========================================================================== \n";
+
+    return RelECs;
+end function;
 
 //----------------------------------------------//
 
-// Example 1
-// something strange is happening in pr:= tauDeltaList[1]; the closest vector is bigger than the lower bound for the closest vector
-//clist:=[3,2,7,2];
-//a:=1;
-//primelist:=[2,3,7,41];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-//sols;
+// Thue-Mahler to solve
+setlist:= ["637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",None,1,2,24,0,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(2,12,0,-5)\",\"(2,12,0,-5)\",\"(1,12,0,-20)\",None,1,2,18,6,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",None,1,2,18,4,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(2,15,-24,-3)\",\"(2,15,-24,-3)\",\"(1,15,-48,-12)\",None,1,2,32,16,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(1,0,3,2)\",\"(1,0,3,2)\",\"(1,0,3,2)\",\"(5)\",1,1,12,0,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(1,3,3,3)\",\"(1,3,3,3)\",\"(1,3,3,3)\",None,1,1,4,0,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(1,3,3,5)\",\"(1,3,3,5)\",\"(1,3,3,5)\",None,1,1,4,0,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(2,6,-33,1)\",\"(2,6,-33,1)\",\"(1,6,-66,4)\",None,1,2,24,4,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(2,0,6,3)\",\"(2,0,6,3)\",\"(1,0,12,12)\",None,1,1,8,0,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(6,15,-12,-11)\",\"(2,36,-33,6)\",\"(1,36,-66,24)\",None,1,2,24,4,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(1,3,6,10)\",\"(1,3,6,10)\",\"(1,3,6,10)\",None,1,1,24,0,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(2,6,6,7)\",\"(2,6,6,7)\",\"(1,6,12,28)\",None,3,1,8,0,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(1,3,3,11)\",\"(1,3,3,11)\",\"(1,3,3,11)\",None,1,1,12,0,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(3,3,6,4)\",\"(4,-6,3,-3)\",\"(1,-6,12,-48)\",None,1,1,8,0,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(1,0,12,12)\",\"(1,0,12,12)\",\"(1,0,12,12)\",None,1,1,8,0,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(5,6,9,2)\",\"(2,-9,6,-5)\",\"(1,-9,12,-20)\",None,1,1,12,0,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(1,3,3,21)\",\"(1,3,3,21)\",\"(1,3,3,21)\",None,3,1,8,0,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(1,6,-3,8)\",\"(1,6,-3,8)\",\"(1,6,-3,8)\",None,1,1,8,0,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(4,12,12,9)\",\"(1,-12,-12,-4)\",\"(1,-12,-12,-4)\",None,1,1,12,0,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(1,9,0,10)\",\"(1,9,0,10)\",\"(1,9,0,10)\",None,1,1,21,2,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(2,0,9,8)\",\"(2,0,9,8)\",\"(1,0,18,32)\",\"(5)\",1,1,6,2,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(3,3,3,11)\",\"(3,3,3,11)\",\"(1,3,9,99)\",None,1,1,18,0,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(1,6,-3,16)\",\"(1,6,-3,16)\",\"(1,6,-3,16)\",None,1,1,12,0,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(1,9,12,62)\",\"(1,9,12,62)\",\"(1,9,12,62)\",None,3,1,12,2,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(10,0,15,3)\",\"(10,0,15,3)\",\"(1,0,150,300)\",None,3,1,18,2,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(6,12,15,14)\",\"(5,-9,-6,-6)\",\"(1,-9,-30,-150)\",None,1,1,20,8,\"(1,3)\",\"(2,5,59)\"",
+"637200,\"(1,0,33,24)\",\"(1,0,33,24)\",\"(1,0,33,24)\",None,1,1,12,4,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(2,6,21,52)\",\"(2,6,21,52)\",\"(1,6,42,208)\",None,1,1,18,4,\"(1,3,5,15)\",\"(2,59)\"",
+"637200,\"(10,9,12,9)\",\"(5,-81,-36,-4)\",\"(1,-81,-180,-100)\",None,1,1,36,16,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(1,6,42,208)\",\"(1,6,42,208)\",\"(1,6,42,208)\",None,1,1,18,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(5,0,18,4)\",\"(5,0,18,4)\",\"(1,0,90,100)\",None,1,1,27,4,\"(1,2,3,6)\",\"(5,59)\"",
+"637200,\"(14,3,12,11)\",\"(5,-75,-60,-12)\",\"(1,-75,-300,-300)\",None,3,1,18,2,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(4,12,-3,29)\",\"(11,2160,1635,310)\",\"(1,2160,17985,37510)\",None,3,1,24,2,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(4,0,33,12)\",\"(23,-126,75,-12)\",\"(1,-126,1725,-6348)\",None,1,1,24,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(5,0,30,12)\",\"(5,0,30,12)\",\"(1,0,150,300)\",None,3,1,18,2,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(4,18,12,31)\",\"(47,12,-6,-4)\",\"(1,12,-282,-8836)\",None,3,1,24,2,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(4,6,36,29)\",\"(11,-237,-69,-5)\",\"(1,-237,-759,-605)\",None,1,1,24,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
+"637200,\"(8,12,21,26)\",\"(10,-105,60,-9)\",\"(1,-105,600,-900)\",None,1,1,72,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\""];
 
-//clist:=[1,2,4,6];
-//a:=1;
-//primelist:=[2,3,7,41,1109];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-//sols;
+for set in setlist do
+    CommaSplit:= Split(set,","); // split bash input by ","
+    RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
 
+    // delimiter for form
+    assert CommaSplit[2][2] eq "(" and CommaSplit[5][#CommaSplit[5]-1] eq ")";
+    // delimiter for optimal form
+    assert CommaSplit[6][2] eq "(" and CommaSplit[9][#CommaSplit[9]-1] eq ")";
+    // delimiter for min poly
+    assert CommaSplit[10][2] eq "(" and CommaSplit[13][#CommaSplit[13]-1] eq ")";
+    assert (#RBracketSplit eq 11) or (#RBracketSplit eq 13);
 
-// Example 2
-//clist:=[7,1,29,-25];
-//a:=1;
-//primelist:=[2,3,7,37,53];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
+    N:= StringToInteger(CommaSplit[1]); // convert bash input N into an integer
+    hash:= CommaSplit[1] cat ","; // set hash as first element of .csv row, N
 
-// Example 3a (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -(2^5)*(3^4);
-//primelist:=[5,11];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
+    // convert bash input for optimal form, min poly into a sequence of integers
+    clist:= [StringToInteger(i) : i in Split(RBracketSplit[4],",")];
+    fclist:= [StringToInteger(i) : i in Split(RBracketSplit[6],",")];
 
-// Example 3b (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -1;
-//primelist:=[2,3,5,7,11,13,17];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
+    if (#RBracketSplit eq 11) then
+	assert CommaSplit[14] eq "None";
+	partialObstruction:= [];
+	classnumber:= StringToInteger(CommaSplit[15]);
+	r:= StringToInteger(CommaSplit[16]);
+	NoIdealEq:= StringToInteger(CommaSplit[17]);
+	NoThueEq:= StringToInteger(CommaSplit[18]);
+	avalues:= [StringToInteger(i) : i in Split(RBracketSplit[8],",")];
+	primelist:= [StringToInteger(i) : i in Split(RBracketSplit[10],",")];
+    else
+	partialObstruction:= [StringToInteger(i) : i in Split(RBracketSplit[8],",")];
+	classnumber:= StringToInteger(Split(RBracketSplit[9],",")[2]);
+	r:= StringToInteger(Split(RBracketSplit[9],",")[3]);
+	NoIdealEq:= StringToInteger(Split(RBracketSplit[9],",")[4]);
+	NoThueEq:= StringToInteger(Split(RBracketSplit[9],",")[5]);
+	avalues:= [StringToInteger(i) : i in Split(RBracketSplit[10],",")];
+	primelist:= [StringToInteger(i) : i in Split(RBracketSplit[12],",")];
+    end if;
+    Sort(~partialObstruction);
 
-// Example 4
-//clist:=[1,0,0,0,-2];
-//primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-//time sols1:=solveThueMahler(clist,primelist,1);
-//time sols2:=solveThueMahler(clist,primelist,-1);
-//sols1;
-//sols2;
-
-// Example 5
-SetClassGroupBounds("GRH");
-clist:=[ 5,  1,  4,  1,  6,  1,  6,  0,  6,  0,  4, -2];
-a:=1;
-primelist:=[2,3,5,7,11];
-time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-sols;
-
-// Example 6 (de Weger--Tzanakis)
-//clist:=[1,-23,5,24];
-//primelist:=[2,3,5,7];
-//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
-//sols;
-
-// Example 7 (no real places)
-//clist:=[ 1, 0, 0, 0, 3 ];
-//a:= 1;
-//primelist:= [ 2, 7, 23, 31 ];
-//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
-
-// Mike's Example
-//SetClassGroupBounds("GRH");
-//clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
-//a:= 1;
-//primelist:= [3];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
-
-// Goormaghtigh's Example
-// 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
-//clist:= [718,718,718,718,719];
-//a:=1;
-//primelist:= [719];
-//SetClassGroupBounds("GRH");
-//time solveThueMahler(clist,primelist,a : verb:=true);
-
-// Goormaghtigh's Example
-//clist:= [189,189,189,189,190];
-//a:=1;
-//primelist:= [2,5,19]; //[190];
-//SetClassGroupBounds("GRH");
-//time solveThueMahler(clist,primelist,a : verb:=true);
-
-//clist:=[14,20,24,15];
-//a:=1;
-//primelist:= [2,3,17,37,53];
-//time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
+    for a in avalues do
+	time sols:= preProcessTM(clist,primelist,a);
+	sols;
+	time ECs:= ConvertTMToEllipticCurves(N,clist,sols);
+    end for;
+end for;
 
 
-// very very slow at large prime
-//clist:=[ 1, 65, -870, -18990, 26325, 255069 ]; primelist:=[ 61315456967 ]; a:=27;
+/*
 
-// ww in LL in initial reduction at pr:= tauDeltaList[4]
-//clist:= [1,4,−18,−12];
-//primelist:= [2,3,17,37,53];
-//a:= 1;
+// Thue to solve
+["637200,\"(1,3,-12,-4)\",\"(1,3,-12,-4)\",\"(1,2,3,5,6,10,15,30)\"",
+"637200,\"(1,9,-3,-3)\",\"(1,9,-3,-3)\",\"(1,2,3,5,6,10,15,30)\"",
+"637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(2,6,10,30)\"",
+"637200,\"(2,12,0,-5)\",\"(2,12,0,-5)\",\"(295,590,885,1770,2360,7080)\"",
+"637200,\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",\"(295,590,885,1770)\"",
+"637200,\"(2,15,-24,-3)\",\"(2,15,-24,-3)\",\"(59,118,177,295,354,472,590,885,944,1416,1770,2360,2832,4720,7080,14160)\"",
+"637200,\"(2,6,-33,1)\",\"(2,6,-33,1)\",\"(118,354,590,1770)\"",
+"637200,\"(6,15,-12,-11)\",\"(2,36,-33,6)\",\"(118,354,590,1770)\"",
+"637200,\"(1,9,0,10)\",\"(1,9,0,10)\",\"(590,1770)\"",
+"637200,\"(2,0,9,8)\",\"(2,0,9,8)\",\"(118,354)\"",
+"637200,\"(1,9,12,62)\",\"(1,9,12,62)\",\"(590,1770)\"",
+"637200,\"(10,0,15,3)\",\"(10,0,15,3)\",\"(590,1770)\"",
+"637200,\"(6,12,15,14)\",\"(5,-9,-6,-6)\",\"(118,354,590,1770,14750,44250,73750,221250)\"",
+"637200,\"(1,0,33,24)\",\"(1,0,33,24)\",\"(118,354,590,1770)\"",
+"637200,\"(2,6,21,52)\",\"(2,6,21,52)\",\"(118,354,590,1770)\"",
+"637200,\"(10,9,12,9)\",\"(5,-81,-36,-4)\",\"(59,118,177,295,354,590,885,1770,7375,14750,22125,36875,44250,73750,110625,221250)\"",
+"637200,\"(1,6,42,208)\",\"(1,6,42,208)\",\"(59,118,177,295,354,590,885,1770)\"",
+"637200,\"(5,0,18,4)\",\"(5,0,18,4)\",\"(295,590,885,1770)\"",
+"637200,\"(14,3,12,11)\",\"(5,-75,-60,-12)\",\"(295,885)\"",
+"637200,\"(4,12,-3,29)\",\"(11,2160,1635,310)\",\"(295,885)\"",
+"637200,\"(4,0,33,12)\",\"(23,-126,75,-12)\",\"(59,118,177,295,354,590,885,1770)\"",
+"637200,\"(5,0,30,12)\",\"(5,0,30,12)\",\"(295,885)\"",
+"637200,\"(4,18,12,31)\",\"(47,12,-6,-4)\",\"(295,885)\"",
+"637200,\"(4,6,36,29)\",\"(11,-237,-69,-5)\",\"(59,118,177,295,354,590,885,1770)\"",
+"637200,\"(8,12,21,26)\",\"(10,-105,60,-9)\",\"(59,118,177,295,354,590,885,1770)\""];
+
+// No Sunit Eq needed - corresponds to first 2 forms
+637200,"(1,3,-12,-4)","(1,3,-12,-4)",8,0.150,7.720,0.060,0.000,0.030,0.010,None,8.000
+637200,"(1,9,-3,-3)","(1,9,-3,-3)",8,0.110,6.050,0.060,0.000,0.020,0.020,None,6.300
+
+*/

@@ -363,39 +363,6 @@ initialBound:=function(K,theta,tau,deltaList,S)
     return c20, c17;
 end function;
 
-distanceLBsq2:=function(LL,ww,cB5sq)
-    // Given a lattice LL (contained in \Z^r)
-    // and a vector ww in \Z^r,
-    // this returns a lower bound for D(LL,ww)
-    // (the shortest distance from a vector in LL
-    // to ww).
-
-    //if ww in LL then
-    // return 0;
-    // end if;
-    ww:=AmbientSpace(Parent(ww))!ww; // Changing
-    // the coefficient ring of ww to the rationals.
-    n:=Rank(LL);
-    assert n eq Degree(LL);
-//    if ww in LL then
-//	return
-    mult:= 15;
-    P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB5sq)*mult);
-    while IsEmpty(P) do
-	print "mult:", mult;
-	mult:= mult+1;
-	P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB5sq)*mult);
-    end while;
-    Norms:= [];
-    while (IsEmpty(P) eq false) do
-	Append(~Norms, Norm(NextVector(P)+ww));
-    end while;
-    print Sqrt(Min(Norms)), Sqrt(cB5sq);
-    print "Norms:", #Norms;
-    return Min(Norms);
-
-end function;
-
 distanceLBsq:=function(LL,ww)
     // Given a lattice LL (contained in \Z^r)
     // and a vector ww in \Z^r,
@@ -797,8 +764,7 @@ sift:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,cB1sq,bigInfs,depth)
 		if tf then
 		    invs:=Invariants(LcumNew);
 		    assert #invs eq rk-1; // Checking that the rank has is reduced by 1.
-		    //LcumNew:=sub<ZZr |
-		    //[ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
+		    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
 		    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
 		    vecs:=vecs cat $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,cB1sq,bigInfs,depth+1);
 		end if;
@@ -847,6 +813,7 @@ c21Func:=function(theta,tau,deltaList,S,absMinv,vecU,vecB)
 	cB2:= Sqrt(&+[i^2 : i in vecB]);
 	// <-kfpp,kfppp> are lower and upper bounds
 	// for the fp-valuation of epsilon=delta_1^b_1 ... delta_r^b_r.
+
 	c21:=c21+Max(0,kfppp)*Log(Norm(fp));
     end for;
 
@@ -1136,7 +1103,7 @@ reducedBoundFixedEmbedding2:=function(K,theta,tau,deltaList,S,consts,sigma : ver
 	    M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
-	    DLwsq:=distanceLBsq2(LL,ww,cB5^2);
+	    DLwsq:=distanceLBsq(LL,ww);
 	    // This D(L,w)^2 in the notation of paper.
 	    tf1:=DLwsq gt cB5^2;
 	    if tf1 eq false then
@@ -1660,227 +1627,452 @@ end function;
 SetAutoColumns(false);
 SetColumns(235);
 
-solveThueMahler:=function(clist,primelist,a : verb:=false)
-    // Input: clist, a, primelist
-    // clist is a list of coefficients c_0,c_1,..,c_n.
-    // a is an integer.
-    // primelist is a list of the primes p_1,p_2,..,p_v.
-    // This solves c_0 X^n+...+c_n Y^n= a \times p_1^{z_1} ... p_t^{z_t}
-    // subject to the assumptions that X, Y are coprime integers
-    // and gcd(Y,c_0)=1.
-    // Output: sols.
-    // sols is a list of solutions to the Thue--Mahler equation.
-    printf
-"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "clist:=%o; primelist:=%o; a:=%o; \n", clist,primelist,a;
-    printf
-"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-
-    d:=#clist-1;
-    ZUV<U,V>:=PolynomialRing(Integers(),2);
-    F:=&+[clist[i+1]*U^(d-i)*V^i : i in [0..d]];
-    c0:=clist[1];
-    tauDeltaList:=prep2(clist,a,primelist);
-    if #tauDeltaList eq 0 then
-	printf "No S-unit equations to solve!\n";
-	printf "Done solving the Thue-Mahler equation.\n";
-	printf
-"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    	return {};
-    end if;
-    K:=Universe([pr[1] : pr in tauDeltaList] cat &cat[pr[2] : pr in tauDeltaList]);
-    K:=NumberField(K);
-    theta:=K.1;
-    OK:=MaximalOrder(K);
-    assert Degree(K) eq (#clist-1);
-    sols:={};
-    eqncount:=0;
-
-    smallInf:=smallSieveInfo([* *],c0, theta, 200);
-    if (#tauDeltaList eq 1) then
-	printf "We have %o S-unit equation to solve.\n", #tauDeltaList;
-	printf "The rank is %o.\n", Sort([#pr[2] : pr in tauDeltaList]);
-    else
-	printf "We have %o S-unit equations to solve.\n", #tauDeltaList;
-	printf "The ranks are %o.\n", Sort([#pr[2] : pr in tauDeltaList]);
-    end if;
-    print "+++++++++++++++++++++++++++++++++++++";
-    for pr in tauDeltaList do
-	eqncount:=eqncount+1;
-	printf "Working on equation number %o...\n", eqncount;
-	tau:=pr[1];
-	deltaList:=pr[2];
-	vecB,S,range:=reducedBound(tau,deltaList : verb:=verb);
-	print "S is ", S;
-	printf "The range is %o.\n", range;
-	cB2sq:= &+[i^2 : i in vecB];
-	printf "The bound on the norm squared of (b1,..,br) is %o.\n", cB2sq;
-	printf "Applying the Dirichlet sieve to equation number %o out of %o.\n",
-	      eqncount, #tauDeltaList;
-
-	if cB2sq gt 500000 then
-	    qBound:= 500;
-	else
-	    qBound:=200;
-	end if;
-	smallInf:=smallSieveInfo(smallInf,c0,theta,qBound);
-	Zr, bigInfs:=bigSieveInfo(tau,deltaList,smallInf);
-	vecs:=sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cB2sq,bigInfs,1);
-	printf "Finished applying the Dirichlet sieve to equation number %o.\n", eqncount;
-	print "+++++++++++++++++++++++++++++++++++++";
-	if #vecs ne 0 then
-	    for ww in vecs do
-		lincom:=tau*&*[deltaList[i]^ww[i] : i in [1..#deltaList]];
-		lincom:=Eltseq(K!lincom);
-		if &and[ lincom[i] eq 0 : i in [3..Degree(K)]] and lincom[1] in Integers()
-		   and lincom[2] in Integers() then
-		    lincom:=[Integers()!lincom[1],Integers()!lincom[2]];
-		    if IsDivisibleBy(lincom[1],c0) then
-			sol:=[lincom[1] div c0, -lincom[2]];
-			Fsol:=Evaluate(F,sol);
-			if GCD(sol[1],sol[2]) eq 1 and GCD(c0,sol[2]) eq 1 and
-			   IsDivisibleBy(Fsol,a) then
-			    Fsol:=Fsol div a;
-			    mlist:=[];
-			    for p in primelist do
-				m:=Valuation(Fsol,p);
-				Append(~mlist,m);
-				Fsol:=Fsol div p^m;
-			    end for;
-			    if Fsol eq 1 then
-				if IsEven(d) then
-				    sols:=sols join { sol cat mlist,[-sol[1],-sol[2]]
-								    cat mlist };
-				else
-				    sols:=sols join {  sol cat mlist };
-				end if;
-			    elif Fsol eq -1 then
-				if IsOdd(d) then
-				    sols:=sols join { [-sol[1],-sol[2]] cat  mlist };
-				end if;
-			    end if;
-			end if;
-		    end if;
-		end if;
-	    end for;
-	end if;
-    end for;
-
-    if (Abs(c0) eq 1) and (Abs(a) eq 1) then
-	if (c0 eq a) then
-	    assert (Evaluate(F,[1,0]) eq c0);
-	    sols:= sols join { [1,0] cat [0 : i in [1..#primelist]] };
-	elif (c0*(-1)^d eq a) then
-	    assert (Evaluate(F,[-1,0]) eq a);
-	    sols:= sols join { [-1,0] cat [0 : i in [1..#primelist]] };
-	end if;
-    end if;
-
-    printf "Done solving the Thue-Mahler equation.\n";
-    printf
-"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    return sols;
-end function;
-
-
-//----------------------------------------------//
-
-// Example 1
-// something strange is happening in pr:= tauDeltaList[1]; the closest vector is bigger than the lower bound for the closest vector
-//clist:=[3,2,7,2];
-//a:=1;
-//primelist:=[2,3,7,41];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-//sols;
-
-//clist:=[1,2,4,6];
-//a:=1;
-//primelist:=[2,3,7,41,1109];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-//sols;
-
-
-// Example 2
-//clist:=[7,1,29,-25];
-//a:=1;
-//primelist:=[2,3,7,37,53];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
-
-// Example 3a (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -(2^5)*(3^4);
-//primelist:=[5,11];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
-
-// Example 3b (improvement on Soydan and Tzanakis)
-//clist:=[3,65,-290,-2110,975,3149];
-//a:= -1;
-//primelist:=[2,3,5,7,11,13,17];
-//time sols:=solveThueMahler(clist,primelist,a);
-//sols;
-
-// Example 4
-//clist:=[1,0,0,0,-2];
-//primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-//time sols1:=solveThueMahler(clist,primelist,1);
-//time sols2:=solveThueMahler(clist,primelist,-1);
-//sols1;
-//sols2;
-
-// Example 5
 SetClassGroupBounds("GRH");
 clist:=[ 5,  1,  4,  1,  6,  1,  6,  0,  6,  0,  4, -2];
 a:=1;
 primelist:=[2,3,5,7,11];
-time sols:=solveThueMahler(clist,primelist,a : verb:=true);
-sols;
+verb:=true;
 
-// Example 6 (de Weger--Tzanakis)
-//clist:=[1,-23,5,24];
-//primelist:=[2,3,5,7];
-//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
-//sols;
+d:=#clist-1;
+ZUV<U,V>:=PolynomialRing(Integers(),2);
+F:=&+[clist[i+1]*U^(d-i)*V^i : i in [0..d]];
+c0:=clist[1];
+tauDeltaList:=prep2(clist,a,primelist);
+K:=Universe([pr[1] : pr in tauDeltaList] cat &cat[pr[2] : pr in tauDeltaList]);
+K:=NumberField(K);
+theta:=K.1;
+OK:=MaximalOrder(K);
+assert Degree(K) eq (#clist-1);
+sols:={};
+eqncount:=0;
 
-// Example 7 (no real places)
-//clist:=[ 1, 0, 0, 0, 3 ];
-//a:= 1;
-//primelist:= [ 2, 7, 23, 31 ];
-//time sols:=solveThueMahler(clist,primelist,1) join solveThueMahler(clist,primelist,-1);
+smallInf:=smallSieveInfo([* *],c0, theta, 200);
 
-// Mike's Example
-//SetClassGroupBounds("GRH");
-//clist:= [ 486, 2673, 8910, 13365, 17820, 12474, 8316, 2970, 990, 165, 22, 1 ];
-//a:= 1;
-//primelist:= [3];
-//time sols:=solveThueMahler(clist,primelist,a : verb:=false); sols;
+// choose pr:= tauDeltaList[2;
+deltaList:=[
+    1/1953125*(62639*theta^10 - 748196*theta^9 - 4621980*theta^8 -
+        22207025*theta^7 + 38965000*theta^6 - 34195000*theta^5 -
+        449543750*theta^4 - 21271312500*theta^3 - 51765703125*theta^2 -
+        209809765625*theta + 942912109375),
+    1/390625*(-304507*theta^10 - 1286200*theta^9 - 8286278*theta^8 -
+        14744530*theta^7 - 120138150*theta^6 + 295735000*theta^5 +
+        31769375*theta^4 + 19645671875*theta^3 - 1856078125*theta^2 +
+        159741562500*theta - 1543269140625),
+    1/1953125*(-506181269733*theta^10 - 15199081379048*theta^9 +
+        3417039996000*theta^8 + 20631263730850*theta^7 - 862101634598875*theta^6
+        - 11248761245089375*theta^5 + 13277953474900000*theta^4 -
+        47969344104562500*theta^3 - 481688292060625000*theta^2 -
+        5526042413395703125*theta + 13231499496662109375),
+    1/1953125*(375938718*theta^10 + 1113068513*theta^9 + 9701253830*theta^8 +
+        28420450900*theta^7 + 337680104250*theta^6 + 897075371250*theta^5 +
+        8807817215625*theta^4 + 17270145140625*theta^3 + 210084124843750*theta^2
+        + 411927193359375*theta + 3744720025390625),
+    1/1953125*(-44039*theta^10 - 174484*theta^9 - 2041150*theta^8 -
+        12553050*theta^7 - 48229625*theta^6 - 380426875*theta^5 -
+        367550000*theta^4 - 6470828125*theta^3 + 8499687500*theta^2 -
+        60500781250*theta + 157595703125),
+    1/1953125*(156*theta^10 + 1076*theta^9 + 7590*theta^8 + 32475*theta^7 +
+        181375*theta^6 + 466250*theta^5 + 1753125*theta^4 - 4156250*theta^3 -
+        7578125*theta^2 - 133984375*theta + 267578125),
+    1/1953125*(3783*theta^10 - 10047*theta^9 - 20595*theta^8 + 94800*theta^7 +
+        2714750*theta^6 - 9815000*theta^5 + 11365625*theta^4 + 6562500*theta^3 +
+        1218125000*theta^2 - 6610156250*theta + 7017578125),
+    1/1953125*(21*theta^10 - 169*theta^9 + 680*theta^8 - 325*theta^7 -
+        2500*theta^6 - 11875*theta^5 + 459375*theta^4 - 3640625*theta^3 +
+        20156250*theta^2 - 65625000*theta + 72265625),
+    1/1953125*(-2386*theta^10 - 126366*theta^9 - 363925*theta^8 +
+        2473650*theta^7 - 14427125*theta^6 - 87118750*theta^5 - 55203125*theta^4
+        + 281968750*theta^3 - 4114296875*theta^2 - 68742968750*theta +
+        152501953125),
+    1/1953125*(-173*theta^10 - 1528*theta^9 - 4840*theta^8 + 6800*theta^7 +
+        54125*theta^6 - 298750*theta^5 - 4609375*theta^4 - 19546875*theta^3 -
+        11953125*theta^2 + 270703125*theta + 1181640625)
+];
+tau:=1/390625*(11114*theta^10 - 156626*theta^9 - 3960*theta^8 + 713050*theta^7 +
+    3733000*theta^6 - 129663750*theta^5 + 175803125*theta^4 - 184687500*theta^3
+    + 1457890625*theta^2 - 70168750000*theta + 134298828125);
 
-// Goormaghtigh's Example
-// 2 hours... any way to speed this up? Why is it so slow? Fund. unit is huge
-//clist:= [718,718,718,718,719];
-//a:=1;
-//primelist:= [719];
-//SetClassGroupBounds("GRH");
-//time solveThueMahler(clist,primelist,a : verb:=true);
+// reducedBound
+K:=Universe([tau] cat deltaList);
+K:=NumberField(K);
+theta:=K.1;
+OK:=MaximalOrder(K);
+S:=&join[Support(delta*OK) : delta in deltaList];
+S:=SetToSequence(S);
+fn:=func<P1,P2 | Norm(P2)-Norm(P1) >;
+Sort(~S,fn); // Sorting S so that the prime ideals with largest norm come first.
+s:= #S;
+assert &and[ fact[1] in S : fact in Factorisation(tau*OK) | fact[2] lt 0 ];
+// This is a sanity check. According to the paper
+// the denominator ideal of tau is supported
+// on S.
+c20,c17:=initialBound(K,theta,tau,deltaList,S);
+c22, c23:=constants(K,theta,tau);
+c26:=1/(2*c17);
+consts:=[c20,c17,c22,c23,c26];
+r:=#deltaList;
+d:=Degree(K);
+assert d ge 3;
+pls:=InfinitePlaces(K);
+realPls:=[pl : pl in pls | LocalDegree(pl) eq 1];
+cmxPls:=[pl : pl in pls | LocalDegree(pl) eq 2];
+t:=#realPls;
+assert d eq t+2*#cmxPls;
+assert t eq 1;
+sigma:= realPls[1];
 
-// Goormaghtigh's Example
-//clist:= [189,189,189,189,190];
-//a:=1;
-//primelist:= [2,5,19]; //[190];
-//SetClassGroupBounds("GRH");
-//time solveThueMahler(clist,primelist,a : verb:=true);
+// reducedBoundFixedEmbedding2
+c20,c17,c22,c23,c26:=Explode(consts);
+c27divc25, c28divc25, c29divc25, sigma2:= constantsDivc25(K,theta,tau,c23,sigma);
+cB0:=c20;
+d:=Degree(K);
+OK:=MaximalOrder(K);
+r:=#deltaList;
+u,v:=Signature(K);
+w:=u+v-2;
+s:=#S;
+n:=r+v;
+assert d eq u+2*v;
+assert s eq (r-(u+v-1));
+assert &and[Abs(Norm(delta)) eq 1 : delta in deltaList[1..u+v-1]];
+assert &and[Abs(Norm(delta)) ne 1 : delta in deltaList[u+v..r]];
+vecB:= [cB0 : i in [1..#deltaList]]; // Converting from a bound on the infinity norm
+absMinv,vecU:= nonunitExps(K,S,deltaList,vecB);
 
-//clist:=[14,20,24,15];
-//a:=1;
-//primelist:= [2,3,17,37,53];
-//time sols:= solveThueMahler(clist,primelist,a : verb:=false); sols;
+// c21Func
+K:=NumberField(Universe([theta] cat [tau] cat deltaList));
+d:=Degree(K);
+assert d ge 3;
+assert theta eq K.1;
+OK:=MaximalOrder(K);
+r:= #deltaList;
+s:=#S;
+u,v:= Signature(K);
+assert d eq u+2*v;
+assert s eq (r-(u+v-1));
+assert &and[Abs(Norm(delta)) eq 1 : delta in deltaList[1..u+v-1]];
+assert &and[Abs(Norm(delta)) ne 1 : delta in deltaList[u+v..r]];
+
+expSbds:=[];
+c21:=0;
+cB2:= Sqrt(&+[i^2 : i in vecB]);
+print "cB_{infty}:= ", cB0;
+print "cB_2:= ", cB2;
+fp:= S[1];
+assert Norm(fp) eq 11;
+print "ideal:= ", fp;
+print "with ideal generators:= ", K!Generators(fp)[1];
+print "with ideal generators:= ", K!Generators(fp)[2];
+
+//valuationBound
+K:=NumberField(Universe([theta] cat [tau] cat deltaList));
+d:=Degree(K);
+assert d ge 3;
+assert theta eq K.1;
+OK:=MaximalOrder(K);
+r:=#deltaList;
+p:=Characteristic(ResidueClassField(fp));
+assert Degree(fp) eq 1;
+assert Valuation(p*OK,fp) eq 1;
+fa:=p*OK/fp;
+for fact in Factorisation(fa) do
+    assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
+end for;
+k:=Floor(r*Log(cB2)/((d-2)*Log(p)));
+print "Heuristic k:= ", k;
+print "Chooses k:= ", k+1;
+k:= k+1;
+mpol:=MinimalPolynomial(theta);
+lcf:=LeadingCoefficient(mpol);
+assert lcf eq 1; // Surely \theta is an algebraic integer!
+hprec:=2*Valuation(Discriminant(mpol),p)+k+1;
+rts:=Roots(mpol,pAdicRing(p,hprec));
+rts:=[Integers()!r[1] : r in rts];
+rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge k];
+assert #rts ge 1;
+theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge k.
+taufacts:=Factorisation(tau*OK);
+taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
+// The factorization
+// of the numerator ideal of tau*OK.
+if #taunumfacts eq 0 then
+    taunum:=1*OK;
+else
+    taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
+end if;
+// Now taunum is the numerator ideal of \tau.
+print "gcd(fa^k, taunum):= ", (taunum+fa^k);
+
+fb:=fa^k/(taunum+fa^k);
+tau0:=(theta0-theta)/tau;
+for fact in Factorisation(fb) do
+    assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
+end for;
+if (fb eq ideal<OK|1>) then
+    kprime:= 0;
+else
+    kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1])) :
+		  fact in Factorisation(fb)]);
+end if;
+pkprime:=p^kprime;
+assert Denominator(pkprime*OK/fb) eq 1;
+if kprime ge 1 then
+    assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
+end if;  // kprime really is the smallest positive
+// integer such thta fb divides p^kprime.
+print "kprime:= ", kprime;
+print "kprime == k: ", kprime eq k;
+Zmod:=Integers(pkprime);
+U,eps:=UnitGroup(Zmod);
+gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
+if IsOdd(p) and kprime ge 1 then
+    assert #gens eq 1; // Sanity check: there is a primitive root.
+end if;
+alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
+D,alphaList:=multGroup(fb,alphaList);
+// D is (isomorphic to) the group (OK/fb)^* and alphaList
+// is the image in D of the original alphaList defined above,
+// i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
+tau0im:=alphaList[1];
+alphaList:=alphaList[2..#alphaList];
+gensim:=alphaList[1..#gens];
+alphaList:=alphaList[(#gens+1)..#alphaList];
+assert #alphaList eq #deltaList;
+G,pi:=quo< D | sub<D | gensim> >;
+tau0im:=pi(tau0im);
+alphaList:=[pi(alpha) : alpha in alphaList];
+assert #alphaList eq r;
+Zr:=FreeAbelianGroup(r);
+phi:=hom<Zr->G | alphaList>;
+print "index of lattice:= ", Factorization(Integers()!#G);
+
+w:=tau0im@@phi;
+L:=Kernel(phi);
+ZZr:=StandardLattice(r);
+LL:=sub<ZZr | [ ZZr!(Eltseq((Zr!l))) : l in OrderedGenerators(L)]>;
+ww:=ZZr!Eltseq(Zr!w);
+// ClosestVectors is error-prone in Magma V2.26-10
+// If there are no vectors in P, then there are no vectors v in w+L
+// such that ||v+w|| < cB2
+P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB2^2));
+Norms:= [];
+while (IsEmpty(P) eq false) do
+    Append(~Norms,Norm( NextVector(P) +ww));
+end while;
+print "D(L,w):= ", Sqrt(Min(Norms));
 
 
-// very very slow at large prime
-//clist:=[ 1, 65, -870, -18990, 26325, 255069 ]; primelist:=[ 61315456967 ]; a:=27;
 
-// ww in LL in initial reduction at pr:= tauDeltaList[4]
-//clist:= [1,4,−18,−12];
-//primelist:= [2,3,17,37,53];
-//a:= 1;
+cK:=function(tau,deltaList,Zr,fp,krange);
+        K:=NumberField(Universe([tau] cat deltaList));
+        theta:=K.1;
+        d:=Degree(K);
+        assert d ge 3;
+        OK:=MaximalOrder(K);
+        r:=#deltaList;
+
+        assert r eq #Invariants(Zr);
+        ZZr:=StandardLattice(r);
+
+        kmin:=krange[1];
+        kmax:=krange[2]; // k is the valution of (c_0 X- \theta Y) at fp.
+        assert kmin ge 0;
+        assert kmax ge kmin;
+        p:=Characteristic(ResidueClassField(fp));
+        assert Degree(fp) eq 1;
+        assert Valuation(p*OK,fp) eq 1;
+        fa:=p*OK/fp;
+        for fact in Factorisation(fa) do
+                assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
+        end for;
+        mpol:=MinimalPolynomial(theta);
+        lcf:=LeadingCoefficient(mpol);
+        assert lcf eq 1; // Surely \theta is an algebraic integer!
+        henPrec:=2*(Valuation(Discriminant(mpol),p))+kmax+1;
+        rts:=Roots(mpol,pAdicRing(p,henPrec));
+        rts:=[Integers()!r[1] : r in rts];
+        rts:=[r : r in rts | Valuation((r-theta)*OK,fp) ge kmax+1];
+        assert #rts ge 1;
+        theta0:=rts[1]; // Thus \ord_\fp(theta-theta_0) \ge kmax+1.
+        taufacts:=Factorisation(tau*OK);
+        taunumfacts:=[ fact : fact in taufacts | fact[2] gt 0  ];
+        // The factorization
+        // of the numerator ideal of tau*OK.
+ if #taunumfacts eq 0 then
+                taunum:=1*OK;
+        else
+        taunum:=&*[fact[1]^(fact[2]) : fact in taunumfacts];
+        end if;
+        // Now taunum is the numerator ideal of \tau.
+        Z1:=FreeAbelianGroup(1);
+        eta:=hom<Zr->Z1 | [ Valuation(delta,fp)*Z1.1  : delta in deltaList  ]>;
+        etaLcum:=eta(Zr);
+        assert #OrderedGenerators(etaLcum) eq 1;
+        modulus:=Eltseq(Z1!(etaLcum.1))[1];
+        class:=Valuation(tau,fp);
+        krange:=[kmin..kmax];
+        krange:=[k : k in krange | IsDivisibleBy(k-class,modulus) ];
+        if #krange eq 0 then
+                return [], [* *], [* *];
+        end if;
+        H:=Kernel(eta);
+        ckList:=[];
+        cosetPairs:=[* *];
+        latPairs:=[* *];
+        kmin:=Minimum(krange);
+        assert kmin ge 0;
+        if kmin eq 0 then
+                Append(~ckList,0);
+                vp:=(-Valuation(tau,fp))*Z1.1;
+                cosetPairs:=cosetPairs cat [* [* vp@@eta, H *] *];
+                LLcumNew:=sub<ZZr | [ ZZr!Eltseq((Zr!g)) : g in OrderedGenerators(H)]>;
+                wwcumNew:=ZZr!Eltseq(Zr!(vp@@eta));
+                latPairs:=latPairs cat [* [* wwcumNew, LLcumNew *] *];
+        end if;
+ krange:=[k : k in krange | k ge 1];
+        krange:=[ k : k in krange | (taunum+fa^k) eq ((theta-theta0)*OK+fa^k)];
+        for k in krange do
+                fb:=fa^k/(taunum+fa^k);
+                tau0:=(theta0-theta)/tau;
+                for fact in Factorisation(fb) do
+                        assert Valuation(tau0*OK,fact[1]) eq 0; // Sanity check!
+                end for;
+                kprime:=Max([ Ceiling(fact[2]/Valuation(p*OK,fact[1]))  : fact in Factorisation(fb)]);
+                pkprime:=p^kprime;
+                assert Denominator(pkprime*OK/fb) eq 1;
+                if kprime ge 1 then
+                        assert Denominator((p^(kprime-1)*OK)/fb) ne 1;
+                end if;  // kprime really is the smallest positive
+                        // integer such thta fb divides p^kprime.
+                Zmod:=Integers(pkprime);
+                U,eps:=UnitGroup(Zmod);
+                gens:=[ Integers()!(u@eps) : u in OrderedGenerators(U)];
+                if IsOdd(p) and kprime ge 1 then
+                        assert #gens eq 1; // Sanity check: there is a primitive root.
+                end if;
+                alphaList:=[K!tau0] cat [K!g : g in gens] cat [K!delta: delta in deltaList];
+                D,alphaList:=multGroup(fb,alphaList);
+                // D is (isomorphic to) the group (OK/fb)^* and alphaList
+                // is the image in D of the original alphaList defined above,
+                // i.e. the images in D of tau0, the generators of (\Z/p^\prime)^*, and the \delta_i.
+  		tau0im:=alphaList[1];
+                alphaList:=alphaList[2..#alphaList];
+                gensim:=alphaList[1..#gens];
+                alphaList:=alphaList[(#gens+1)..#alphaList];
+                assert #alphaList eq #deltaList;
+                G,pi:=quo< D | sub<D | gensim> >;
+                tau0im:=pi(tau0im);
+                alphaList:=[pi(alpha) : alpha in alphaList];
+                assert #alphaList eq r;
+                phi:=hom<Zr->G | alphaList>;
+                // This the map \phi in the paper.
+                if tau0im in Image(phi)  then
+                        w:=tau0im@@phi;
+                        L:=Kernel(phi);
+                        vp:=(k-Valuation(tau,fp))*Z1.1;
+                        v:=vp@@eta;
+                        tf,wcumNew,LcumNew:=cosetIntersect(Zr,v,H,w,L);
+                        if tf then
+                                invs:=Invariants(LcumNew);
+                                assert #invs eq r-1; // Checking that the rank has is reduced by 1.
+                                Append(~ckList,k);
+                                cosetPairs:=cosetPairs cat [* [* wcumNew, LcumNew *] *];
+                                LLcumNew:=sub<ZZr | [ ZZr!Eltseq((Zr!g)) : g in OrderedGenerators(LcumNew)]>;
+                                wwcumNew:=ZZr!Eltseq(Zr!wcumNew);
+                                latPairs:=latPairs cat [* [* wwcumNew, LLcumNew *] *];
+                        end if;
+                end if;
+        end for;
+        return ckList, cosetPairs, latPairs;
+end function;
+
+
+horzSift:=function(tau,deltaList,Zr,S,range,cB1sq,res1,res2,res3);
+        r:=#deltaList;
+        assert r eq #Invariants(Zr);
+        ZZr:=StandardLattice(r);
+        if #S eq 0 then
+                return res1,res2,res3;
+        end if;
+        fp:=S[1];
+        krange:=range[1];
+        ckList,cosetPairs:=cK(tau,deltaList,Zr,fp,krange);
+        resNew1:=[* *];
+        resNew2:=res2;
+        resNew3:=res3;
+        for i in [1..#ckList] do
+                kfp:=ckList[i];
+                wfp:=cosetPairs[i,1];
+                Lfp:=cosetPairs[i,2];
+                for j in [1..#res1] do
+                        path:=res1[j,1];
+                        wres:=res1[j,2];
+                        Lres:=res1[j,3];
+                        tf,wres,Lres:=cosetIntersect(Zr,wres,Lres,wfp,Lfp);
+                        if tf then
+                                det,len:=detSVP(Zr,Lres);
+                                if len gt 4*cB1sq then
+                                        vecs:=vectorsInCoset(Zr,Lres,wres,cB1sq);
+                                        resNew2:=resNew2 cat [* [* path cat [* kfp *], wres,Lres, vecs  *] *];
+                                else
+                                        resNew1:=resNew1 cat [* [* path cat [* kfp *], wres,Lres  *] *];
+                                end if;
+                        else
+                                resNew3:=resNew3 cat [* path cat [* kfp *] *];
+                        end if;
+                end for;
+        end for;
+        return $$(tau,deltaList,Zr,S[2..#S],range[2..#range], cB1sq, resNew1, resNew2, resNew3);
+end function;
+
+deeperHorzSift:=function(tau,deltaList,Zr,cB1sq,res1,res2,res3);
+        if #res1 eq 0 then
+                return res2,res3;
+        end if;
+        path:=res1[1,1];
+        wcum:=res1[1,2];
+        Lcum:=res1[1,3];
+        bigInfs:=res1[1,4];
+        assert #bigInfs ge 1;
+        res1:=res1[2..#res1];
+        rk:=#Invariants(Lcum);
+        imLList:=[ #I[4]/Index(Zr,Kernel(I[3])+Lcum) : I in bigInfs];
+        Sort(~imLList,~permut);
+        bigInfs:=[* bigInfs[i^permut] : i in [1..#bigInfs] *];
+        bigInf:=bigInfs[1];
+        bigInfs:=bigInfs[2..#bigInfs];
+        q:=bigInf[1];
+        phiq:=bigInf[3];
+        Tq:=bigInf[4];
+        phiqLcum:=phiq(Lcum);
+        phiwcum:=phiq(wcum);
+        Tqcut:=[t : t in Tq | (t-phiwcum) in phiqLcum ];
+	#Tqcut;
+        K:=Kernel(phiq);
+        for t in Tqcut do
+                s:=t@@phiq;
+                tf,wcumNew,LcumNew:=cosetIntersect(Zr,wcum,Lcum,s,K);
+                if tf then
+                    det,len:=detSVP(Zr,LcumNew);
+		    print det;
+                        if len gt 4*cB1sq or #bigInfs eq 0 then
+                                vecs:=vectorsInCoset(Zr,LcumNew,wcumNew,cB1sq);
+                                res2:=res2 cat [* [* path cat [* <q,s> *], wcumNew, LcumNew, vecs  *] *];
+                                res3:=res3 cat [* path cat [* <q,s> *] *];
+                        else
+                                res1:=res1 cat [* [* path cat [* <q,s> *], wcumNew, LcumNew, bigInfs  *] *];
+                        end if;
+                else
+                        res3:=res3 cat [* path cat [* <q,s> *] *];
+                end if;
+        end for;
+        return $$(tau,deltaList,Zr,cB1sq,res1,res2,res3);
+end function;
+
+
+time res1,res2,res3:=horzSift(tau,deltaList,Zr,S,range,cB1sq,[* [* [* *], Zr!0, Zr *\
+] *], [* *], [* *]);
+
+res1:=[* trip cat [* bigInfs *] : trip in res1 *];
+
+time res2,res3:=deeperHorzSift(tau,deltaList,Zr,cB1sq,res1,res2,res3);
