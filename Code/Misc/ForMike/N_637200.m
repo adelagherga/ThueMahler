@@ -2013,7 +2013,7 @@ end function;
 //----------------------------------------------//
 
 // Thue-Mahler to solve
-setlist:= ["637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,\"(1,3,5,15)\",\"(2,59)\"",
+/*TMSetList:=[ "637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,\"(1,3,5,15)\",\"(2,59)\"",
 "637200,\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",None,1,2,24,0,\"(1,3)\",\"(2,5,59)\"",
 "637200,\"(2,12,0,-5)\",\"(2,12,0,-5)\",\"(1,12,0,-20)\",None,1,2,18,6,\"(1,3)\",\"(2,5,59)\"",
 "637200,\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",None,1,2,18,4,\"(1,2,3,6)\",\"(5,59)\"",
@@ -2053,7 +2053,7 @@ setlist:= ["637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,
 "637200,\"(4,6,36,29)\",\"(11,-237,-69,-5)\",\"(1,-237,-759,-605)\",None,1,1,24,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\"",
 "637200,\"(8,12,21,26)\",\"(10,-105,60,-9)\",\"(1,-105,600,-900)\",None,1,1,72,8,\"(1,2,3,5,6,10,15,30)\",\"(59)\""];
 
-for set in setlist do
+for set in TMSetList do
     CommaSplit:= Split(set,","); // split bash input by ","
     RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
 
@@ -2098,12 +2098,11 @@ for set in setlist do
 	time ECs:= ConvertTMToEllipticCurves(N,clist,sols);
     end for;
 end for;
-
-
-/*
+*/
 
 // Thue to solve
-["637200,\"(1,3,-12,-4)\",\"(1,3,-12,-4)\",\"(1,2,3,5,6,10,15,30)\"",
+ThueSetList:=[
+"637200,\"(1,3,-12,-4)\",\"(1,3,-12,-4)\",\"(1,2,3,5,6,10,15,30)\"",
 "637200,\"(1,9,-3,-3)\",\"(1,9,-3,-3)\",\"(1,2,3,5,6,10,15,30)\"",
 "637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(2,6,10,30)\"",
 "637200,\"(2,12,0,-5)\",\"(2,12,0,-5)\",\"(295,590,885,1770,2360,7080)\"",
@@ -2129,8 +2128,44 @@ end for;
 "637200,\"(4,6,36,29)\",\"(11,-237,-69,-5)\",\"(59,118,177,295,354,590,885,1770)\"",
 "637200,\"(8,12,21,26)\",\"(10,-105,60,-9)\",\"(59,118,177,295,354,590,885,1770)\""];
 
+primelist:= [];
+for set in ThueSetList do
+    CommaSplit:= Split(set,","); // split bash input by ","
+    RBracketSplit:= Split(set,"()"); // split bash input by "(" and ")"
+
+    // delimiter for form
+    assert CommaSplit[2][2] eq "(" and CommaSplit[5][#CommaSplit[5]-1] eq ")";
+    // delimiter for optimal form
+    assert CommaSplit[6][2] eq "(" and CommaSplit[9][#CommaSplit[9]-1] eq ")";
+    assert (#RBracketSplit eq 7);
+
+    N:= StringToInteger(CommaSplit[1]); // convert bash input N into an integer
+    hash:= CommaSplit[1] cat ","; // set hash as first element of .csv row, N
+
+    // convert bash input for optimal form into a sequence of integers
+    clist:= [StringToInteger(i) : i in Split(RBracketSplit[4],",")];
+    avalues:= [StringToInteger(i) : i in Split(RBracketSplit[6],",")];
+
+    R<X,Y>:= PolynomialRing(Integers(),2);
+    R<x>:= PolynomialRing(Integers());
+    F:= clist[1]*X^3 +clist[2]*X^2*Y + clist[3]*X*Y^2 + clist[4]*Y^3;
+    ThueF:= Thue(Evaluate(F,[x,1]));
+
+    for a in avalues do
+	    printf		"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+	    printf "clist:=%o; primelist:=%o; a:=%o; \n", clist,primelist,a;
+	    printf
+"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+	time sols:= Solutions(ThueF,a);
+	sols;
+	time ECs:= ConvertTMToEllipticCurves(N,clist,sols);
+    end for;
+end for;
+
+
+
+/*
 // No Sunit Eq needed - corresponds to first 2 forms
 637200,"(1,3,-12,-4)","(1,3,-12,-4)",8,0.150,7.720,0.060,0.000,0.030,0.010,None,8.000
 637200,"(1,9,-3,-3)","(1,9,-3,-3)",8,0.110,6.050,0.060,0.000,0.020,0.020,None,6.300
-
 */
