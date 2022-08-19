@@ -2013,7 +2013,7 @@ end function;
 //----------------------------------------------//
 
 // Thue-Mahler to solve
-/*TMSetList:=[ "637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,\"(1,3,5,15)\",\"(2,59)\"",
+TMSetList:=[ "637200,\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",\"(1,6,-3,-2)\",None,1,2,4,4,\"(1,3,5,15)\",\"(2,59)\"",
 "637200,\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",\"(1,6,-9,-4)\",None,1,2,24,0,\"(1,3)\",\"(2,5,59)\"",
 "637200,\"(2,12,0,-5)\",\"(2,12,0,-5)\",\"(1,12,0,-20)\",None,1,2,18,6,\"(1,3)\",\"(2,5,59)\"",
 "637200,\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",\"(1,9,-21,-9)\",None,1,2,18,4,\"(1,2,3,6)\",\"(5,59)\"",
@@ -2098,7 +2098,6 @@ for set in TMSetList do
 	time ECs:= ConvertTMToEllipticCurves(N,clist,sols);
     end for;
 end for;
-*/
 
 // Thue to solve
 ThueSetList:=[
@@ -2169,3 +2168,62 @@ end for;
 637200,"(1,3,-12,-4)","(1,3,-12,-4)",8,0.150,7.720,0.060,0.000,0.030,0.010,None,8.000
 637200,"(1,9,-3,-3)","(1,9,-3,-3)",8,0.110,6.050,0.060,0.000,0.020,0.020,None,6.300
 */
+
+
+
+load "/home/adela/SUnitCode/XYZ2Code/MagmaXYZ2Functions/ExponentsXYZ2.m";
+
+//load "/Users/Adela/Documents/ConductorXYZ2.m";
+function ConvertXYZ2ToEllipticCurves(S,sols)
+    Ds0:= ExponentsXYZ2(S,0);
+    Ds:= Ds0;
+    for d in Ds0 do
+        Append(~Ds, -d);
+    end for;
+
+    ECs:= [];
+    for s in sols do
+        X:= IntegerRing() ! s[1];
+        Y:= IntegerRing() ! s[2]; //solInteger(sol[1])
+        Z:= IntegerRing() ! s[3]; //Integer(sol[2])
+
+        EC:= [];
+        if X mod 4 eq 0 then
+            Append(~EC, [0, Z, 0, X/4, 0]);
+            Append(~EC, [0, -Z, 0, X/4, 0]);
+        else
+            Append(~EC, [0, 2*Z, 0, X, 0]);
+            Append(~EC, [0, -2*Z, 0, X, 0]);
+        end if;
+
+        if Y mod 4 eq 0 then
+            Append(~EC, [0, Z, 0, Y/4, 0]);
+            Append(~EC, [0, -Z, 0, Y/4, 0]);
+        else
+            Append(~EC, [0, 2*Z, 0, Y, 0]);
+            Append(~EC, [0, -2*Z, 0, Y, 0]);
+        end if;
+
+        for e in EC do
+            for d in Ds do
+                TwistE:= [0, d*e[2], 0, (d^2)*e[4], 0];
+                //if IsEllipticCurve(TwistE) eq true then
+                //E:= EllipticCurve(e);
+                //TwistE:= QuadraticTwist(E,d);
+                MinE:= MinimalModel(EllipticCurve(TwistE));
+                CondE:= Conductor(MinE);
+
+                Append(~ECs, < CondE, cInvariants(MinE),s>);
+            end for;
+        end for;
+    end for;
+    Sort(~ECs);
+    RelECs:= {};
+    for E in ECs do
+	if E[1] eq 637200 then
+	    RelECs:= RelECs join {E};
+	end if;
+    end for;
+
+    return ECs;
+end function;

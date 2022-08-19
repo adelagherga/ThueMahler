@@ -363,6 +363,57 @@ initialBound:=function(K,theta,tau,deltaList,S)
     return c20, c17;
 end function;
 
+distanceLBsq2:=function(LL,ww,cB5sq)
+    // Given a lattice LL (contained in \Z^r)
+    // and a vector ww in \Z^r,
+    // this function returns tf and a lower bound for D(LL,ww),
+    // where if tf is true, D(LL,ww) > cB5 and false if
+    // D(LL,ww) < cB5
+    // D(LL,ww) is the shortest distance from a vector in LL
+    // to ww.
+
+    // Changing the coefficient ring of ww to the rationals
+    ww:=AmbientSpace(Parent(ww))!ww;
+    n:=Rank(LL);
+    assert n eq Degree(LL);
+    if ww in LL then
+	// initial test to determine whether D(LL,ww) < cB5
+	test:= ShortVectorsProcess(LL, Integers()!Floor(cB5sq));
+	if (IsEmpty(test) eq false) then
+	    return false, 0;
+	else
+	    mult:= 1;
+	    P:= ShortVectorsProcess(LL, Integers()!Floor(cB5sq)*mult);
+	    while IsEmpty(P) do
+		mult:= mult+1;
+		P:= ShortVectorsProcess(LL, Integers()!Floor(cB5sq)*mult);
+	    end while;
+	    Norms:= [];
+	    while (IsEmpty(P) eq false) do
+		Append(~Norms, Norm(NextVector(P)));
+	    end while;
+	    return true, Min(Norms);
+	end if;
+    end if;
+    // initial test to determine whether D(LL,ww) < cB5
+    test:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB5sq));
+    if (IsEmpty(test) eq false) then
+	return false, 0;
+    else
+	mult:= 1;
+	P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB5sq)*mult);
+	while IsEmpty(P) do
+	    mult:= mult+1;
+	    P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB5sq)*mult);
+	end while;
+	Norms:= [];
+	while (IsEmpty(P) eq false) do
+	    Append(~Norms, Norm(NextVector(P)+ww));
+	end while;
+	return true, Min(Norms);
+    end if;
+end function;
+
 distanceLBsq:=function(LL,ww)
     // Given a lattice LL (contained in \Z^r)
     // and a vector ww in \Z^r,
@@ -394,12 +445,12 @@ distanceLBsq:=function(LL,ww)
     return (2^(1-n))*sigmai0*Norm(b1);
 end function;
 
-valuationBound:=function(theta,tau,deltaList,fp,cB1)
+valuationBound:=function(theta,tau,deltaList,fp,cB2)
     // We're looking at (*)
     // fp is a prime in S.
-    // cB1 is an upper bound for the L^2-norm of (b_1,..,b_r).
+    // cB2 is an upper bound for the L^2-norm of (b_1,..,b_r).
     // This returns an upper bound for the valuation of \ord_\fp(c_0 X - \theta Y).
-    if cB1 lt 1 then
+    if cB2 lt 1 then
         return Valuation(tau,fp);   // TO CHECK THIS IS WHAT WE WANT!
     end if;
     K:=NumberField(Universe([theta] cat [tau] cat deltaList));
@@ -415,7 +466,7 @@ valuationBound:=function(theta,tau,deltaList,fp,cB1)
     for fact in Factorisation(fa) do
 	assert &and[Valuation(delta*OK,fact[1]) eq 0 : delta in deltaList];
     end for;
-    k:=Floor(r*Log(cB1)/((d-2)*Log(p)));
+    k:=Floor(r*Log(cB2)/((d-2)*Log(p)));
     repeat
 	k:=k+1;
 
@@ -491,9 +542,14 @@ valuationBound:=function(theta,tau,deltaList,fp,cB1)
 	ZZr:=StandardLattice(r);
 	LL:=sub<ZZr | [ ZZr!(Eltseq((Zr!l))) : l in OrderedGenerators(L)]>;
 	ww:=ZZr!Eltseq(Zr!w);
-	DLwsq:=Norm(ClosestVectors(LL,-ww)[1]+ww);
+	// ClosestVectors is error-prone in Magma V2.26-10
+	// If there are no vectors in P, then there are no vectors v in w+L
+	// such that ||v+w|| < cB2
+	P:= CloseVectorsProcess(LL,-ww, Integers()!Floor(cB2^2));
+	// DLwsq:=Norm(ClosestVectors(LL,-ww)[1]+ww);
 	// This is D(L,w)^2 in the notation of the paper.
-    until DLwsq gt cB1^2; // We keep increasing k until condtion (iii)
+	// until DLwsq gt cB2^2; // We keep increasing k until condtion (iii)
+	until (IsEmpty(P) eq true);
     // (or conditions (i), (ii)) are satisfied.
     return k-1;
 end function;
@@ -759,7 +815,8 @@ sift:=function(tau,deltaList,Zr,Lcum,wcum,SLeft,rangeLeft,cB1sq,bigInfs,depth)
 		if tf then
 		    invs:=Invariants(LcumNew);
 		    assert #invs eq rk-1; // Checking that the rank has is reduced by 1.
-		    //LcumNew:=sub<ZZr | [ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
+		    //LcumNew:=sub<ZZr |
+		    //[ZZr!Eltseq(Zr!l) : l in OrderedGenerators(LcumNew)]>;
 		    //wcumNew:=ZZr!(Eltseq(Zr!wcumNew));
 		    vecs:=vecs cat $$(tau,deltaList,Zr,LcumNew,wcumNew,SLeft,rangeLeft,cB1sq,bigInfs,depth+1);
 		end if;
@@ -808,7 +865,6 @@ c21Func:=function(theta,tau,deltaList,S,absMinv,vecU,vecB)
 	cB2:= Sqrt(&+[i^2 : i in vecB]);
 	// <-kfpp,kfppp> are lower and upper bounds
 	// for the fp-valuation of epsilon=delta_1^b_1 ... delta_r^b_r.
-
 	c21:=c21+Max(0,kfppp)*Log(Norm(fp));
     end for;
 
@@ -876,7 +932,7 @@ constantsDivc25:=function(K,theta,tau,c23,sigma)
 	    c28divc25:= tau1/(Min(thetaconjIms));
 	end if;
 	c29divc25:= [0] cat [tau1/(tau2*c23)] cat [tau1/tau*c23 : tau in tauconjAbs]
-		    cat [tau1/Imth : Imth in thetaconjIms];
+		    cat [tau1/thetaj : thetaj in thetaconjIms];
     else
 	assert IsEmpty(otherRealPls);
 	otherCmxPls:= [pl : pl in cmxPls | pl ne sigma2];
@@ -926,9 +982,9 @@ approxLattice:=function(tau,deltaList,S,sigma,sigma2,C)
     // to compute
     // the nearest integer correctly.
     Cpi:=Round(saj);
-    matblock1:= ZeroMatrix(Integers(),w,r+v);
-    matblock2:= HorizontalJoin(IdentityMatrix(Integers(),s+1),ZeroMatrix(Integers(),s+1,d-2));
-    matblock3:= ZeroMatrix(Integers(),v,r+v);
+    matblock1:=ZeroMatrix(Integers(),w,r+v);
+    matblock2:=HorizontalJoin(IdentityMatrix(Integers(),s+1),ZeroMatrix(Integers(),s+1,d-2));
+    matblock3:=ZeroMatrix(Integers(),v,r+v);
     LatMat:= VerticalJoin(<matblock1,matblock2,matblock3>);
     assert NumberOfColumns(LatMat) eq NumberOfRows(LatMat);
     assert NumberOfColumns(LatMat) eq ((s+1)+(d-2));
@@ -1098,18 +1154,17 @@ reducedBoundFixedEmbedding2:=function(K,theta,tau,deltaList,S,consts,sigma : ver
 	    M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
-	    DLwsq:=distanceLBsq(LL,ww);
+	    tf1, DLwsq:=distanceLBsq2(LL,ww,cB5^2);
 	    // This D(L,w)^2 in the notation of paper.
-	    tf1:=DLwsq gt cB5^2;
-	    if tf1 eq false then
+	    tf2:=DLwsq gt cB5^2;
+	    if (tf1 eq false) or (tf2 eq false) then
 		if verb then
 		    printf "Increasing C.\n";
 		end if;
 		C:=10*C;
 	    end if;
-	    //	until tf1 and tf2;
-	until tf1;
-	denom:= (cB3*(DLwsq^2-cB5^2) + cB4^2)^(1/2) - cB4;
+	until tf1 and tf2;
+	denom:= (cB3*(DLwsq-cB5^2) + cB4^2)^(1/2) - cB4;
 	cB0New:=(1/c26)*Log((2*C*cB3)/denom);
 
 	cB0New:=Max(c30,cB0New);
@@ -1619,104 +1674,6 @@ bigSieveInfo:=function(tau,deltaList,smallInf)
     return Zr, bigInf;
 end function;
 
-function furtherreduced(tau, deltaList, c21, vecB)
-    K:=Universe([tau] cat deltaList);
-    K:=NumberField(K);
-    theta:=K.1;
-    OK:=MaximalOrder(K);
-    S:=&join[Support(delta*OK) : delta in deltaList];
-    S:=SetToSequence(S);
-    fn:=func<P1,P2 | Norm(P2)-Norm(P1) >;
-    Sort(~S,fn); // Sorting S so that the prime ideals with largest norm come first.
-    s:= #S;
-    assert &and[ fact[1] in S : fact in Factorisation(tau*OK) | fact[2] lt 0 ];
-    // This is a sanity check. According to the paper
-    // the denominator ideal of tau is supported
-    // on S.
-    c20,c17:=initialBound(K,theta,tau,deltaList,S);
-    c22, c23:=constants(K,theta,tau);
-    c26:=1/(2*c17);
-    r:=#deltaList;
-    d:=Degree(K);
-    assert d ge 3;
-    pls:=InfinitePlaces(K);
-    realPls:=[pl : pl in pls | LocalDegree(pl) eq 1];
-    cmxPls:=[pl : pl in pls | LocalDegree(pl) eq 2];
-    sigma:= realPls[1];
-
-    u,v:= Signature(K);
-    assert d eq u+2*v;
-    assert s eq (r-(u+v-1));
-    assert &and[Abs(Norm(delta)) eq 1 : delta in deltaList[1..u+v-1]];
-    assert &and[Abs(Norm(delta)) ne 1 : delta in deltaList[u+v..r]];
-
-     c27divc25, c28divc25, c29divc25, sigma2:= constantsDivc25(K,theta,tau,c23,sigma);
-     w:=u+v-2;
-     n:=r+v;
-
-     c24:=c21+c22+(u-1)*Log(Max(1,1/c23));
-     c25:=Exp(c24);
-     c27:= c27divc25*c25;
-     c28:= c28divc25*c25;
-     c29:= [c29divc25[j]*c25 : j in [1..(u+v)]];
-     if u eq 1 then
-	 c30:=Max([2*c17*c24, Log(2*c28)/c26]);
-     elif v eq 0 then
-	 c30:=Max([2*c17*c24, Log(2*c27)/c26]);
-     else
-	 c30:=Max([2*c17*c24, Log(2*c27)/c26, Log(2*c28)/c26]);
-     end if;
-
-     cB0:= Max(vecB);
-     cB1:= &+[Abs(i) : i in vecB];
-     cB2:= Sqrt(&+[i^2 : i in vecB]);
-     cA1:= (1 + cB1)/2;
-     cA2:= (1 + cB1) + 1/(2*Pi(RealField()));
-     cB3:= 0;
-     cB4:= 0;
-     for j in [1..w] do
-	 cB3:= cB3 + (c29[2] + c29[j+2])^2;
-	 cB4:= cB4 + cA1*(c29[2] + c29[j+2]);
-     end for;
-     for j in [1..v] do
-	 cB3:= cB3 + (c29[u+j])^2;
-	 cB4:= cB4 + cA2*(c29[u+j]);
-     end for;
-     cB5:= (cB2^2 - w*cB0^2 + w*cA1^2 + v*cA2^2)^(1/2);
-     C:=Ceiling(cB5^(n/(d-2)));
-
-     repeat
-	 ZZn:=StandardLattice(n);
-	 M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
-	 ww:=ZZn!ww;
-	 LL:=Lattice(M);
-	 DLwsq:=distanceLBsq(LL,ww);
-	 //print C,DLwsq+0.0;
-	 // This D(L,w)^2 in the notation of paper.
-	 tf1:=DLwsq gt cB5^2;
-	 tf2:=(ww in LL) eq false;
-	 if (tf1 and tf2) eq false then
-	     C:=10*C;
-	 end if;
-     until tf1 and tf2;
-     denom:= (cB3*(DLwsq^2-cB5^2) + cB4^2)^(1/2) - cB4;
-     cB0New:=(1/c26)*Log((2*C*cB3)/denom);
-
-     cB0New:=Max(c30,cB0New);
-     if cB0New lt 10^10 then
-	 cB0New:=Floor(cB0New);
-     end if;
-     if cB0New lt cB0 then
-	 cB0:=cB0New;
-	 for i in [1..r] do
-	     if cB0 lt vecB[i] then
-		 vecB[i]:= cB0;
-	     end if;
-	 end for;
-     end if;
-     return vecB;
-end function;
-
 SetAutoColumns(false);
 SetColumns(235);
 
@@ -1842,13 +1799,12 @@ solveThueMahler:=function(clist,primelist,a : verb:=false)
     return sols;
 end function;
 
-
 //----------------------------------------------//
 
 // Example 4
 clist:=[1,0,0,0,-2];
 primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-time sols1:=solveThueMahler(clist,primelist,1);
+time sols1:=solveThueMahler(clist,primelist,1: verb:=true);
 sols1;
-time sols2:=solveThueMahler(clist,primelist,-1);
-sols2;
+//time sols2:=solveThueMahler(clist,primelist,-1);
+//sols2;
