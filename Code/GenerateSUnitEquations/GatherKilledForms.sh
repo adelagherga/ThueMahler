@@ -16,7 +16,7 @@
 # Example:     N/A
 #
 
-cd /home/adela/ThueMahler/Data/SUnitEqData
+cd /home/adela/data/from_lehner/ThueMahler/Data/SUnitEqData
 
 { cat tmplog; echo; } | while read line; do
     set=$(echo $line | awk '{print $10 }')

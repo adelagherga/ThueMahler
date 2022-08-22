@@ -79,7 +79,7 @@ solveThueMahler:=function(alist,a,primelist : verb:=false)
 	printf "Applying the Dirichlet sieve to equation number %o ",eqncount;
 	printf "out of %o.\n",#tauDeltaList;
 	if cBfsq gt 500000 then
-	    qBound:= 500;
+	    qBound:=500;
 	else
 	    qBound:=200;
 	end if;

@@ -26,7 +26,7 @@
 # Commentary:  We ignore the "optimal form" here as it is only optimal in regards to the
 #              associated number of S-unit equations, and simply use the original form instead.
 #
-#              This program only needs to be appli once. Run with
+#              This program only needs to be applied once. Run with
 #              python3 /home/adela/ThueMahler/Code/GenerateSUnitEquations/GatherRedundancy_ThueEq.py
 #
 # To do list:
