@@ -445,6 +445,7 @@ totallyComplexRed:=function(tau,deltaList,S,consts : verb:=false)
               The mode up-to-date lower and upper bounds for the fp-valuation
               of eps.
    */
+    SetVerbose("User1",verb);
     K:=Universe([tau] cat deltaList);
     K:=NumberField(K);
     theta:=K.1;
@@ -463,10 +464,8 @@ totallyComplexRed:=function(tau,deltaList,S,consts : verb:=false)
     assert u eq 0;
 
     c17,c20,c22,c23,c26:=Explode(consts);
-    if verb then
-	printf "We're in the totally complex case.\n";
-	printf "The initial bound is %o.\n",c20;
-    end if;
+    vprintf User1: "We're in the totally complex case.\n";
+    vprintf User1: "The initial bound is %o.\n",c20;
     cBinf:=c20;
     vecB:=[cBinf : i in [1..r]];
     absM0inv,vecUpp:=nonUnitExps(K,S,deltaList,vecB);
@@ -474,15 +473,13 @@ totallyComplexRed:=function(tau,deltaList,S,consts : verb:=false)
     finished:=false;
     repeat
 	c21,expSbds,vecUpp,vecB:=c21Func(tau,deltaList,S,absM0inv,vecUpp,vecB);
-	if verb and (s gt 0) then
-	    printf "The exponent bounds are %o.\n",expSbds;
+	if (s gt 0) then
+	    vprintf User1: "The exponent bounds are %o.\n",expSbds;
 	end if;
 	cBinfNew:=2*c17*(c21+c22);
 	if cBinfNew lt cBinf then
-	    if verb then
-		printf "The reduction process gives a new bound of %o.\n",
-		       Floor(cBinfNew);
-	    end if;
+	    vprintf User1: "The reduction process gives a new bound of %o.\n",
+			   Floor(cBinfNew);
 	    cBinf:=Floor(cBinfNew);
 	    for i in [1..r] do
 		if cBinf lt vecB[i] then
@@ -490,10 +487,8 @@ totallyComplexRed:=function(tau,deltaList,S,consts : verb:=false)
 		end if;
 	    end for;
 	else
-	    if verb then
-		printf "The reduction process gives a worse bound of %o.\n",
-		       Floor(cBinfNew);
-	    end if;
+	    vprintf User1: "The reduction process gives a worse bound of %o.\n",
+			   Floor(cBinfNew);
 	    finished:=true;
 	end if;
     until finished;
@@ -816,6 +811,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
               The mode up-to-date lower and upper bounds for the fp-valuation
               of eps.
    */
+    SetVerbose("User1",verb);
     K:=Universe([tau] cat deltaList);
     K:=NumberField(K);
     theta:=K.1;
@@ -834,9 +830,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
     c17,c20,c22,c23,c26:=Explode(consts);
     constsDivc25,sigma2:=boundConstantsDivc25(K,theta,tau,c23,sigma);
     c27divc25,c28divc25,c29divc25:=Explode(constsDivc25);
-    if verb then
-	printf "The initial bound is %o.\n",c20;
-    end if;
+    vprintf User1: "The initial bound is %o.\n",c20;
     cBinf:=c20;
     vecB:=[cBinf : i in [1..r]];
     absMinv,vecUpp:=nonUnitExps(K,S,deltaList,vecB);
@@ -844,8 +838,8 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
     finished:=false;
     repeat
 	c21,expSbds,vecUpp,vecB:=c21Func(tau,deltaList,S,absMinv,vecUpp,vecB);
-	if verb and (s gt 0) then
-	    printf "The exponent bounds are %o.\n",expSbds;
+	if (s gt 0) then
+	    vprintf User1: "The exponent bounds are %o.\n",expSbds;
 	end if;
 	c24:=c21+c22+(u-1)*Log(Max(1,1/c23));
 	c25:=Exp(c24);
@@ -887,9 +881,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	    tf,DLwsq:=distanceLBsq2(LL,ww,cB5^2);
 	    // This is D(L,w)^2 in the notation of Proposition 9.1.
 	    if (tf eq false) then
-		if verb then
-		    printf "Increasing C.\n";
-		end if;
+		vprintf User1: "Increasing C.\n";
 		C:=10*C;
 	    end if;
 	until tf;
@@ -900,9 +892,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	    cBinfNew:=Floor(cBinfNew);
 	end if;
 	if cBinfNew lt cBinf then
-	    if verb then
-		printf "The new bound is %o.\n",cBinfNew;
-	    end if;
+	    vprintf User1: "The new bound is %o.\n",cBinfNew;
 	    cBinf:=cBinfNew;
 	    for i in [1..r] do
 		if cBinf lt vecB[i] then
@@ -938,6 +928,7 @@ reducedBound:=function(tau,deltaList : verb:=false)
               The mode up-to-date lower and upper bounds for the fp-valuation
               of eps.
    */
+    SetVerbose("User1",verb);
     K:=Universe([tau] cat deltaList);
     K:=NumberField(K);
     theta:=K.1;
@@ -975,24 +966,20 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	end for;
 	return [Integers()!b : b in vecB],S,expSbds;
     end if;
-    if verb then
-	printf "We're carrying out the reduction process for each real ";
-	printf "embedding separately.\n";
-    end if;
+    vprintf User1: "We're carrying out the reduction process for each real ";
+    vprintf User1: "embedding separately.\n";
     vecBList:=[];
     expSbdsList:=[];
     for i in [1..u] do
-	if verb then
-	    print "++++++++++++++++++++++++++";
-	    if (i mod 10) eq 1 then
-		printf "Dealing with the %o-st real embedding.\n",i;
-	    elif (i mod 10) eq 2 then
-		printf "Dealing with the %o-nd real embedding.\n",i;
-	    elif (i mod 10) eq 3 then
-		printf "Dealing with the %o-rd real embedding.\n",i;
-	    else
-		printf "Dealing with the %o-th real embedding.\n",i;
-	    end if;
+	vprintf User1: "++++++++++++++++++++++++++\n";
+	if (i mod 10) eq 1 then
+	    vprintf User1: "Dealing with the %o-st real embedding.\n",i;
+	elif (i mod 10) eq 2 then
+	    vprintf User1: "Dealing with the %o-nd real embedding.\n",i;
+	elif (i mod 10) eq 3 then
+	    vprintf User1: "Dealing with the %o-rd real embedding.\n",i;
+	else
+	    vprintf User1: "Dealing with the %o-th real embedding.\n",i;
 	end if;
 	sigma:=realPls[i];
 	vecBsig,expSbds:=fixedRealEmbeddingRed(tau,deltaList,S,consts,sigma

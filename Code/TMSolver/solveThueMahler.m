@@ -37,13 +37,13 @@ solveThueMahler:=function(alist,a,primelist : verb:=false)
 	      updates as it proceeds.
       Returns
           sols: SetEnum
-              A list of solutions [X, Y, z_1,...,z_v] to the Thue-Mahler
+              A list of solutions [X,Y,z_1,...,z_v] to the Thue-Mahler
 	      equation.
    */
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "alist:=%o; a:=%o; primelist:=%o; \n",alist,a,primelist;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    tauDeltaList:=equationsInK(alist,a,primelist);
+    time tauDeltaList:=equationsInK(alist,a,primelist);
     if (#tauDeltaList eq 0) then
 	printf "No S-unit equations to solve!\n";
 	printf "Done solving the Thue-Mahler equation.\n";
@@ -71,7 +71,7 @@ solveThueMahler:=function(alist,a,primelist : verb:=false)
 	printf "Working on equation number %o...\n",eqncount;
 	tau:=pr[1];
 	deltaList:=pr[2];
-	vecB,S,range:=reducedBound(tau,deltaList : verb:=verb);
+	time vecB,S,range:=reducedBound(tau,deltaList : verb:=verb);
 	print "S is ",S;
 	printf "The range is %o.\n",range;
 	cBfsq:= &+[i^2 : i in vecB];
@@ -85,11 +85,12 @@ solveThueMahler:=function(alist,a,primelist : verb:=false)
 	end if;
 	smallInfs:=smallSieveInfo(smallInfs,a0,theta,qBound);
 	Zr,bigInfs:=bigSieveInfo(tau,deltaList,smallInfs);
-	vecs:=sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cBfsq,bigInfs,1);
+	time vecs:=sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cBfsq,bigInfs,1);
 	printf "Finished applying the Dirichlet sieve to equation number %o.\n",
 	       eqncount;
+	time sols:=sols join
+			solutionVectors(alist,a,primelist,tau,deltaList,vecs);
 	printf "++++++++++++++++++++++++++++++++++\n";
-	sols:=sols join solutionVectors(alist,a,primelist,tau,deltaList,vecs);
     end for;
     printf "Done solving the Thue-Mahler equation.\n";
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";

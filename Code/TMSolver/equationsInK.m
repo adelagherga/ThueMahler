@@ -333,9 +333,9 @@ equationsInK:=function(alist,a,primelist)
    */
     afplist:=idealEquations(alist,a,primelist);
     if (#afplist eq 1) then
-	printf "There is %o ideal equations to solve.\n", #afplist;
+	printf "There is %o ideal equations to solve.\n",#afplist;
     else
-	printf "There are %o ideal equations to solve.\n", #afplist;
+	printf "There are %o ideal equations to solve.\n",#afplist;
     end if;
     tauDeltaList:=[* *];
     for pr in afplist do
