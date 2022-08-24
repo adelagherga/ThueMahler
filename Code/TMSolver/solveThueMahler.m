@@ -1,9 +1,9 @@
 /*
 solveThueMahler.m
 
-This solves a_0 X^d + ... + a_d Y^d = a * p_1^{z_1} ... p_v^{z_v} subject to
-the assumptions that X, Y are integers and gcd(X,Y) = 1, with a_0, Y optionally
-coprime.
+These functions solve a_0 X^d + ... + a_d Y^d = a * p_1^{z_1} ... p_v^{z_v}
+subject to the assumptions that X, Y are integers and gcd(X,Y) = 1, with
+a_0, Y optionally coprime.
 
 Authors
     Adela Gherga <adelagherga@gmail.com>
