@@ -56,7 +56,7 @@ def print_format(output,rhs,Nset):
 
 # seperate all lines of Thue data by (original) "form"
 all_forms = {}
-for line in open("/home/adela/ThueMahler/Data/SUnitEqData/RegeneratedThueEqToSolve.csv"):
+for line in open("/home/adela/ThueMahler/Data/SUnitEqData/ECTest/ObsRegeneratedTestThue.csv"):
     form, new_line = fragle(line)
     if form in all_forms:
         all_forms[form].append(new_line)
@@ -69,15 +69,16 @@ for key in sorted(all_forms):
     all_forms_rhs[key] = {}
     for form in all_forms[key]:
         N,rhs = extract_rhs(form)
-        for r in rhs:
-            if r in all_forms_rhs[key]:
-                all_forms_rhs[key][r].append(N)
-            else:
-                all_forms_rhs[key][r] = [N]
+        if N in range(500000,501000):
+            for r in rhs:
+                if r in all_forms_rhs[key]:
+                    all_forms_rhs[key][r].append(N)
+                else:
+                    all_forms_rhs[key][r] = [N]
 
 # output all data to "ThueEqToSolve_ByRHS.csv", in the format
 # (original) "form",rhs-value,"list of conductors"
-ThueEqToSolve_ByRHS=open("/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve_ByRHS.csv",
+ThueEqToSolve_ByRHS=open("/home/adela/ThueMahler/Data/SUnitEqData/ECTest/ThueEqToSolve_ByRHS.csv",
                          "w")
 for form in sorted(all_forms_rhs):
     output0 = "\"" + form + "\","
@@ -88,7 +89,7 @@ ThueEqToSolve_ByRHS.close()
 
 # output all data to "ThueEqToSolve_ByForm.csv" in the format
 # (original) "form",rhs-value
-ThueEqToSolve_ByForm=open("/home/adela/ThueMahler/Data/SUnitEqData/ThueEqToSolve_ByForm.csv",
+ThueEqToSolve_ByForm=open("/home/adela/ThueMahler/Data/SUnitEqData/ECTest/ThueEqToSolve_ByForm.csv",
                           "w")
 for form in sorted(all_forms_rhs):
     output = "\"" + form + "\",\"" + str(sorted(all_forms_rhs[form])).replace(" ","") + "\""

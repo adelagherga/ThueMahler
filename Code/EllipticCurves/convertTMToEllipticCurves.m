@@ -1,5 +1,5 @@
 /*
-ellipticCurves.m
+convertTMToEllipticCurves.m
 
 This function determines all elliptic curves over Q of conductor N associated to
 the solutions of the Thue--Mahler form
