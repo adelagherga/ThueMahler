@@ -13,16 +13,16 @@
 # That is, for each line "set" of Data/Forms/ThueTestForms.csv, run
 # nohup magma set:="set" Code/computeEllipticCurvesThue.m &.
 # The following code runs these jobs in the background using GNU parallel,
-# running no more than 20 jobs at once, and storing GNU parallel's progress in
-# the logfile Data/ThueTest1Log.
+# running no more than 20 jobs at once (-j20), and storing GNU parallel's
+# progress in the logfile Data/ThueTest1Log (--joblog Data/ThueTest1Log).
 nohup cat Data/Forms/ThueTestForms.csv | parallel -j20 --joblog Data/ThueTest1Log magma set:={} Code/computeEllipticCurvesThue.m 2>&1 &
 
 # Run ThueMahler code in parallel.
 # That is, for each line "set" of Data/Forms/TMTestForms.csv, run
 # nohup magma set:="set" Code/computeEllipticCurvesTM.m &.
 # The following code runs these jobs in the background using GNU parallel,
-# running no more than 20 jobs at once, and storing GNU parallel's progress in
-# the logfile Data/TMTest1Log.
+# running no more than 20 (-j20) jobs at once, and storing GNU parallel's
+# progress in the logfile Data/TMTest1Log (--joblog Data/TMTest1Log).
 nohup cat Data/Forms/TMTestForms.csv | parallel -j20 --joblog Data/TMTest1Log magma set:={} Code/computeEllipticCurvesTM.m 2>&1 &
 
 # Generate files for each conductor and populate each file with the
