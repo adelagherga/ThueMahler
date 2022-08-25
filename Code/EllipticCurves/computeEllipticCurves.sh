@@ -3,6 +3,9 @@
 #
 # This function initiates the Thue and Thue--Mahler solver in Magma in parallel
 # and amalgamates the elliptic curves in seperate files, by conductor.
+# Run with
+# $ chmod u+x Code/computeEllipticCurves.sh
+# $ nohup Code/computeEllipticCurves.sh &
 #
 # Authors
 #    Adela Gherga <adelagherga@gmail.com>
