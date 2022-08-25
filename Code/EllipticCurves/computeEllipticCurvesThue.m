@@ -40,7 +40,7 @@ seqEnumToString:=function(X : quotes:=false)
 	      quotations.
       Returns
           stX: MonStgElt
-	      The set X as a string without whitespace.
+	      the set X as a string without whitespace.
    */
     strX:= "[";
     for i in [1..#X] do
@@ -88,16 +88,13 @@ assert IsHomogeneous(F);
 ThueF:=Thue(Evaluate(F,[x,1]));
 for rhs in rhsList do
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "alist:=%o; rhs:=%o; \n",alist,rhs;
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    time sols:=Solutions(ThueF,rhsList[1]);
-    printf "sols:=%o\n",sols;
-    ECs:=convertTMToEllipticCurves(N,alist,sols);
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "N:=%o; alist:=%o; rhs:=%o; \n",N,alist,rhs;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+    time sols:=Solutions(ThueF,rhs);
+    printf "sols:=%o\n",sols;
+    ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
+    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     for E in ECs do
 	assert E[1] eq N;
 	fprintf OutFile, "%o, %o, %o, %o, %o\n",

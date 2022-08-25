@@ -89,14 +89,14 @@ LogFile:="../Data/TMLogfiles/" cat
 	 CommaSplit[1] cat "\,\[" cat RBracketSplit[4] cat "\]Log.txt";
 SetLogFile(LogFile);
 for a in aconsts do
-    sols:=solveThueMahler(alist,a,primelist : coprime:=false);
-    printf "sols:=%o\n",sols;
-    ECs:=convertTMToEllipticCurves(N,alist,sols);
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "N:=%o; alist:=%o; a:=%o; primelist:=%o; \n",N,alist,a,primelist;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+    sols:=solveThueMahler(alist,a,primelist : coprime:=false);
+    printf "sols:=%o\n",sols;
+    ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
+    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     for E in ECs do
 	assert E[1] eq N;
 	fprintf OutFile, "%o, %o, %o, %o, %o, %o\n",
