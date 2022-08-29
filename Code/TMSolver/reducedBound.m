@@ -902,6 +902,9 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	else
 	    finished:=true;
 	end if;
+	if (cBinf eq 0) then
+	    finished:=true;
+	end if;
     until finished;
     return vecB,expSbds;
 end function;
