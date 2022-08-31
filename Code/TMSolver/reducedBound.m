@@ -685,7 +685,7 @@ end function;
 distanceLBsq:=function(LL,ww)
    /*
       Determines the shortest distance from a vector in the lattice L to the
-      vector w,
+      vector w.
 
       Parameters
 	  LL: Lat
