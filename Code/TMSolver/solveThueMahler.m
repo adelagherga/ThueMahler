@@ -215,7 +215,7 @@ coprimeThueMahler:=function(alist,a,primelist : verb:=false)
 	printf "Working on equation number %o...\n",eqncount;
 	tau:=pr[1];
 	deltaList:=pr[2];
-	time vecB,S,range:=reducedBound(tau,deltaList : verb:=verb);
+	time vecs,vecB,S,range:=reducedBound(tau,deltaList : verb:=verb);
 	print "S is ",S;
 	printf "The range is %o.\n",range;
 	cBfsq:= &+[i^2 : i in vecB];
@@ -229,7 +229,8 @@ coprimeThueMahler:=function(alist,a,primelist : verb:=false)
 	end if;
 	smallInfs:=smallSieveInfo(smallInfs,a0,theta,qBound);
 	Zr,bigInfs:=bigSieveInfo(tau,deltaList,smallInfs);
-	time vecs:=sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cBfsq,bigInfs,1);
+	time vecs:=vecs cat
+		   sift(tau,deltaList,Zr,Zr,Zr!0,S,range,cBfsq,bigInfs,1);
 	printf "Finished applying the Dirichlet sieve to equation number %o.\n",
 	       eqncount;
 	time sols:=sols join

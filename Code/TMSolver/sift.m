@@ -84,7 +84,7 @@ vectorsInCoset:=function(Zr,L,w,distSq)
       Returns
 	  vecs: SeqEnum
               A list of vectors v of the translated lattice w + L having squared
-	      L^2 <= distSq.
+	      L^2 norm <= distSq.
    */
     assert L subset Zr;
     r:=#Invariants(Zr);

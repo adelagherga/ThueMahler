@@ -714,7 +714,7 @@ distanceLBsq:=function(LL,ww)
     sigma:=[AbsoluteValue(t-Round(t)) : t in sigma];
     sigma:=[t : t in sigma | t ne 0];
     sigmai0:=sigma[#sigma];
-    return (2^(1-n))*sigmai0*Norm(b1);
+    return (2^(1-n))*sigmai0^2*Norm(b1);
 end function;
 
 distanceLBsq2:=function(LL,ww,cB5sq)
@@ -731,9 +731,9 @@ distanceLBsq2:=function(LL,ww,cB5sq)
           cB5sq: FldReElt
               The bound cB5^2.
       Returns
-          tf: BoolElt
-              A true/false value. This value is true if D(L,w) > cB5 and
-	      false if D(L,w) < cB5.
+          shortvecs: SeqEnum
+              A list of vectors v of the translated lattice w + L having squared
+	      L^2 norm <= cB5^2.
           DLwsq: RngIntElt
               The squared shortest distance from a vector in L to w, D(L,w)^2.
    */
@@ -741,46 +741,44 @@ distanceLBsq2:=function(LL,ww,cB5sq)
     // Changing the coefficient ring of ww to the rationals.
     n:=Rank(LL);
     assert n eq Degree(LL);
+    l:=Integers()!Floor(cB5sq);
+    u:=10*l;
     if ww in LL then
-	test:=ShortVectorsProcess(LL,Integers()!Floor(cB5sq));
-	// Initial test to determine whether D(L,w) < cB5 when w is in L.
-	if (IsEmpty(test) eq false) then
-	    return false,0;
-	else
-	    mult:=1;
-	    P:=ShortVectorsProcess(LL,Integers()!Floor(cB5sq)*mult);
-	    while IsEmpty(P) do
-		mult:=mult+1;
-		P:=ShortVectorsProcess(LL,Integers()!Floor(cB5sq)*mult);
-	    end while;
-	    Norms:=[];
-	    while (IsEmpty(P) eq false) do
-		Append(~Norms,Norm(NextVector(P)));
-	    end while;
-	    DLwsq:=Min(Norms);
-	    assert DLwsq gt cB5sq;
-	    return true,DLwsq;
-	end if;
-    end if;
-    test:=CloseVectorsProcess(LL,-ww,Integers()!Floor(cB5sq));
-    // Initial test to determine whether D(L,w) < cB5 when w is not in L.
-    if (IsEmpty(test) eq false) then
-	return false,0;
-    else
-	mult:=1;
-	P:=CloseVectorsProcess(LL,-ww,Integers()!Floor(cB5sq)*mult);
+	P:=ShortVectorsProcess(LL,l,u);
 	while IsEmpty(P) do
-	    mult:=mult+1;
-	    P:=CloseVectorsProcess(LL,-ww,Integers()!Floor(cB5sq)*mult);
+	    u:=10*u;
+	    P:=ShortVectorsProcess(LL,l,u);
 	end while;
-	Norms:=[];
+	// Find at least 1 vector v in L such that cB5^2 <= Norm(v+w) <= mult*cB5^2.
+	P:=ShortVectorsProcess(LL,u);
+	// Find all vectors v in L such that Norm(v+w) <= mult*cB5^2.
+	vecs:=[];
 	while (IsEmpty(P) eq false) do
-	    Append(~Norms,Norm(NextVector(P)+ww));
+	    Append(~vecs,NextVector(P));
 	end while;
-	DLwsq:=Min(Norms);
+	shortvecs:=[xx : xx in vecs | Norm(xx) le l];
+	DLwsq:=Min([Norm(xx) : xx in vecs | xx notin shortvecs]);
+	shortvecs:=[ChangeRing(xx-ww,Rationals()) : xx in shortvecs];
 	assert DLwsq gt cB5sq;
-	return true,DLwsq;
+	return shortvecs,DLwsq;
     end if;
+    P:=CloseVectorsProcess(LL,-ww,l,u);
+    while IsEmpty(P) do
+	u:=10*u;
+	P:=CloseVectorsProcess(LL,-ww,l,u);
+    end while;
+    // Find at least 1 vector v in L such that cB5^2 <= Norm(v+w) <= mult*cB5^2.
+    P:=CloseVectorsProcess(LL,-ww,u);
+    // Find all vectors v in L such that Norm(v+w) <= mult*cB5^2.
+    vecs:=[];
+    while (IsEmpty(P) eq false) do
+	Append(~vecs,NextVector(P));
+    end while;
+    shortvecs:=[vv : vv in vecs | Norm(vv+ww) le l];
+    DLwsq:=Min([Norm(vv+ww) : vv in vecs | vv notin shortvecs]);
+    shortvecs:=[ChangeRing(vv,Rationals()) : vv in shortvecs];
+    assert DLwsq gt cB5sq;
+    return shortvecs,DLwsq;
 end function;
 
 fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
@@ -805,6 +803,9 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
               A true/false value. If set to true, this function returns status
 	      updates as it proceeds.
       Returns
+          vecs: SetEnum
+              A list of vectors v of the translated lattice w + L having squared
+	      L^2 norm <= cB5^2.
           vecB: SeqEnum
               The list of smallest known bounds for |b_1|,...,|b_r|.
           expSbds: SeqEnum
@@ -834,6 +835,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
     cBinf:=c20;
     vecB:=[cBinf : i in [1..r]];
     absMinv,vecUpp:=nonUnitExps(K,S,deltaList,vecB);
+    vecs:={};
 
     finished:=false;
     repeat
@@ -873,16 +875,31 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	C:=Ceiling(cB5^(n/(d-2)));
 	// We follow the procedure in the section "Reduction of Bounds"
 	// to repeatedly reduce the initial bound.
+	iter:=1;
 	repeat
 	    ZZn:=StandardLattice(n);
 	    M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
-	    tf,DLwsq:=distanceLBsq2(LL,ww,cB5^2);
+	    if (ww in LL) then
+		vv:=ChangeRing(-ww,Rationals());
+		vecs:=vecs join
+			   {(vv*ChangeRing(M,Rationals())^(-1))[1]};
+	    end if;
+	    DLwsq:=distanceLBsq(LL,-ww);
 	    // This is D(L,w)^2 in the notation of Proposition 9.1.
+	    tf:=DLwsq gt cB5^2;
 	    if (tf eq false) then
-		vprintf User1: "Increasing C.\n";
-		C:=10*C;
+		if (iter eq 10) then
+		    shortvecs,DLwsq:=distanceLBsq2(LL,ww,cB5^2);
+		    vecs:=vecs join {(vv*ChangeRing(M,Rationals())^(-1))[1]
+				     : vv in shortvecs};
+		    tf:=DLwsq gt cB5^2;
+		else
+		    vprintf User1: "Increasing C.\n";
+		    C:=10*C;
+		    iter:=iter+1;
+		end if;
 	    end if;
 	until tf;
 	denom:=(cB3*(DLwsq-cB5^2) + cB4^2)^(1/2) - cB4;
@@ -906,7 +923,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	    finished:=true;
 	end if;
     until finished;
-    return vecB,expSbds;
+    return vecs,vecB,expSbds;
 end function;
 
 reducedBound:=function(tau,deltaList : verb:=false)
@@ -923,6 +940,9 @@ reducedBound:=function(tau,deltaList : verb:=false)
               A true/false value. If set to true, this function returns status
 	      updates as it proceeds.
       Returns
+          vecs: SeqEnum
+              A list of vectors v of the translated lattice w + L having squared
+	      L^2 norm <= cB5^2.
           vecB: SeqEnum
               The list of smallest known bounds for |b_1|,...,|b_r|.
           S: SeqEnum
@@ -959,6 +979,8 @@ reducedBound:=function(tau,deltaList : verb:=false)
     assert #realPls eq u;
     assert #cmxPls eq v;
     assert d eq u+2*v;
+    ZZn:=StandardLattice(r+v);
+    vecs:={};
 
     if u eq 0 then
 	vecB,expSbds:=totallyComplexRed(tau,deltaList,S,consts : verb:=verb);
@@ -985,10 +1007,11 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    vprintf User1: "Dealing with the %o-th real embedding.\n",i;
 	end if;
 	sigma:=realPls[i];
-	vecBsig,expSbds:=fixedRealEmbeddingRed(tau,deltaList,S,consts,sigma
-					       : verb:=verb);
+	vecsig,vecBsig,expSbds:=
+	    fixedRealEmbeddingRed(tau,deltaList,S,consts,sigma : verb:=verb);
 	Append(~vecBList,vecBsig);
 	Append(~expSbdsList,expSbds);
+	vecs:=vecs join vecsig;
     end for;
 
     assert (#vecBList eq u) and (#expSbdsList eq u);
@@ -1011,5 +1034,6 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    vecB[i]:=Max(vecB[i],vecB2[i]);
 	end for;
     end for;
-    return [Integers()!b : b in vecB],S,expSbds;
+    vecs:=[Eltseq(ZZn!vv) : vv in vecs];
+    return vecs,[Integers()!b : b in vecB],S,expSbds;
 end function;
