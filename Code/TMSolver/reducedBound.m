@@ -890,7 +890,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	    // This is D(L,w)^2 in the notation of Proposition 9.1.
 	    tf:=DLwsq gt cB5^2;
 	    if (tf eq false) then
-		if (iter eq 5) then
+		if (iter eq 20) then
 		    shortvecs,DLwsq:=distanceLBsq2(LL,ww,cB5^2);
 		    vecs:=vecs join {(vv*ChangeRing(M,Rationals())^(-1))[1]
 				     : vv in shortvecs};
