@@ -742,11 +742,11 @@ distanceLBsq2:=function(LL,ww,cB5sq)
     n:=Rank(LL);
     assert n eq Degree(LL);
     l:=Integers()!Floor(cB5sq);
-    u:=10*l;
+    u:=5*l;
     if ww in LL then
 	P:=ShortVectorsProcess(LL,l,u);
 	while IsEmpty(P) do
-	    u:=10*u;
+	    u:=5*u;
 	    P:=ShortVectorsProcess(LL,l,u);
 	end while;
 	// Find at least 1 vector v in L such that cB5^2 <= Norm(v+w) <= mult*cB5^2.
@@ -764,7 +764,7 @@ distanceLBsq2:=function(LL,ww,cB5sq)
     end if;
     P:=CloseVectorsProcess(LL,-ww,l,u);
     while IsEmpty(P) do
-	u:=10*u;
+	u:=5*u;
 	P:=CloseVectorsProcess(LL,-ww,l,u);
     end while;
     // Find at least 1 vector v in L such that cB5^2 <= Norm(v+w) <= mult*cB5^2.
@@ -890,7 +890,7 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	    // This is D(L,w)^2 in the notation of Proposition 9.1.
 	    tf:=DLwsq gt cB5^2;
 	    if (tf eq false) then
-		if (iter eq 10) then
+		if (iter eq 5) then
 		    shortvecs,DLwsq:=distanceLBsq2(LL,ww,cB5^2);
 		    vecs:=vecs join {(vv*ChangeRing(M,Rationals())^(-1))[1]
 				     : vv in shortvecs};
