@@ -879,6 +879,11 @@ fixedRealEmbeddingRed:=function(tau,deltaList,S,consts,sigma : verb:=false)
 	repeat
 	    ZZn:=StandardLattice(n);
 	    M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
+	    while (Rank(M) ne n) do
+		vprintf User1: "Increasing C.\n";
+		C:=10*C;
+		M,ww:=approxLattice(tau,deltaList,S,sigma,sigma2,C);
+	    end while;
 	    ww:=ZZn!ww;
 	    LL:=Lattice(M);
 	    if (ww in LL) then
