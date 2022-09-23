@@ -673,6 +673,7 @@ N:=StringToInteger(N);
 validForms:=reducedForms(N);
 for form in validForms do
     alist,a,primelist:=Explode(form);
-    fprintf OutFile, "%o, %o, %o\n",seqEnumToString(alist),
+    fprintf OutFile, "%o,%o,%o\n",seqEnumToString(alist),
 	    IntegerToString(a),seqEnumToString(primelist);
 end for;
+exit;
