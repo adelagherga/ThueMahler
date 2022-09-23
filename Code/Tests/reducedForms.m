@@ -1,8 +1,16 @@
 /*
 reducedForms.m
 
-<description>
+This function generates all Thue--Mahler forms required to generate all elliptic
+curves of conductor N.
 
+Parameters
+    N: RngIntElt
+Returns
+    OutFile: MonStgElt
+        A .csv file named NForms.csv containing the rows "alist,a,primelist" for
+	each Thue--Mahler form to solve. If there are no forms to solve, no such
+        file is created.
 Authors
     Adela Gherga <adelagherga@gmail.com>
 Created
@@ -322,23 +330,21 @@ end function;
 
 modpCheckDivRHS:=function(F,q)
     /*
-     Description: determine whether F(X,Y) = 0 mod q has a non-trivial solution;
-                  ie. when q divides the RHS
-     Input: F:= polynomial F(X,Y) in question
-            q:= rational integer under which the local test is performed
-                that is, we search for solutions of the TM equations mod q
-     Output: hasSolutions:= boolean value determining whether F(X,Y) = 0 mod q has a
-     	     		    nontrivial solution
-             F_qs:= all possible values of F(u,v) mod q where u,v ranges through [0..q-1]
-                    NB. this set is empty if F(X,Y) = 0 mod q has a nontrivial solution
-     Example:
+      Determines whether F(u,v) = 0 mod q has a nontrivial solution, and
+      otherwise determines all possible values of F(u,v) mod q.
 
-    // local, partial local obstructions are only possible where hasSolutions returns false
-    // return all F(u,v) mod q values if false; will be used for further local
-    // obstruction tests
-    // NB. F_qs does not contain 0 in this case
-
-
+      Parameters
+          F: RngMPolElt
+	      The polynomial F(u,v).
+          q: RngIntElt
+              A rational prime.
+      Returns
+          FmodqList: SeqEnum
+	      All possible values of F(u,v) mod q. This set is empty if
+	      F(u,v) = 0 mod q has a nontrivial solution.
+          tf: BoolElt
+              A true/false value. This value is true if F(u,v) = 0 mod q has
+              a nontrivial solution.
    */
     FmodqList:=[];
     if IsPrime(q) then
@@ -367,26 +373,31 @@ modpCheckDivRHS:=function(F,q)
 end function;
 
 modpCheck:=function(FmodqList,a,rhsPrimes,q)
-
     /*
-     Description: determine whether F(X,Y) has a non-trivial solution
-     		  ie. when q does not divide the RHS
-     Input: F_qs:= all possible values F(u,v) mod p, where u,v ranges through [0..q-1]
-            RHSprimes:= primes appearing on RHS of TM equation in local test
-            avalues:= [a_1, \dots, a_m], fixed coefficients on RHS of F(X,Y)
-            q:= rational prime under which the local test is performed
-                that is, we search for solutions of the TM equations mod q
-     Output: hasSolutions:= boolean values determining whether TM equation has nontrivial
-                            local solutions mod q at the corresponding a value
-     Example:
+      Determines whether F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod q has
+      a nontrivial solution.
+
+      Parameters
+          FmodqList: SeqEnum
+	      All possible values of F(u,v) mod q. This set is empty if
+	      F(u,v) = 0 mod q has a nontrivial solution.
+          a: RngIntElt
+          rhsPrimes: SeqEnum
+              A list of rational primes p_1, p_2,...,p_v, excluding q.
+          q: RngIntElt
+              A rational prime.
+      Returns
+          tf: BoolElt
+              A true/false value. This value is true if
+	      F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod q has a nontrivial
+	      solution.
    */
     assert (IsEmpty(FmodqList) eq false);
     Zmodq:=FiniteField(q,1);
     a_q:=Zmodq!a;
-
     if (FmodqList eq [1..q-1]) then
-	// Nontrivial solutions exist if F(u,v) mod q can take on all values
-	// in [1..q-1], regardless of the RHS value.
+	// F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod q has a nontrivial solution
+	// if F(u,v) mod q can take on all values in [1..q-1].
 	return true;
     end if;
     if IsEmpty(rhsPrimes) and (a_q in FmodqList) then
@@ -404,8 +415,8 @@ modpCheck:=function(FmodqList,a,rhsPrimes,q)
     for prod in RHSprod do
 	prod_q:=Zmodq!(a_q*&*prod);
 	if (prod_q in FmodqList) then
-	    // A nontrivial solution exists to F(u,v) mod q when q does not
-	    // divide the RHS.
+	    // F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod q has a nontrivial
+	    // solution.
 	    return true;
 	end if;
     end for;
@@ -413,26 +424,26 @@ modpCheck:=function(FmodqList,a,rhsPrimes,q)
 end function;
 
 localTest:=function(N,alist,a,primelist)
-
     /*
-     Description: determines whether the TM equation has local or partial local obstructions
-     Input: N:= conductor of corresponding elliptic curves in question
-     	    F:= polynomial F(X,Y) in question
-            DiscF:= discriminant of F(X,Y)
-	    testPrimes:= [p_1, \dots, p_v], rational primes on RHS of F(X,Y) along with the
-	    		 incomplete list of partial obstructions
-            avalues:= [a_1, \dots, a_m], fixed coefficients on RHS of F(X,Y)
-     Output: avaluesNew:= updated list of possible a values generated after discarding
-                          those which are not possible
-	     partialObstruction:= set of primes p for which solutions can only be possible
-     	     			  with p having exponent 0 on RHS of the TM equation
-             localobstruction:= set of primes p presenting obstructions for the TM equation
-	                        that is, an obstruction exists at p as per Theorem 1 of BeGhRe
-                                or no solution of the TM equation exists mod p
-     Example:
+      Determines whether a_0 X^3 + ... + a_3 Y^3 = a p_1^{z_1} ... p_v^{z_v} has
+      a local obstruction at conductor N, and otherwise removes rational primes
+      which cannot appear with positive exponent on the RHS.
+
+      Parameters
+          N: RngIntElt
+	      The conductor associated to Thue--Mahler form.
+          alist: SeqEnum
+              A list of coefficients a_0, a_1,...,a_3.
+          a: RngIntElt
+          primelist: SeqEnum
+              A list of rational primes p_1, p_2,...,p_v.
+      Returns
+          validForm: SetEnum
+	      A list containing the single entry <alist,a,primelist> when no
+	      local obstructions exist, where primelist excludes rational primes
+	      which cannot appear with positive exponent on the RHS. This list
+	      is empty when a local obstruction exists.
    */
-
-
     QUV<U,V>:=PolynomialRing(Rationals(),2);
     Qx<x>:= PolynomialRing(Rationals());
     assert &and[a_i in Integers() : a_i in alist];
@@ -452,8 +463,8 @@ localTest:=function(N,alist,a,primelist)
     testPrimes:=[p : p in primelist | p lt 5000];
     toRemove:=[];
     for p in testPrimes do
-	// Search for solutions (u,v) of F(u,v) mod p under the assumption
-	// that the exponent on p is strictly positive.
+	// Search for solutions to F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod p
+	// under the assumption that the exponent on p is strictly positive.
 	FmodpList,hasSol1:=modpCheckDivRHS(F,p);
 	if (hasSol1 eq false) then
 	    if (p ge 3) and (Valuation(N,p) eq 1) and (DF mod p ne 0) then
@@ -463,12 +474,13 @@ localTest:=function(N,alist,a,primelist)
 		// gcd(u,v) != 1.
 		return {};
 	    end if;
-	    // Search for solutions (u,v) of F(u,v) mod p under the
-	    // assumption that the exponent on p is 0.
+	    // Search for solutions to F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod p
+	    // under the assumption that the exponent on p is 0.
 	    hasSol2:=modpCheck(FmodpList,a,Exclude(primelist,p),p);
 	    if (hasSol2 eq false) then
-		// There are no nontrivial solutions F(u,v) mod p whether p
-		// divides the RHS or not.
+		// There are no nontrivial solutions to
+		// F(u,v) = a p_1^{z_1} ... p_v^{z_v} mod p whether p divides
+		// the RHS or not.
 		return {};
 	    end if;
 	    Append(~toRemove,p);
@@ -481,14 +493,36 @@ end function;
 
 testForm:=function(N,prime2,prime3,form)
     /*
-      <description>
+      Determines all primitive, irreducible Thue--Mahler forms
+      a_0 X^3 + ... + a_3 Y^3 = a p_1^{z_1} ... p_v^{z_v} associated to the
+      cubic form a x^3 + b x^2 y + c x y^2 + d y^3 of discriminant DF, for each
+      possible value a and each possible list of primes p_1, ..., p_v. These
+      forms are valid in that they have no local obstructions.
 
       Parameters
-          <param>: <param type>
-	      <param description>
+          N: RngIntElt
+	      The conductor associated to the Thue--Mahler form.
+	  prime2: SeqEnum
+	      A list of all elements (alpha0,alpha1,tf) where alpha0 is the
+	      possible valuation ord_2(DF), alpha1 is the possible
+	      exponent on 2 in the right-hand-side of the Thue--Mahler form
+	      having discriminant DF, and tf is a true/false value which is set
+	      to false if alpha1 is not a lower bound.
+          prime3: SeqEnum
+	      A list of all elements (beta0,beta1,tf) where beta0 is the
+	      possible valuation ord_3(DF), beta1 is the possible
+	      exponent on 3 in the right-hand-side of the Thue--Mahler form
+	      having discriminant DF, and tf is a true/false value which is set
+	      to false if beta1 is not a lower bound.
+          form: Tup
+              The set (DF,[a,b,c,d]) defining a binary cubic form
+	      a x^3 + b x^2 y + c x y^2 + d y^3 of discriminant DF.
       Returns
-          <param>: <param type>
-	      <param description>
+          validForms: SetEnum
+	      A list of elements <alist,a,primelist> defining a Thue--Mahler
+              equation a_0 X^3 + ... + a_3 Y^3 = a p_1^{z_1} ... p_v^{z_v}
+              having no local obstructions, for each possible value a and each
+	      possible list of primes p_1, ..., p_v.
    */
     DF:=form[1];
     alist:=form[2];
@@ -554,16 +588,16 @@ testForm:=function(N,prime2,prime3,form)
     return validForms;
 end function;
 
-findForms:=function(N)
+reducedForms:=function(N)
     /*
       Determines all Thue--Mahler forms to be solved in order to compute all
       elliptic curves E of conductor N, where E has non-zero j-invariant and no
-      non-trivial rational 2-torsion.
+      nontrivial rational 2-torsion.
 
       Parameters
           N: RngIntElt
       Returns
-          validForms: SeqEnum
+          validForms: SetEnum
 	      A list of elements (alist,a,primelist) defining a Thue--Mahler
 	      form.
    */
@@ -601,144 +635,6 @@ findForms:=function(N)
     return validForms;
 end function;
 
-findGL2Zaction:=function(a,c)
-    actions:={};
-    if ((a eq 0) and (Abs(c) eq 1)) then
-	b:=-1/c;
-	d:=0;
-	assert (a*d-b*c eq 1);
-	actions:=actions join {[a,b,c,d]};
-    elif ((c eq 0) and (Abs(a) eq 1)) then
-	d:=1/a;
-	b:=0;
-	assert (a*d-b*c eq 1);
-	actions:=actions join {[a,b,c,d]};
-    elif ((a ne 0) and (c ne 0) and (GCD(a,c) eq 1)) then
-	g,d,b:=XGCD(a,c);
-	b:=-b;
-	assert g eq 1;
-	assert (a*d-b*c eq 1);
-	actions:=actions join {[a,b,c,d]};
-    end if;
-    return actions;
-end function;
-
-equivForm:=function(alist)
-
-    /*
-     Description: generate all possible GL2(Z) actions under which c0 lies in [1..20]
-     Input: clist:= [c_0, \dots, c_n], the coefficients of F(X,Y)
-     Output: GL2Zclists:= all possible coefficients of F(X,Y) under GL2(Z) action under which
-                          c0 lies in the interval [1..20]
-     Example:
-   */
-
-    QUV<U,V>:=PolynomialRing(Rationals(),2);
-    Qx<x>:= PolynomialRing(Integers());
-    assert &and[a_i in Integers() : a_i in alist];
-    assert (#alist-1) eq 3;
-    F:=&+[alist[i+1]*U^(3-i)*V^i : i in [0..3]];
-    assert IsHomogeneous(F);
-
-    // generate possible GL2(Z) actions under which c0 is small, avoiding Thue solver
-    ThueF:=Thue(Evaluate(F,[x,1]));
-    GL2Zactions:={};
-    testset:=PrimesInInterval(1,200) cat [1,4,9,25];
-    Sort(~testset);
-    for i in testset do
-	if IsEmpty(Solutions(ThueF,i)) eq false then
-	    a:=Solutions(ThueF,i)[1][1];
-	    c:=Solutions(ThueF,i)[1][2];
-	    GL2Zactions:=GL2Zactions join findGL2Zaction(a,c);
-	end if;
-    end for;
-    absMax:=25;
-    for a,c in [-absMax..absMax] do
-	if GCD(a,c) eq 1 then
-	    GL2Zactions:=GL2Zactions join findGL2Zaction(a,c);
-	end if;
-    end for;
-    GL2Zalists:=[];
-    for action in GL2Zactions do
-	a,b,c,d:=Explode(action);
-	assert (a*d-b*c eq 1);
-	GL2ZF:=Evaluate(F,[a*U+b*V,c*U+d*V]);
-	newalist:=[MonomialCoefficient(GL2ZF,U^(3-i)*V^i) : i in [0..3]];
-	newalist:=[Integers()!a_i : a_i in newalist];
-	if (newalist[1] lt 0) then
-	    newalist:=[-a_i : a_i in newalist];
-	end if;
-	a0:=newalist[1];
-	if (#Divisors(a0) le 3) and (a0 le 5000) then
-	    if (newalist notin GL2Zalists) then
-		Append(~GL2Zalists,newalist);
-	    end if;
-	end if;
-    end for;
-    a0Eq1:=[newalist : newalist in GL2Zalists | newalist[1] eq 1];
-    a0IsPrime:=[newalist : newalist in GL2Zalists | IsPrime(newalist[1])];
-    a0Other:=[newalist : newalist in GL2Zalists |
-	      newalist notin a0Eq1 and newalist notin a0IsPrime ];
-    GL2Zalists:=Sort(a0Eq1) cat Sort(a0IsPrime) cat Sort(a0Other);
-    if alist in GL2Zalists then
-	Exclude(~GL2Zalists,alist);
-    end if;
-    if #GL2Zalists lt 10 then
-	return [alist] cat GL2Zalists;
-    else
-	return [alist] cat GL2Zalists[1..10];
-    end if;
-end function;
-
-optimalForm:=function(alist,a,primelist)
-    GL2Zalists:=equivForm(alist);
-    if #GL2Zalists eq 1 then
-	return GL2Zalists[1];
-    end if;
-    caseNo:=[0 : i in [1..#GL2Zalists]];
-    for i in [1..#GL2Zalists] do
-	alist:=GL2Zalists[i];
-	assert &and[IsPrime(p) : p in primelist];
-	assert &and[a_i in Integers() : a_i in alist];
-	a0:=Integers()!alist[1];
-	assert a0 ne 0;
-	d:=#alist-1;
-	assert d ge 3;
-	QUV<U,V>:=PolynomialRing(Rationals(),2);
-	Qx<x>:=PolynomialRing(Rationals());
-	F:=&+[alist[j+1]*U^(d-j)*V^j : j in [0..d]];
-	assert IsHomogeneous(F);
-	f:=a0^(d-1)*Evaluate(F,[x/a0,1]);
-	assert IsMonic(f);
-	assert Degree(f) eq d;
-	assert IsIrreducible(f);
-	falist:=Reverse(Coefficients(f));
-	assert &and[a_i in Integers() : a_i in falist];
-	falist:=[Integers()!a_i : a_i in falist];
-	newablist:=makeMonic(alist,a,primelist);
-	no:=0;
-	for j in [1..#newablist] do
-            new_a:=Integers()!newablist[j][1][1];
-            blist:=newablist[j][2];
-	    assert &and[Valuation(new_a,p) eq 0 : p in primelist];
-	    no:=no+#equationsInK(falist,new_a,primelist);
-	end for;
-	caseNo[i]:=no;
-    end for;
-    min,ind:=Min(caseNo);
-    return GL2Zalists[ind];
-end function;
-
-validForms:=findForms(N);
-for form in validForms do
-    print form;
-    optimalForm(form[1],form[2],form[3]);
-    print "-========================";
-end for;
-
-
-
-
 seqEnumToString:=function(X : quotes:=false)
     /*
       Convert a SeqEnum into a string without whitespace, enclosed by "[ ]" for
@@ -772,6 +668,11 @@ seqEnumToString:=function(X : quotes:=false)
     return strX;
 end function;
 
-
-OutFile:="../Data/TMForms/" cat N cat ".txt";
+OutFile:="../Data/TMForms/" cat N cat "Forms.csv";
 N:=StringToInteger(N);
+validForms:=reducedForms(N);
+for form in validForms do
+    alist,a,primelist:=Explode(form);
+    fprintf OutFile, "%o, %o, %o\n",seqEnumToString(alist),
+	    IntegerToString(a),seqEnumToString(primelist);
+end for;
