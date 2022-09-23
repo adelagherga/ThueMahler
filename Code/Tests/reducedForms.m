@@ -1,8 +1,8 @@
 /*
 reducedForms.m
 
-This function generates all Thue--Mahler forms required to generate all elliptic
-curves of conductor N.
+This function determines all Thue--Mahler forms required to generate all elliptic
+curves of conductor N with no non-trivial rational 2-torsion.
 
 Parameters
     N: RngIntElt
