@@ -156,7 +156,7 @@ verifyPosReduced:=function(a,b,c,d,df)
         return false;
     end if;
     if (Valuation(DF,3) eq 2) or (Valuation(DF,3) gt 5) then
-        // Verify that ord_3(DF) lies in {0,1,3,4,5}
+        // Verify that ord_3(DF) lies in {0,1,3,4,5}.
         return false;
     end if;
     if (IsIrreducible(F/gcd) eq false) then
@@ -266,7 +266,7 @@ verifyNegReduced:=function(a,b,c,d,df)
         return false;
     end if;
     if (Valuation(DF,3) eq 2) or (Valuation(DF,3) gt 5) then
-        // Verify that ord_3(DF) lies in {0,1,3,4,5}
+        // Verify that ord_3(DF) lies in {0,1,3,4,5}.
         return false;
     end if;
     if (IsIrreducible(F/gcd) eq false) then
