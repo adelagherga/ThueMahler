@@ -353,7 +353,7 @@ modpCheckDivRHS:=function(F,q)
 	Zmodq:=ResidueClassRing(q);
     end if;
     for u,v in [0..q-1] do
-	if [u,v] ne [0,0] then
+	if GCD(q,GCD(u,v)) eq 1 then
 	    F_q:=Zmodq!(Evaluate(F,[u,v]));
 	    if F_q notin FmodqList then
 		Append(~FmodqList,F_q);
@@ -669,11 +669,12 @@ seqEnumToString:=function(X : quotes:=false)
 end function;
 
 OutFile:="../Data/TMForms/" cat N cat "Forms.csv";
+sN:=N;
 N:=StringToInteger(N);
 validForms:=reducedForms(N);
 for form in validForms do
     alist,a,primelist:=Explode(form);
-    fprintf OutFile, "%o,%o,%o\n",seqEnumToString(alist),
+    fprintf OutFile, "%o,%o,%o,%o\n",sN,seqEnumToString(alist),
 	    IntegerToString(a),seqEnumToString(primelist);
 end for;
 exit;
