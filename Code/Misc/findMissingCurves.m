@@ -49,13 +49,19 @@ findMissingForms:=function(N,aInvs)
     M2:=&*[p^(Valuation(M,p))
 	   : p in PrimeDivisors(M) | p notin PrimeDivisors(X)];
     assert M eq M1*M2;
-    a1:=&*[p^(Floor((Valuation(M,p)-1)/2)) : p in PrimeDivisors(M1)];
+    if M1 eq 1 then
+	a1:=1;
+    else
+	a1:=&*[p^(Floor((Valuation(M,p)-1)/2)) : p in PrimeDivisors(M1)];
+    end if;
     if (Valuation(X,3) eq 0) and (Valuation(M,3) mod 2 eq 0) and
        (Valuation(M,3) ge 4) then
 	a2:=3^(-1)*&*[p^(Floor(Valuation(M,p)/2)) : p in PrimeDivisors(M2)];
     else
 	a2:=&*[p^(Floor(Valuation(M,p)/2)) : p in PrimeDivisors(M2)];
     end if;
+    a1:=Integers()!a1;
+    a2:=Integers()!a2;
     a:=a1*a2;
     assert IsDivisibleBy(M1,a1^2);
     assert IsDivisibleBy(M2,a2^2);
