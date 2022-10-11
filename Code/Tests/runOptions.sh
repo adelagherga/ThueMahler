@@ -2,6 +2,18 @@
 # chmod u+x Code/Tests/runOptions.sh
 
 
+
+
+function usage {
+    echo "usage: "
+    echo "  $0 N1 [N2]"
+    echo "    Generate elliptic curves having conductors in the range N1 to N2."
+    echo "    If N2 is omitted, generate elliptic curves having conductor N1."
+    echo "  $0 [-l N1] N2..."
+    echo "    Generate elliptic curves having conductors in the list [N1,N2,...]."
+    exit 1
+}
+
 getConductorList() {
 
     # Parses terminal input and generates the list of conductors to be resolved,
