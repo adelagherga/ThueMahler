@@ -41,10 +41,11 @@ getConductorList() {
     done
     shift $(($OPTIND - 1))
 
+
     for i in $@; do
 	if ! [[ "$i" =~ ^[0-9]+$ ]]; then
-            echo "Invalid input: integers only."
-            exit 1
+	    echo "Invalid input: integers only."
+	    exit 1
 	fi
     done
     if [ -z "${list}" ]; then
@@ -71,10 +72,13 @@ getConductorList() {
 	    exit 1
 	fi
     else
-	list+=("$((10#$@))")
+	if [ $# -gt 0 ]; then
+	    list+=("$((10#$@))")
+	fi
 	printf -v Nlist '%s,' "${list[@]}"
 	name="[""${Nlist%,}""]"
     fi
+
 }
 
 main () {
