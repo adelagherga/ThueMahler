@@ -1,5 +1,5 @@
 #!/bin/bash
-# $ chmod u+x Code/computeEllipticCurves.sh
+# chmod u+x Code/Tests/runOptions.sh
 
 
 getConductorList() {
@@ -73,7 +73,7 @@ main () {
 
     local N
     local line
-    getConductorList
+    getConductorList "$@"
     printf "Generating all required cubic forms for conductors in ${name}..."
     echo ${name}
     echo $list[@]
