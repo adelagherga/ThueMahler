@@ -65,7 +65,7 @@ getConductorList() {
 	    exit 1
 	fi
     else
-	if [ $# gt 0 ]; then
+	if [ $# -gt 0 ]; then
 	    echo "wtf"
 	    exit 1
 	fi
