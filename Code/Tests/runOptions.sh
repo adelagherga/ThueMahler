@@ -39,13 +39,13 @@ getConductorList() {
 
     local OPTIND
     local Nlist
+    local N1
+    local N2
     while getopts ":l:" opt; do
 	case $opt in
 	    l)
 		# List of conductors.
 		list+=("$((10#${OPTARG}))")
-#		name+="${OPTARG}"
-#		name="["${list//${IFS:0:1}/,}"]"
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
@@ -59,11 +59,10 @@ getConductorList() {
     done
     shift $(($OPTIND - 1))
 
-
     for i in $@; do
 	if ! [[ "$i" =~ ^[0-9]+$ ]]; then
-	    echo "Invalid input: integers only."
-	    exit 1
+	    echo "Invalid input: integers only." >&2
+	    usage
 	fi
     done
     if [ -z "${list}" ]; then
@@ -82,12 +81,12 @@ getConductorList() {
 		list=($(seq ${N1} ${N2}))
 		name="[""${N1}""..""${N2}""]"
 	    else
-		echo "error"
-		exit 1
+		echo "Invalid input: N1 must be less than or equal to N2." >&2
+		usage
 	    fi
 	else
-	    echo "error"
-	    exit 1
+	    echo "Invalid input: too many arguments: use -l." >&2
+	    usage
 	fi
     else
 	for i in $@; do
@@ -96,7 +95,6 @@ getConductorList() {
 	printf -v Nlist '%s,' "${list[@]}"
 	name="[""${Nlist%,}""]"
     fi
-
 }
 
 main () {
