@@ -52,14 +52,14 @@ getConductorList() {
 	    echo "Argument required." >&2
 	    exit 1
 	elif [ $# -eq 1 ]; then
-	    list=($1)
+	    list=($((10#$1)))
 	    name="[""$((10#$1))""]"
 	elif [ $# -eq '2' ]; then
 	    if [ "$1" -gt "$2" ]; then
 		echo "Wrong order." >&2
 		exit 1
 	    elif [ "$1" -eq "$2" ]; then
-		list=($1)
+		list=($((10#$1)))
 		name="[""$((10#$1))""]"
 	    else
 		list=($(seq $1 $2))
