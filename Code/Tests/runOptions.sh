@@ -33,6 +33,7 @@ getConductorList() {
 		;;
 	    j)
 		jobs="${OPTARG}"
+		OPTIND=2
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
