@@ -40,6 +40,9 @@ getConductorList() {
 	esac
     done
 
+    shift $(($OPTIND - 1))
+    # testing what this variable looks like
+    printf "Remaining arguments are: %s\n" "$*"
     echo $#
     if [ -z "${list}" ]; then
 	if [ $# -eq 0 ]; then
