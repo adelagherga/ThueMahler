@@ -33,7 +33,6 @@ getConductorList() {
 		;;
 	    j)
 		jobs="${OPTARG}"
-		OPTIND=2
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
@@ -44,6 +43,11 @@ getConductorList() {
 	esac
     done
 
+    if [ -z "${jobs}" ]; then
+	jobs=20
+    else
+	shift
+    fi
     if [ -z "${list}" ]; then
 	if [ $# -eq 0 ]; then
 	    echo "Argument required." >&2
@@ -62,9 +66,6 @@ getConductorList() {
     else
 	printf -v Nlist '%s,' "${list[@]}"
 	name="[""${Nlist%,}""]"
-    fi
-    if [ -z "${jobs}" ]; then
-	jobs=20
     fi
 }
 
