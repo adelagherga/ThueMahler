@@ -45,7 +45,7 @@ getConductorList() {
     printf "Remaining arguments are: %s\n" "$*"
     echo $#
     for i in $@ ; do
-	if ! [[ "$i" =~ ^[0-9]+$ ]] ; then
+	if ! [[ "$i" =~ ^[1-9]+$ ]] ; then
             echo "Invalid input: integers only."
             exit 1
 	fi
