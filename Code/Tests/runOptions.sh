@@ -62,7 +62,7 @@ getConductorList() {
 	printf -v Nlist '%s,' "${list[@]}"
 	name="[""${Nlist%,}""]"
     fi
-    if [-z "${jobs}" ]; then
+    if [ -z "${jobs}" ]; then
 	jobs=20
     fi
 }
@@ -75,8 +75,8 @@ main () {
     local line
     getConductorList "$@"
     printf "Generating all required cubic forms for conductors in ${name}..."
-    echo ${name}
-    echo $list[@]
+    echo ${list[*]}
+    echo ${jobs}
 }
 
 main "$@"
