@@ -48,25 +48,26 @@ getConductorList() {
 	fi
     done
     if [ -z "${list}" ]; then
-	if [ $# -eq 0 ]; then
-	    echo "Argument required." >&2
-	    exit 1
-	elif [ $# -eq 1 ]; then
-	    list=($((10#$1)))
-	    name="[""$((10#$1))""]"
+	if [ $# -eq 1 ]; then
+	    N1=$((10#$1))
+	    list=(${N1})
+	    name="[""${N1}""]"
 	elif [ $# -eq '2' ]; then
-	    if [ "$1" -gt "$2" ]; then
-		echo "Wrong order." >&2
-		exit 1
-	    elif [ "$1" -eq "$2" ]; then
-		list=($((10#$1)))
-		name="[""$((10#$1))""]"
+	    if [ "$1" -eq "$2" ]; then
+		N1=$((10#$1))
+		list=(${N1})
+		name="[""${N1}""]"
+	    elif [ "$1" -lt "$2" ]; then
+		N1=$((10#$1))
+		N2=$((10#$2))
+		list=($(seq ${N1} ${N2}))
+		name="[""${N1}""..""${N2}""]"
 	    else
-		list=($(seq $1 $2))
-		name="[""$((10#$1))""..""$((10#$2))""]"
+		echo "error"
+		exit 1
 	    fi
 	else
-	    echo "Invalid argument."
+	    echo "error"
 	    exit 1
 	fi
     else
