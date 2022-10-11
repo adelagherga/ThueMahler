@@ -43,6 +43,7 @@ getConductorList() {
 	esac
     done
 
+    echo $#
     if [ -z "${jobs}" ]; then
 	jobs=20
     else
