@@ -8,11 +8,11 @@ function usage {
     echo "usage: "
     echo "  $0 N1 [N2]"
     echo "  $0 [-l N1] N2..."
-    echo "     Generate elliptic curves having conductors in the range N1 to"\
-	 "N2."
-    echo "     If N2 is omitted, generate elliptic curves having conductor N1."
     echo ""
-    echo "     -l    Generate elliptic curves having conductors in the list"\
+    echo "Generate elliptic curves having conductors in the range N1 to N2."
+    echo "If N2 is omitted, generate elliptic curves having conductor N1."
+    echo ""
+    echo "-l  Generate elliptic curves having conductors in the list"\
 	 "[N1,N2,...]."
     1>&2
     exit 1
