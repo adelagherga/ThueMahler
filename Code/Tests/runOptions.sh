@@ -152,7 +152,7 @@ runInParallel() {
     #         The filename in of the magma function to be run.
 
     echo "$1" | parallel -j20 --joblog ${Dir}/TMLog magma -b "$2":={} \
-			 name:=${name} Code/"$3" 2>&1
+			 dir:=${Dir} Code/"$3" 2>&1
 }
 
 amalgamateFiles() {
