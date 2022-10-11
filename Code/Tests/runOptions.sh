@@ -41,6 +41,7 @@ getConductorList() {
 		echo "Option -$OPTARG requires an argument." >&2
 		exit 1 ;;
 	esac
+	shift $((OPTIND-1))
     done
 
     echo $#
