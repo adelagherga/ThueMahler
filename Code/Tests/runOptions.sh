@@ -1,9 +1,6 @@
 #!/bin/bash
 # chmod u+x Code/Tests/runOptions.sh
 
-
-
-
 function usage {
     echo "usage: "
     echo "  $0 N1 [N2]"
@@ -22,20 +19,18 @@ getConductorList() {
 
     # Parses terminal input and generates the list of conductors to be resolved,
     # along with an appropriate directory name. This function handles a single
-    # conductor N, a range of conductors [N1,...,Nn], or, with the flag -l, an
+    # conductor N, a range of conductors [N1,...,N2], or, with the flag -l, an
     # arbitrary finite list of conductors.
 
     # Parameters
     #     N1
     #         A single conductor.
-    #     N1 Nn: [OPTIONAL]
-    #         Two conductor values to generate the range [N1,...,Nn].
+    #     N1 N2: [OPTIONAL]
+    #         Two conductor values to generate the range [N1,...,N2].
     #     -l Ni: [OPTIONAL]
     #         A single conductor Ni, to be parsed with the flag -l, indicating a
     #         list. This command can be repeated to parse any finite list of
     #         conductors.
-    # Returns
-    #
 
     local OPTIND
     local Nlist
@@ -61,7 +56,7 @@ getConductorList() {
 
     for i in $@; do
 	if ! [[ "$i" =~ ^[0-9]+$ ]]; then
-	    echo "Invalid input: integers only." >&2
+	    echo "Invalid input: positive integers only." >&2
 	    usage
 	fi
     done
@@ -85,7 +80,7 @@ getConductorList() {
 		usage
 	    fi
 	else
-	    echo "Invalid input: too many arguments: use -l." >&2
+	    echo "Invalid input: too many arguments: use option -l." >&2
 	    usage
 	fi
     else
@@ -97,6 +92,53 @@ getConductorList() {
     fi
 }
 
+generateDirectories() {
+
+    # Generates a directory Data/${name} for all output, as well as all
+    # necessary subdirectories and files. If such a directory
+    # already exists in Data/, generates a directory Data/${name}i, where
+    # Data/${name}j exists for all j < i.
+
+    local iter
+    local tmpname
+    local N
+    Dir="Data/${name}"
+    ECDir="${Dir}/EllipticCurves"
+    TMOutDir="${Dir}/TMOutfiles"
+    TMLogDir="${Dir}/TMLogfiles"
+
+    # Generate Data directory, if it does not already exist.
+    if [ ! -d "Data/" ]; then
+	mkdir "Data/"
+    fi
+
+    # Generate Data/${name} directory.
+    if [ ! -d "Data/${name}" ]; then
+	mkdir "Data/${name}"
+    else
+	iter=1
+	tmpname="${name}${iter}"
+	while [ -d "Data/${tmpname}" ]; do
+	    iter=$(( "${iter}" + 1 ))
+	    tmpname="${name}${iter}"
+	done
+	mkdir "Data/${tmpname}"
+    fi
+
+    # Generate necessary subdirectories and files.
+    mkdir "${ECDir}"
+    mkdir "${TMOutDir}"
+    mkdir "${TMLogDir}"
+    touch "${Dir}/Errors.txt"
+
+    # Generate files for each conductor.
+    for N in "${list[@]}"; do
+	touch "${ECDir}/${N}.csv"
+    done
+}
+
+
+
 main () {
 
     # Establishes run order.
@@ -104,6 +146,10 @@ main () {
     local N
     local line
     getConductorList "$@"
+    generateDirectories
+
+    # Generate all required Thue--Mahler forms in parallel, applying all
+    # necessary local tests in the process.
     printf "Generating all required cubic forms for conductors in ${name}..."
     echo ${list[*]}
 }
