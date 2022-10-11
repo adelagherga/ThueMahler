@@ -42,7 +42,7 @@ getConductorList() {
     shift $(($OPTIND - 1))
 
     for i in $@; do
-	if ![[ "$i" =~ ^[0-9]+$ ]]; then
+	if ! [[ "$i" =~ ^[0-9]+$ ]]; then
             echo "Invalid input: integers only."
             exit 1
 	fi
