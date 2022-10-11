@@ -72,9 +72,9 @@ getConductorList() {
 	    exit 1
 	fi
     else
-	if [ $# -gt 0 ]; then
-	    list+=("$((10#$@))")
-	fi
+	for i in $@; do
+	    list+=("$((10#$i))")
+	done
 	printf -v Nlist '%s,' "${list[@]}"
 	name="[""${Nlist%,}""]"
     fi
