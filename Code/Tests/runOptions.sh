@@ -11,6 +11,7 @@ function usage {
     echo "    If N2 is omitted, generate elliptic curves having conductor N1."
     echo "  $0 [-l N1] N2..."
     echo "    Generate elliptic curves having conductors in the list [N1,N2,...]."
+    1>&2
     exit 1
 }
 
@@ -45,10 +46,12 @@ getConductorList() {
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
-		exit 1 ;;
+		usage
+		;;
 	    :)
 		echo "Option -$OPTARG requires an argument." >&2
-		exit 1 ;;
+		usage
+		;;
 	esac
     done
     shift $(($OPTIND - 1))
