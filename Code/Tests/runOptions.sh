@@ -104,10 +104,6 @@ generateDirectories() {
     local iter
     local tmpname
     local N
-    Dir="Data/${name}"
-    ECDir="${Dir}/EllipticCurves"
-    TMOutDir="${Dir}/TMOutfiles"
-    TMLogDir="${Dir}/TMLogfiles"
 
     # Generate Data directory, if it does not already exist.
     if [ ! -d "Data/" ]; then
@@ -116,7 +112,7 @@ generateDirectories() {
 
     # Generate Data/${name} directory.
     if [ ! -d "Data/${name}" ]; then
-	mkdir "Data/${name}"
+	Dir="Data/${name}"
     else
 	iter=1
 	tmpname="${name}${iter}"
@@ -124,10 +120,14 @@ generateDirectories() {
 	    iter=$(( "${iter}" + 1 ))
 	    tmpname="${name}${iter}"
 	done
-	mkdir "Data/${tmpname}"
+	Dir="Data/${tmpname}"
     fi
 
     # Generate necessary subdirectories and files.
+    mkdir "${Dir}"
+    ECDir="${Dir}/EllipticCurves"
+    TMOutDir="${Dir}/TMOutfiles"
+    TMLogDir="${Dir}/TMLogfiles"
     mkdir "${ECDir}"
     mkdir "${TMOutDir}"
     mkdir "${TMLogDir}"
