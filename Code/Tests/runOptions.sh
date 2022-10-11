@@ -39,29 +39,29 @@ getConductorList() {
 		exit 1 ;;
 	esac
     done
-
     shift $(($OPTIND - 1))
-    # testing what this variable looks like
-    printf "Remaining arguments are: %s\n" "$*"
-    echo $#
-    for i in $@ ; do
-	if ! [[ "$i" =~ ^[0-9]+$ ]] ; then
+
+    for i in $@; do
+	if ![[ "$i" =~ ^[0-9]+$ ]]; then
             echo "Invalid input: integers only."
             exit 1
 	fi
     done
-
     if [ -z "${list}" ]; then
 	if [ $# -eq 0 ]; then
 	    echo "Argument required." >&2
 	    exit 1
-	fi
-	if [ $# -eq 1 ]; then
+	elif [ $# -eq 1 ]; then
 	    list=($1)
 	    name="[""$((10#$1))""]"
 	elif [ $# -eq '2' ]; then
-	    list=($(seq $1 $2))
-	    name="[""$((10#$1))""..""$((10#$2))""]"
+	    if [ "$1" -gt "$2" ]; then
+		echo "Wrong order." >&2
+		exit 1
+	    else
+		list=($(seq $1 $2))
+		name="[""$((10#$1))""..""$((10#$2))""]"
+	    fi
 	else
 	    echo "Invalid argument."
 	    exit 1
