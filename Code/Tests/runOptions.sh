@@ -33,9 +33,11 @@ getConductorList() {
     #         conductors.
 
     local OPTIND
-    local Nlist
+    local i
     local N1
     local N2
+    local Nlist
+
     while getopts ":l:" opt; do
 	case $opt in
 	    l)
@@ -137,6 +139,21 @@ generateDirectories() {
     done
 }
 
+runInParallel() {
+
+    # Runs code in parallel.
+    #
+    # Parameters
+    #     input
+    #         The input for gnu parallel.
+    #     varName
+    #         A variable name for magma.
+    #     funcFile
+    #         The filename in of the magma function to be run.
+
+    echo "$1" | parallel -j20 --joblog ${Dir}/TMLog magma -b "$2":={} \
+			 name:=${name} Code/"$3" 2>&1
+}
 
 
 main () {
@@ -152,6 +169,8 @@ main () {
     # necessary local tests in the process.
     printf "Generating all required cubic forms for conductors in ${name}..."
     echo ${list[*]}
+    runInParallel "$(printf '%s\n' "${list[@]}")" N findForms.m
+
 }
 
 main "$@"
