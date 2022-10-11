@@ -23,16 +23,13 @@ getConductorList() {
 
     local OPTIND
     local Nlist
-    while getopts ":l:j:" opt; do
+    while getopts ":l:" opt; do
 	case $opt in
 	    l)
 		# List of conductors.
 		list+=("${OPTARG}")
 		name+="${OPTARG}"
 		name="["${list//${IFS:0:1}/,}"]"
-		;;
-	    j)
-		jobs="${OPTARG}"
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
@@ -41,15 +38,9 @@ getConductorList() {
 		echo "Option -$OPTARG requires an argument." >&2
 		exit 1 ;;
 	esac
-	shift $((OPTIND-1))
     done
 
     echo $#
-    if [ -z "${jobs}" ]; then
-	jobs=20
-    else
-	shift
-    fi
     if [ -z "${list}" ]; then
 	if [ $# -eq 0 ]; then
 	    echo "Argument required." >&2
@@ -84,7 +75,6 @@ main () {
     getConductorList "$@"
     printf "Generating all required cubic forms for conductors in ${name}..."
     echo ${list[*]}
-    echo ${jobs}
 }
 
 main "$@"
