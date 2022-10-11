@@ -28,8 +28,8 @@ getConductorList() {
 	    l)
 		# List of conductors.
 		list+=("${OPTARG}")
-		name+="${OPTARG}"
-		name="["${list//${IFS:0:1}/,}"]"
+#		name+="${OPTARG}"
+#		name="["${list//${IFS:0:1}/,}"]"
 		;;
 	    \?)
 		echo "Invalid option: -${OPTARG}." >&2
