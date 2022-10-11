@@ -1,7 +1,7 @@
 #!/bin/bash
 # chmod u+x Code/Tests/runOptions.sh
 
-function usage {
+usage() {
     echo "usage: "
     echo "  $0 N1 [N2]"
     echo "  $0 [-l N1] N2..."
@@ -155,6 +155,24 @@ runInParallel() {
 			 name:=${name} Code/"$3" 2>&1
 }
 
+amalgamateFiles() {
+
+    # Amalgamates all Thue--Mahler forms into a single document.
+
+    # Parameters
+    #     $1
+    #         An output file LEFT OFF HERE
+    local F1
+    local F2
+    F1="${Dir}/"$1".csv"
+    F2="${Dir}/"$2"tmp.txt"
+    [ -f "${F1}" ] && cat "${F1}" >> "${Dir}/"$3"TMForms.csv"
+    rm -f "${F1}"
+    if grep -q "error" "${F2}"; then
+	echo "$4" >> "${Dir}/Errors.txt"
+    fi
+    rm -f "${F2}"
+}
 
 main () {
 
@@ -170,6 +188,10 @@ main () {
     printf "Generating all required cubic forms for conductors in ${name}..."
     echo ${list[*]}
     runInParallel "$(printf '%s\n' "${list[@]}")" N findForms.m
+    for N in "${list[@]}"; do
+	amalgamateFiles "${N}Forms" "${N}" "" "${N}:findForms.m"
+    done
+    printf "Done.\n"
 
 }
 
