@@ -58,6 +58,9 @@ getConductorList() {
 	    if [ "$1" -gt "$2" ]; then
 		echo "Wrong order." >&2
 		exit 1
+	    elif [ "$1" -eq "$2" ]; then
+		list=($1)
+		name="[""$((10#$1))""]"
 	    else
 		list=($(seq $1 $2))
 		name="[""$((10#$1))""..""$((10#$2))""]"
