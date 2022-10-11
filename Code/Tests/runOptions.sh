@@ -27,7 +27,7 @@ getConductorList() {
 	case $opt in
 	    l)
 		# List of conductors.
-		list+=("${OPTARG}")
+		list+=("$((10#${OPTARG}))")
 #		name+="${OPTARG}"
 #		name="["${list//${IFS:0:1}/,}"]"
 		;;
