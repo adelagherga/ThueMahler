@@ -39,8 +39,12 @@ findMissingForms:=function(N,aInvs)
     else
 	delta:=0;
     end if;
-    D:=&*[p^Min(Floor(Valuation(c4,p)/2),Floor(Valuation(c6,p)/3))
-	  : p in PrimeDivisors(GCD(c4,c6))];
+    if (GCD(c4,c6) ne 1) then
+	D:=&*[p^Min(Floor(Valuation(c4,p)/2),Floor(Valuation(c6,p)/3))
+	      : p in PrimeDivisors(GCD(c4,c6))];
+    else
+	D:=1;
+    end if;
     X:=Integers()!(c4/D^2);
     Y:=Integers()!(c6/D^3);
     M:=Integers()!(D^(-6)*2^6*3^3*Abs(deltaE));

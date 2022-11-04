@@ -174,6 +174,20 @@ amalgamateFiles() {
     rm -f "${F2}"
 }
 
+errorSearch() {
+    # Search for errors
+    local F
+    local form1
+    local form
+    for F in "${TMLogDir}"/*; do
+	if grep -q "error" "$F"; then
+	    form1=${F%Log.*}
+	    form=${form1##*/}
+	    echo "$form:computeEllipticCurvesTM.m" >> "${Dir}/Errors.txt"
+	fi
+    done
+}
+
 main () {
 
     # Establishes run order.
@@ -193,6 +207,42 @@ main () {
     done
     printf "Done.\n"
 
+    if ! [ -f "${Dir}/TMForms.csv" ]; then
+	printf "Finished computing all elliptic curves of conductor ${name}.\n"
+	exit 0
+    fi
+
+    # Remove redundant Thue--Mahler equations.
+    printf "Removing redundant cubic forms..."
+    python Code/gatherFormRedundancy.py "${Dir}/TMForms.csv" \
+	   "${Dir}/tmpTMForms.csv"
+    printf "Done.\n"
+
+    # Generate optimal Thue--Mahler forms and all S-unit equations.
+    printf "Generating optimal GL2(Z)-equivalent cubic forms..."
+    runInParallel "$(cat ${Dir}/TMForms.csv)" set optimalForm.m
+    while IFS= read -r line; do
+	amalgamateFiles "${line}" "${line}" "tmp" "${line}:optimalForm.m"
+    done < "${Dir}/TMForms.csv"
+    mv "${Dir}/tmpTMForms.csv" "${Dir}/TMForms.csv"
+    printf "Done.\n"
+
+    # Run Thue--Mahler code in parallel.
+    # That is, for each line "set" of Data/${name}/TMForms.csv, run
+    # magma set:="set" Code/computeEllipticCurvesTM.m &.
+    # The following code runs these jobs using GNU parallel, running no more than
+    # 20 (-j20) jobs at once, and storing GNU parallel's progress in the logfile
+    # Data/${name}/TMLog (--joblog Data/${name}/TMLog).
+    printf "Solving the Thue--Mahler equations..."
+    runInParallel "$(cat ${Dir}/TMForms.csv)" set computeEllipticCurvesTM.m
+    errorSearch
+
 }
 
+
 main "$@"
+
+
+
+
+#TODO: can probably update gatherr

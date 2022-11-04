@@ -17,5 +17,5 @@ sols;
 alist:=[3,2,7,2];
 a:=1;
 primelist:=[2,3,7,41];
-time sols:=solveThueMahlerAll(alist,a,primelist : coprime:=false);
+time sols:=solveThueMahlerXS(alist,a,primelist : coprime:=false);
 sols;
