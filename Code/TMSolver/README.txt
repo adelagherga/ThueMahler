@@ -19,3 +19,11 @@ a:=1;
 primelist:=[2,3,7,41];
 time sols:=solveThueMahler(alist,a,primelist : coprime:=false);
 sols;
+
+// To solve the same Thue--Mahler equation with verbose output:
+
+alist:=[3,2,7,2];
+a:=1;
+primelist:=[2,3,7,41];
+time sols:=solveThueMahler(alist,a,primelist : verb:=true);
+sols;
