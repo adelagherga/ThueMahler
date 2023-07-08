@@ -107,7 +107,7 @@ initialBound:=function(tau,deltaList,S)
     c13:=(u+v+2*#S)/d;
     c14:=2*htau + c13*Max(c8,c10);
     c15:=c13*Max(c9,c12);
-    c16:=c14 + (3/2)*Log(2) + 2*htheta + htau;
+    c16:=c14 + 2*Log(2) + 2*htheta + htau;
 
     c17list:=[];
     for i in [1..#S + #embeds] do
