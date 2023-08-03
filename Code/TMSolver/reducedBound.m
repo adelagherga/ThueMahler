@@ -994,7 +994,8 @@ reducedBound:=function(tau,deltaList : verb:=false)
 	    expSbds[i,1]:=expSbds[i,1]+Valuation(tau,S[i]);
 	    expSbds[i,2]:=expSbds[i,2]+Valuation(tau,S[i]);
 	end for;
-	return [Integers()!b : b in vecB],S,expSbds;
+	vecs:=[Eltseq(ZZn!vv) : vv in vecs];
+	return vecs,[Integers()!b : b in vecB],S,expSbds;
     end if;
     vprintf User1: "We're carrying out the reduction process for each real ";
     vprintf User1: "embedding separately.\n";
