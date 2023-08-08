@@ -97,7 +97,7 @@ end function;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 // Example 1 //
 
-N:= 771456;
+N:=771456;
 
 primelist:= [3,7,41];
 a:=1;
@@ -116,9 +116,9 @@ for alist in aLists do
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "N:=%o; alist:=%o; a:=%o; primelist:=%o;\n",N,alist,a,primelist;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    time sols:=solveThueMahler(alist,a,primelist : coprime:=false);
+    sols:=solveThueMahler(alist,a,primelist : coprime:=false);
     printf "sols:=%o\n",sols;
-    time ECs:=convertTMToEllipticCurves(N,alist,sols);
+    ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
     for E in ECs do
     fprintf OutFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
@@ -126,4 +126,7 @@ for alist in aLists do
 	    seqEnumToString(primelist),seqEnumToString(E[3]);
     end for;
 end for;
+printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+printf "Total time: %o",Cputime();
 exit;
