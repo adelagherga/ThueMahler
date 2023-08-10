@@ -7,13 +7,12 @@ the logfile and elliptic curve data in seperate files.
 
 Returns
     OutFile: MonStgElt
-        A .csv file named "Example1Out.csv" containing, for
-	each elliptic curve E, the row
-	"N,aInvariants(E),alist,a,primelist,sol". If there are no
+        A .csv file named "Example1Out.csv" containing, for each elliptic curve
+	E, the row "N,aInvariants(E),alist,a,primelist,sol". If there are no
 	elliptic curves corresponding to this set, no such file is created.
     LogFile: MonStgElt
-        A .txt file named "Example1Log.txt" containing all output, timings,
-	and solutions.
+        A .txt file named "Example1Log.txt" containing all output, timings, and
+	solutions.
 Authors
     Adela Gherga <adelagherga@gmail.com>
 Created
