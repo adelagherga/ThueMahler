@@ -63,16 +63,24 @@ for set in aLists do
     alist:=set[1];
     a:=set[2];
     primelist:=set[3];
+    d:=#alist-1;
+    QUV<U,V>:=PolynomialRing(Integers(),2);
+    F:=&+[alist[i+1]*U^(d-i)*V^i : i in [0..d]];
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "alist:=%o; a:=%o; primelist:=%o;\n",alist,a,primelist;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    sols:=solveThueMahler(alist,a,primelist : coprime:=false);
-    printf "sols:=%o\n",sols;
-    for sol in sols do
-	fprintf OutFile, "%o %o %o %o\n",seqEnumToString(alist),
-		IntegerToString(a),seqEnumToString(primelist),
-		seqEnumToString(sol);
-    end for;
+    if IsIrreducible(F) then
+	sols:=solveThueMahler(alist,a,primelist : coprime:=false);
+	printf "sols:=%o\n",sols;
+	for sol in sols do
+	    fprintf OutFile, "%o %o %o %o\n",seqEnumToString(alist),
+		    IntegerToString(a),seqEnumToString(primelist),
+		    seqEnumToString(sol);
+	end for;
+    else
+	fprintf OutFile, "%o %o %o %Not irreducible\n",seqEnumToString(alist),
+		IntegerToString(a),seqEnumToString(primelist);
+    end if;
 end for;
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
