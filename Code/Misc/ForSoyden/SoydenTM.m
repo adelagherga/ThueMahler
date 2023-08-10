@@ -78,7 +78,7 @@ for set in aLists do
 		    seqEnumToString(sol);
 	end for;
     else
-	fprintf OutFile, "%o %o %o %Not irreducible\n",seqEnumToString(alist),
+	fprintf OutFile, "%o %o %o Not irreducible\n",seqEnumToString(alist),
 		IntegerToString(a),seqEnumToString(primelist);
     end if;
 end for;
