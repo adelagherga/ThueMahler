@@ -20,8 +20,8 @@ Created
 
 ChangeDirectory("../../TMSolver");
 load "./solveThueMahler.m";
-LogFile:="../../../Data/SoydenLog.txt";
-OutFile:="../../../Data/SoydenOut.csv";
+LogFile:="../../Data/SoydenLog.txt";
+OutFile:="../../Data/SoydenOut.csv";
 SetOutputFile(LogFile);
 
 aLists:=[<[1,5,-70,-70,245,49], 32,[7]>, // primelist:=[7];
