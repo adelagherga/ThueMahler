@@ -25,9 +25,14 @@ SetOutputFile(LogFile);
 
 primelist:=[2,3,5,7,11];
 a:=1;
-aclist:=[5,1,4,1,6,1,6,0,6,0,4,-2];
+alist:=[5,1,4,1,6,1,6,0,6,0,4,-2];
 time sols:=solveThueMahler(alist,a,primelist);
 printf "sols:=%o\n",sols;
+printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+printf "Timing under GRH\n";
+SetClassGroupBounds("GRH");
+time sols:=solveThueMahler(alist,a,primelist);
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 printf "Total time: %o",Cputime();
