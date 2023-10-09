@@ -117,11 +117,7 @@ sols:=solveThueMahler(alist,a,primelist : coprime:=false);
 printf "sols:=%o\n",sols;
 
 for N in Nlist do
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    printf "N:=%o; alist:=%o; a:=%o; primelist:=%o;\n",N,alist,a,primelist;
-    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     ECs:=convertTMToEllipticCurves(N,alist,sols);
-    printf "%o\n",ECs;
     for E in ECs do
 	fprintf ECFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
 		seqEnumToString(alist),IntegerToString(a),
@@ -130,5 +126,4 @@ for N in Nlist do
 end for;
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-printf "Total time: %o",Cputime();
 exit;
