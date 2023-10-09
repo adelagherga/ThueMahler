@@ -23,7 +23,7 @@ Created
 ChangeDirectory("../../TMSolver");
 load "./solveThueMahler.m";
 LogFile:="../../GhSiData/Example1/Example1Log.txt";
-OutFile:="../../GhSiData/Example1/Example1ECs.csv";
+ECFile:="../../GhSiData/Example1/Example1ECs.csv";
 SetOutputFile(LogFile);
 
 convertTMToEllipticCurves:=function(N,alist,sols)
