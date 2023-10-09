@@ -24,7 +24,7 @@ SetOutputFile(LogFile);
 // Example 3 //
 
 primelist:=[2, 7, 23, 31, 47, 71, 73, 79, 89];
-clist:=[1,0,0,0,-2];
+alist:=[1,0,0,0,-2];
 time sols:=solveThueMahler(alist,1,primelist);
 time sols:=sols join solveThueMahler(alist,-1,primelist);
 printf "sols:=%o\n",sols;
