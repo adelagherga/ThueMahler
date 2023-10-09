@@ -99,18 +99,18 @@ end function;
 
 N:=771456;
 
-primelist:= [3,7,41];
+primelist:=[3,7,41];
 a:=1;
-aLists:= [[1,4,3,6],
-	  [2,1,0,3],
-	  [3,4,4,4],
-	  [4,4,6,3],
-	  [2,5,0,6],
-	  [3,7,14,14],
-	  [1,7,4,12],
-	  [3,3,-1,7],
-	  [4,1,12,-6],
-	  [3,9,5,19]];
+aLists:=[[1,4,3,6],
+	 [2,1,0,3],
+	 [3,4,4,4],
+	 [4,4,6,3],
+	 [2,5,0,6],
+	 [3,7,14,14],
+	 [1,7,4,12],
+	 [3,3,-1,7],
+	 [4,1,12,-6],
+	 [3,9,5,19]];
 
 for alist in aLists do
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
@@ -118,6 +118,18 @@ for alist in aLists do
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     sols:=solveThueMahler(alist,a,primelist : coprime:=false);
     printf "sols:=%o\n",sols;
+    a0,a1,a2,a3:=Explode(alist);
+    DF:=-27*a0^2*a3^2 + a1^2*a2^2 + 18*a0*a1*a2*a3 - 4*a0*a2^3 - 4*a1^3*a3;
+    assert Valuation(DF,41) le 1;
+    val7:=Valuation(DF,7);
+    val3:=Valuation(DF,3);
+    assert Valuation(DF,2) eq 0;
+    if (val7 ge 2) then
+	sols:=[s : s in sols | s[4] le 1];
+    end if;
+    if (val3 eq 0) then
+	sols:=[s : s in sols | s[3] ge 1];
+    end if;
     ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
     for E in ECs do
