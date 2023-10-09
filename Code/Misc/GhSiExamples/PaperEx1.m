@@ -116,7 +116,7 @@ for alist in aLists do
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     printf "N:=%o; alist:=%o; a:=%o; primelist:=%o;\n",N,alist,a,primelist;
     printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-    sols:=solveThueMahler(alist,a,primelist : coprime:=false);
+    time sols:=solveThueMahler(alist,a,primelist : coprime:=false);
     printf "sols:=%o\n",sols;
     a0,a1,a2,a3:=Explode(alist);
     DF:=-27*a0^2*a3^2 + a1^2*a2^2 + 18*a0*a1*a2*a3 - 4*a0*a2^3 - 4*a1^3*a3;

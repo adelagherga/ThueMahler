@@ -113,7 +113,7 @@ primelist:=[2,3,17,37,53];
 a:=1;
 alist:=[17,-182,92,-12]; // This is the optimal form (a is 1 here, vs 17).
 
-sols:=solveThueMahler(alist,a,primelist);
+time sols:=solveThueMahler(alist,a,primelist);
 printf "sols:=%o\n",sols;
 
 for N in Nlist do
