@@ -23,7 +23,7 @@ Created
 ChangeDirectory("../../TMSolver");
 load "./solveThueMahler.m";
 LogFile:="../../GhSiData/Example2/Example2Log.txt";
-OutFile:="../../GhSiData/Example2/Example2Out.csv";
+ECFile:="../../GhSiData/Example2/Example2ECs.csv";
 SetOutputFile(LogFile);
 
 convertTMToEllipticCurves:=function(N,alist,sols)
@@ -109,17 +109,21 @@ Nlist:=[400044,
 	12801408,
 	19202112,
 	38404224];
-alist:=[17,-182,92,-12]; // This is the optimal form (a is 1 here, vs 17).
-a:=1;
 primelist:=[2,3,17,37,53];
+a:=1;
+alist:=[17,-182,92,-12]; // This is the optimal form (a is 1 here, vs 17).
+
 sols:=solveThueMahler(alist,a,primelist : coprime:=false);
 printf "sols:=%o\n",sols;
 
 for N in Nlist do
+    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+    printf "N:=%o; alist:=%o; a:=%o; primelist:=%o;\n",N,alist,a,primelist;
+    printf "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
     ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
     for E in ECs do
-	fprintf OutFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
+	fprintf ECFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
 		seqEnumToString(alist),IntegerToString(a),
 		seqEnumToString(primelist),seqEnumToString(E[3]);
     end for;

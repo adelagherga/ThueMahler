@@ -15,6 +15,7 @@ Returns
 	solutions.
 Authors
     Adela Gherga <adelagherga@gmail.com>
+    Samir Siksek <samir.siksek@gmail.com>
 Created
     24 August 2022
 */
@@ -22,7 +23,7 @@ Created
 ChangeDirectory("../../TMSolver");
 load "./solveThueMahler.m";
 LogFile:="../../GhSiData/Example1/Example1Log.txt";
-OutFile:="../../GhSiData/Example1/Example1Out.csv";
+OutFile:="../../GhSiData/Example1/Example1ECs.csv";
 SetOutputFile(LogFile);
 
 convertTMToEllipticCurves:=function(N,alist,sols)
@@ -120,7 +121,7 @@ for alist in aLists do
     ECs:=convertTMToEllipticCurves(N,alist,sols);
     printf "%o\n",ECs;
     for E in ECs do
-    fprintf OutFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
+    fprintf ECFile, "%o %o %o %o %o %o\n",E[1],seqEnumToString(E[2]),
 	    seqEnumToString(alist),IntegerToString(a),
 	    seqEnumToString(primelist),seqEnumToString(E[3]);
     end for;
