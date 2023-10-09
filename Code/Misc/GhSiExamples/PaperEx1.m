@@ -123,7 +123,7 @@ for alist in aLists do
     assert Valuation(DF,41) le 1;
     val7:=Valuation(DF,7);
     val3:=Valuation(DF,3);
-    assert Valuation(DF,2) eq 0;
+    assert (Valuation(DF,2) eq 3) or (Valuation(DF,2) eq 4);
     if (val7 ge 2) then
 	sols:=[s : s in sols | s[4] le 1];
     end if;
