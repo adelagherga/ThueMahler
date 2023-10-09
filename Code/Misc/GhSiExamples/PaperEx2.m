@@ -111,7 +111,8 @@ Nlist:=[400044,
 	38404224];
 primelist:=[2,3,17,37,53];
 a:=1;
-alist:=[17,-182,92,-12]; // This is the optimal form (a is 1 here, vs 17).
+alist:=[7,1,29,-25];
+//alist:=[17,-182,92,-12]; // This is the optimal form (a is 1 here, vs 17).
 
 time sols:=solveThueMahler(alist,a,primelist);
 printf "sols:=%o\n",sols;
