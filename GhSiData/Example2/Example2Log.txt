@@ -1,0 +1,610 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+alist:=[ 7, 1, 29, -25 ]; a:=1; primelist:=[ 2, 3, 17, 37, 53 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 0.500
+We have 30 S-unit equations to solve.
+The ranks are [ 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5 ].
+Getting the small sieve information...Done.
+++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+Time: 0.540
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 64.
+Applying the Dirichlet sieve to equation number 1 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 1.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+Time: 0.370
+S is  [
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 2> ].
+The bound on the norm squared of (b1,..,br) is 16.
+Applying the Dirichlet sieve to equation number 2 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 2.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 3...
+Time: 0.460
+S is  [
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 36.
+Applying the Dirichlet sieve to equation number 3 out of 30.
+Time: 0.010
+Finished applying the Dirichlet sieve to equation number 3.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 4...
+Time: 0.380
+S is  [
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 49.
+Applying the Dirichlet sieve to equation number 4 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 4.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 5...
+Time: 0.390
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 64.
+Applying the Dirichlet sieve to equation number 5 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 5.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 6...
+Time: 0.370
+S is  [
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 2> ].
+The bound on the norm squared of (b1,..,br) is 25.
+Applying the Dirichlet sieve to equation number 6 out of 30.
+Time: 0.010
+Finished applying the Dirichlet sieve to equation number 6.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 7...
+Time: 0.360
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 81.
+Applying the Dirichlet sieve to equation number 7 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 7.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 8...
+Time: 0.370
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0]
+]
+The range is [ <0, 1> ].
+The bound on the norm squared of (b1,..,br) is 64.
+Applying the Dirichlet sieve to equation number 8 out of 30.
+Time: 0.000
+Finished applying the Dirichlet sieve to equation number 8.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 9...
+Time: 1.600
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 3>, <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 1357.
+Applying the Dirichlet sieve to equation number 9 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 9.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 10...
+Time: 2.380
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 4>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 11450.
+Applying the Dirichlet sieve to equation number 10 out of 30.
+Time: 0.070
+Finished applying the Dirichlet sieve to equation number 10.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 11...
+Time: 1.850
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 3>, <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 3285.
+Applying the Dirichlet sieve to equation number 11 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 11.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 12...
+Time: 2.380
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 3>, <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 2129.
+Applying the Dirichlet sieve to equation number 12 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 12.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 13...
+Time: 1.550
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0]
+]
+The range is [ <0, 3>, <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 3117.
+Applying the Dirichlet sieve to equation number 13 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 13.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 14...
+Time: 1.370
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0]
+]
+The range is [ <0, 3>, <0, 3> ].
+The bound on the norm squared of (b1,..,br) is 1202.
+Applying the Dirichlet sieve to equation number 14 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 14.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 15...
+Time: 2.320
+S is  [
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 11210.
+Applying the Dirichlet sieve to equation number 15 out of 30.
+Time: 0.110
+Finished applying the Dirichlet sieve to equation number 15.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 16...
+Time: 2.360
+S is  [
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 11558.
+Applying the Dirichlet sieve to equation number 16 out of 30.
+Time: 0.120
+Finished applying the Dirichlet sieve to equation number 16.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 17...
+Time: 1.730
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 3>, <0, 14> ].
+The bound on the norm squared of (b1,..,br) is 11290.
+Applying the Dirichlet sieve to equation number 17 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 17.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 18...
+Time: 1.700
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 3>, <0, 14> ].
+The bound on the norm squared of (b1,..,br) is 15165.
+Applying the Dirichlet sieve to equation number 18 out of 30.
+Time: 0.070
+Finished applying the Dirichlet sieve to equation number 18.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 19...
+Time: 2.610
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 4>, <0, 12> ].
+The bound on the norm squared of (b1,..,br) is 10694.
+Applying the Dirichlet sieve to equation number 19 out of 30.
+Time: 0.090
+Finished applying the Dirichlet sieve to equation number 19.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 20...
+Time: 2.590
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 3>, <0, 5> ].
+The bound on the norm squared of (b1,..,br) is 2081.
+Applying the Dirichlet sieve to equation number 20 out of 30.
+Time: 0.050
+Finished applying the Dirichlet sieve to equation number 20.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 21...
+Time: 6.120
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 6>, <0, 20> ].
+The bound on the norm squared of (b1,..,br) is 37193.
+Applying the Dirichlet sieve to equation number 21 out of 30.
+Time: 0.850
+Finished applying the Dirichlet sieve to equation number 21.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 22...
+Time: 5.660
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 7>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 35891.
+Applying the Dirichlet sieve to equation number 22 out of 30.
+Time: 0.770
+Finished applying the Dirichlet sieve to equation number 22.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 23...
+Time: 4.890
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 6>, <0, 8>, <0, 21> ].
+The bound on the norm squared of (b1,..,br) is 39177.
+Applying the Dirichlet sieve to equation number 23 out of 30.
+Time: 1.170
+Finished applying the Dirichlet sieve to equation number 23.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 24...
+Time: 6.870
+S is  [
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 6>, <0, 8>, <0, 21> ].
+The bound on the norm squared of (b1,..,br) is 39898.
+Applying the Dirichlet sieve to equation number 24 out of 30.
+Time: 1.300
+Finished applying the Dirichlet sieve to equation number 24.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 25...
+Time: 5.650
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 7>, <0, 19> ].
+The bound on the norm squared of (b1,..,br) is 33894.
+Applying the Dirichlet sieve to equation number 25 out of 30.
+Time: 0.830
+Finished applying the Dirichlet sieve to equation number 25.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 26...
+Time: 6.740
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 5>, <0, 6>, <0, 20> ].
+The bound on the norm squared of (b1,..,br) is 44279.
+Applying the Dirichlet sieve to equation number 26 out of 30.
+Time: 0.890
+Finished applying the Dirichlet sieve to equation number 26.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 27...
+Time: 3.830
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 4>, <0, 5>, <0, 6> ].
+The bound on the norm squared of (b1,..,br) is 8564.
+Applying the Dirichlet sieve to equation number 27 out of 30.
+Time: 0.480
+Finished applying the Dirichlet sieve to equation number 27.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 28...
+Time: 5.200
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0]
+]
+The range is [ <0, 4>, <0, 4>, <0, 6> ].
+The bound on the norm squared of (b1,..,br) is 3981.
+Applying the Dirichlet sieve to equation number 28 out of 30.
+Time: 0.320
+Finished applying the Dirichlet sieve to equation number 28.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 29...
+Time: 14.910
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 7>, <0, 8>, <0, 10>, <0, 31> ].
+The bound on the norm squared of (b1,..,br) is 93357.
+Applying the Dirichlet sieve to equation number 29 out of 30.
+Time: 7.050
+Finished applying the Dirichlet sieve to equation number 29.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 30...
+Time: 13.530
+S is  [
+    Prime Ideal
+    Two element generators:
+        [53, 0, 0]
+        [24, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [37, 0, 0]
+        [9, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [17, 0, 0]
+        [16, 1, 0],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0]
+        [2, 1, 0]
+]
+The range is [ <0, 7>, <0, 8>, <0, 10>, <0, 31> ].
+The bound on the norm squared of (b1,..,br) is 103545.
+Applying the Dirichlet sieve to equation number 30 out of 30.
+Time: 6.600
+Finished applying the Dirichlet sieve to equation number 30.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 129.300
+sols:={
+[ 19, -23, 2, 4, 0, 1, 1 ],
+[ 13, -6, 0, 0, 1, 1, 1 ],
+[ -343, -463, 2, 11, 1, 0, 0 ],
+[ 79, -8, 0, 2, 2, 2, 0 ],
+[ 37, -13, 2, 1, 1, 0, 2 ],
+[ 1, 1, 2, 1, 0, 0, 0 ],
+[ 3, 4, 0, 0, 1, 0, 0 ]
+}
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Total time: 131.909 seconds, Total memory usage: 32.09MB

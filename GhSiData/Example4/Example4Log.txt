@@ -1,0 +1,162 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+alist:=[ 5, 1, 4, 1, 6, 1, 6, 0, 6, 0, 4, -2 ]; a:=1; primelist:=[ 2, 3, 5, 7, 11 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+WARNING
+Class group unconditional proof is expensive.
+Hint: to obtain class group proven under GRH, input
+> SetClassGroupBounds("GRH");
+before starting the current calculation.
+
+Time: 24360.110
+We have 2 S-unit equations to solve.
+The ranks are [ 9, 10 ].
+Getting the small sieve information...Done.
+++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+Time: 62.970
+S is  [
+    Prime Ideal
+    Two element generators:
+        [11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 4, 1, 3, 3, 2, 3, 1, 4, 1, 4],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+The range is [ <0, 2>, <0, 2>, <0, 4>, <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 18033.
+Applying the Dirichlet sieve to equation number 1 out of 2.
+Getting the small sieve information...Done.
+Time: 4.650
+Finished applying the Dirichlet sieve to equation number 1.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+Time: 118.880
+S is  [
+    Prime Ideal
+    Two element generators:
+        [11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 4, 1, 3, 3, 2, 3, 1, 4, 1, 4],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+The range is [ <0, 3>, <0, 3>, <0, 5>, <0, 6>, <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 231276.
+Applying the Dirichlet sieve to equation number 2 out of 2.
+Getting the small sieve information...Done.
+Time: 30.450
+Finished applying the Dirichlet sieve to equation number 2.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 24578.260
+sols:={
+[ 1, 2, 0, 3, 0, 1, 1 ],
+[ 1, 1, 5, 0, 0, 0, 0 ],
+[ 0, -1, 1, 0, 0, 0, 0 ],
+[ 1, -1, 1, 1, 1, 0, 0 ]
+}
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Timing under GRH
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+alist:=[ 5, 1, 4, 1, 6, 1, 6, 0, 6, 0, 4, -2 ]; a:=1; primelist:=[ 2, 3, 5, 7, 11 ]; 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 2.030
+We have 2 S-unit equations to solve.
+The ranks are [ 9, 10 ].
+Getting the small sieve information...Done.
+++++++++++++++++++++++++++++++++++
+Working on equation number 1...
+Time: 67.910
+S is  [
+    Prime Ideal
+    Two element generators:
+        [11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 4, 1, 3, 3, 2, 3, 1, 4, 1, 4],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+The range is [ <0, 2>, <0, 2>, <0, 4>, <0, 4> ].
+The bound on the norm squared of (b1,..,br) is 18033.
+Applying the Dirichlet sieve to equation number 1 out of 2.
+Getting the small sieve information...Done.
+Time: 4.640
+Finished applying the Dirichlet sieve to equation number 1.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Working on equation number 2...
+Time: 115.330
+S is  [
+    Prime Ideal
+    Two element generators:
+        [11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [3, 4, 1, 3, 3, 2, 3, 1, 4, 1, 4],
+    Prime Ideal
+    Two element generators:
+        [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    Prime Ideal
+    Two element generators:
+        [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+The range is [ <0, 3>, <0, 3>, <0, 5>, <0, 6>, <0, 9> ].
+The bound on the norm squared of (b1,..,br) is 233431.
+Applying the Dirichlet sieve to equation number 2 out of 2.
+Getting the small sieve information...Done.
+Time: 30.500
+Finished applying the Dirichlet sieve to equation number 2.
+Time: 0.000
+++++++++++++++++++++++++++++++++++
+Done solving the Thue-Mahler equation.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Time: 221.610
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Total time: 24799.960
+Total time: 24799.959 seconds, Total memory usage: 64.12MB
